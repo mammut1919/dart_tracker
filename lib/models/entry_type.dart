@@ -9,10 +9,10 @@ enum EntryType {
         return '$value';
 
       case EntryType.highFinish:
-        return 'HF $value';
+        return 'High Finish: $value';
 
       case EntryType.shortLeg:
-        return 'SL $value';
+        return 'Short Leg: $value darts';
     }
   }
 }

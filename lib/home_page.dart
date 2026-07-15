@@ -361,7 +361,7 @@ class _HomePageState extends State<HomePage> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // buttons
+            // score buttons
             Row(
               children: defaultScores.map((definition) {
                 return Expanded(
@@ -382,7 +382,7 @@ class _HomePageState extends State<HomePage> {
               }).toList(),
             ),
             const SizedBox(height: 8),
-            // score summary cards scores
+            // score summary cards
             Row(
               children: defaultScores.map((definition) {
                 final rawCount = switch (definition.score) {
@@ -406,7 +406,44 @@ class _HomePageState extends State<HomePage> {
               }).toList(),
             ),
             const SizedBox(height: 8),
-            // score summary cards other
+            // other buttons
+            Row(
+              children: [
+
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    child: FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Colors.deepPurple,
+                      ),
+                      onPressed: () {
+                        // kommt später
+                      },
+                      child: const Text('HIGH FINISH'),
+                    ),
+                  ),
+                ),
+
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    child: FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Colors.teal,
+                      ),
+                      onPressed: () {
+                        // kommt später
+                      },
+                      child: const Text('SHORT LEG'),
+                    ),
+                  ),
+                ),
+
+              ],
+            ),
+            const SizedBox(height: 8),
+            // other summary cards
             Row(
               children: [
                 Expanded(
@@ -429,7 +466,6 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
-                const Spacer(),
               ],
             ),
             const SizedBox(height: 8),
