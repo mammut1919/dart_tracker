@@ -79,11 +79,11 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  Future<void> _addScore(int score) async {
+  Future<void> _addEntry(NewEntry entry) async {
     await _storage.add(
-      EntryType.score,
-      score,
-      DateTime.now(),
+      entry.type,
+      entry.value,
+      entry.timestamp,
     );
 
     await _loadEntries();
@@ -99,11 +99,7 @@ class _HomePageState extends State<HomePage> {
       return;
     }
 
-    await _storage.add(
-      EntryType.score,
-      entry.value,
-      entry.timestamp,
-    );
+    await _addEntry(entry);
 
     await _loadEntries();
   }
@@ -340,7 +336,13 @@ class _HomePageState extends State<HomePage> {
                     padding: const EdgeInsets.symmetric(horizontal: 6),
                     child: ScoreButton(
                       definition: definition,
-                      onPressed: () => _addScore(definition.score),
+                      onPressed: () => _addEntry(
+                        NewEntry(
+                          type: EntryType.score,
+                          value: definition.score,
+                          timestamp: DateTime.now(),
+                        ),
+                      ),
                     ),
                   ),
                 );
@@ -390,39 +392,41 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 8),
             // List of historic scores
             Expanded(
-              child: _entries.isEmpty
-                  ? const Center(
-                      child: Text('Noch keine Treffer erfasst.'),
-                    )
-                  : ListView.builder(
-                      itemCount: _entries.length,
-                      itemBuilder: (context, index) {
-                        final entry = _entries[index];
-
-                        return Dismissible(
-                          key: ValueKey(entry.id),
-                          direction: DismissDirection.endToStart,
-                          onDismissed: (_) => _deleteEntry(entry.id!),
-                          background: Container(
-                            alignment: Alignment.centerRight,
-                            padding: const EdgeInsets.only(right: 24),
-                            color: Colors.red,
-                            child: const Icon(
-                              Icons.delete,
-                              color: Colors.white,
-                            ),
-                          ),
-                          child: Card(
-                            child: ListTile(
-                              onLongPress: () => _confirmDelete(entry),
-                              leading: const Icon(Icons.sports_score),
-                              title: Text(entry.type.format(entry.value),),
-                              subtitle: Text(_dateFormat.format(entry.timestamp),),
-                          ),
-                          ),
-                        );
-                      },
+              child: _entries.isEmpty 
+              ? const Center(
+                child: Text('Noch keine Treffer erfasst.'),
+              )
+              : ListView.builder(
+                itemCount: _entries.length,
+                itemBuilder: (context, index) {
+                  final entry = _entries[index];
+debugPrint(
+  'Entry: type=${entry.type}, value=${entry.value}',
+);
+                  return Dismissible(
+                    key: ValueKey(entry.id),
+                    direction: DismissDirection.endToStart,
+                    onDismissed: (_) => _deleteEntry(entry.id!),
+                    background: Container(
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.only(right: 24),
+                      color: Colors.red,
+                      child: const Icon(
+                        Icons.delete,
+                        color: Colors.white,
+                      ),
                     ),
+                    child: Card(
+                      child: ListTile(
+                        onLongPress: () => _confirmDelete(entry),
+                        leading: const Icon(Icons.sports_score),
+                        title: Text(entry.type.format(entry.value),),
+                        subtitle: Text(_dateFormat.format(entry.timestamp),),
+                    ),
+                    ),
+                  );
+                },
+              ),
             ),
           ],
         ),
