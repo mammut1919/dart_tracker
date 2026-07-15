@@ -13,7 +13,7 @@ import 'settings/settings_repository.dart';
 import 'widgets/score_button.dart';
 import 'widgets/score_chart.dart';
 import 'widgets/score_entry_dialog.dart';
-import 'widgets/score_summary_card.dart';
+import 'widgets/entry_summary_card.dart';
 import 'widgets/settings_dialog.dart';
 
 enum _MenuAction {
@@ -44,6 +44,23 @@ class _HomePageState extends State<HomePage> {
   final DateFormat _dateFormat = DateFormat('dd.MM.yyyy');
 
   List<NewEntry> _entries = [];
+
+  int _countEntries({
+    required EntryType type,
+    int? value,
+  }) {
+    return _entries.where((entry) {
+      if (entry.type != type) {
+        return false;
+      }
+
+      if (value != null) {
+        return entry.value == value;
+      }
+
+      return true;
+    }).length;
+  }
 
   @override
   void initState() {
@@ -287,9 +304,25 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final count180 = _entries.where((e) => e.value == 180).length;
-    final count171 = _entries.where((e) => e.value == 171).length;
-    final count162 = _entries.where((e) => e.value == 162).length;
+    final count180 = _countEntries(
+      type: EntryType.score,
+      value: 180,
+    );
+    final count171 = _countEntries(
+      type: EntryType.score,
+      value: 171,
+    );
+    final count162 = _countEntries(
+      type: EntryType.score,
+      value: 162,
+    );
+    final countHF = _countEntries(
+      type: EntryType.highFinish,
+    );
+
+    final countSL = _countEntries(
+      type: EntryType.shortLeg,
+    );
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dart Tracker'),
@@ -349,7 +382,7 @@ class _HomePageState extends State<HomePage> {
               }).toList(),
             ),
             const SizedBox(height: 8),
-            // score summary cards
+            // score summary cards scores
             Row(
               children: defaultScores.map((definition) {
                 final rawCount = switch (definition.score) {
@@ -363,13 +396,41 @@ class _HomePageState extends State<HomePage> {
                 return Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 6),
-                    child: ScoreSummaryCard(
+                    child: EntrySummaryCard(
                       count: displayCount,
                       color: definition.color,
+                      label: '${definition.score}',
                     ),
                   ),
                 );
               }).toList(),
+            ),
+            const SizedBox(height: 8),
+            // score summary cards other
+            Row(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    child: EntrySummaryCard(
+                      count: countHF,
+                      color: Colors.deepPurple,
+                      label: 'HF',
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    child: EntrySummaryCard(
+                      count: countSL,
+                      color: Colors.teal,
+                      label: 'SL',
+                    ),
+                  ),
+                ),
+                const Spacer(),
+              ],
             ),
             const SizedBox(height: 8),
             // score chart
@@ -400,9 +461,6 @@ class _HomePageState extends State<HomePage> {
                 itemCount: _entries.length,
                 itemBuilder: (context, index) {
                   final entry = _entries[index];
-debugPrint(
-  'Entry: type=${entry.type}, value=${entry.value}',
-);
                   return Dismissible(
                     key: ValueKey(entry.id),
                     direction: DismissDirection.endToStart,
