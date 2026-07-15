@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-import '../models/entry_type.dart';
+import '../models/entry_option.dart';
+import '../models/entry_options.dart';
 import '../models/new_entry.dart';
 
 class ScoreEntryDialog extends StatefulWidget {
@@ -11,17 +13,17 @@ class ScoreEntryDialog extends StatefulWidget {
 }
 
 class _ScoreEntryDialogState extends State<ScoreEntryDialog> {
-  static const _scores = [180, 171, 162];
+  EntryOption _selectedOption = availableEntryOptions.first;
 
-  int _selectedScore = _scores.first;
-  DateTime? _selectedDate;
+  DateTime _selectedDate = DateTime.now();
+
+  final TextEditingController _valueController =
+    TextEditingController();
 
   Future<void> _pickDate() async {
-    final now = DateTime.now();
-
     final date = await showDatePicker(
       context: context,
-      initialDate: _selectedDate ?? now,
+      initialDate: _selectedDate,
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
     );
@@ -34,18 +36,38 @@ class _ScoreEntryDialogState extends State<ScoreEntryDialog> {
   }
 
   void _save() {
-    if (_selectedDate == null) {
-      return;
+    final int value;
+
+    if (_selectedOption.requiresInput) {
+      value = int.tryParse(_valueController.text) ?? 0;
+    } else {
+      value = _selectedOption.presetValue!;
     }
 
     Navigator.pop(
       context,
       NewEntry(
-        type: EntryType.score,
-        value: _selectedScore,
-        timestamp: _selectedDate!,
+        type: _selectedOption.type,
+        value: value,
+        timestamp: _selectedDate,
       ),
     );
+  }
+
+  bool get _canSave {
+    if (!_selectedOption.requiresInput) {
+      return true;
+    }
+
+    final value = int.tryParse(_valueController.text);
+
+    return value != null && _selectedOption.isValidValue(value);
+  }
+
+  @override
+  void dispose() {
+    _valueController.dispose();
+    super.dispose();
   }
 
   @override
@@ -55,23 +77,23 @@ class _ScoreEntryDialogState extends State<ScoreEntryDialog> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          DropdownButtonFormField<int>(
-            initialValue: _selectedScore,
+          DropdownButtonFormField<EntryOption>(
+            initialValue: _selectedOption,
             decoration: const InputDecoration(
-              labelText: 'Score',
+              labelText: 'Eintrag',
             ),
-            items: _scores
-                .map(
-                  (score) => DropdownMenuItem(
-                    value: score,
-                    child: Text('$score'),
-                  ),
-                )
-                .toList(),
-            onChanged: (value) {
-              if (value != null) {
+            items: availableEntryOptions
+              .map(
+                (option) => DropdownMenuItem(
+                  value: option,
+                  child: Text(option.label),
+                ),
+              )
+              .toList(),
+            onChanged: (option) {
+              if (option != null) {
                 setState(() {
-                  _selectedScore = value;
+                  _selectedOption = option;
                 });
               }
             },
@@ -80,11 +102,28 @@ class _ScoreEntryDialogState extends State<ScoreEntryDialog> {
           FilledButton.tonal(
             onPressed: _pickDate,
             child: Text(
-              _selectedDate == null
-                  ? 'Datum auswählen'
-                  : '${_selectedDate!.day}.${_selectedDate!.month}.${_selectedDate!.year}',
+               '${_selectedDate.day}.${_selectedDate.month}.${_selectedDate.year}',
             ),
           ),
+          if (_selectedOption.requiresInput) ...[
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _valueController,
+                onChanged: (_) {
+                  setState(() {});
+                },
+              keyboardType: const TextInputType.numberWithOptions(
+                signed: false,
+                decimal: false,
+              ),
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+              ],
+              decoration: InputDecoration(
+                labelText: _selectedOption.inputLabelWithRange,
+              ),
+            ),
+          ],
         ],
       ),
       actions: [
@@ -93,7 +132,7 @@ class _ScoreEntryDialogState extends State<ScoreEntryDialog> {
           child: const Text('Abbrechen'),
         ),
         FilledButton(
-          onPressed: _selectedDate == null ? null : _save,
+          onPressed: _canSave ? _save : null,
           child: const Text('Speichern'),
         ),
       ],
