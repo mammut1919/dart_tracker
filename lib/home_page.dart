@@ -5,7 +5,7 @@ import 'backup/backup_service.dart';
 import 'backup/backup_file_service.dart';
 import 'database/database.dart';
 import 'database/score_storage.dart';
-import 'models/new_score_entry.dart';
+import 'models/new_entry.dart';
 import 'models/default_scores.dart';
 import 'settings/app_settings.dart';
 import 'settings/settings_repository.dart';
@@ -88,7 +88,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _showAddDialog() async {
-    final entry = await showDialog<NewScoreEntry>(
+    final entry = await showDialog<NewEntry>(
       context: context,
       builder: (_) => const ScoreEntryDialog(),
     );
@@ -98,7 +98,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     await _storage.add(
-      entry.score,
+      entry.value,
       entry.timestamp,
     );
 
@@ -219,7 +219,7 @@ class _HomePageState extends State<HomePage> {
 
       for (final entry in backup.entries) {
         await _storage.add(
-          entry.score,
+          entry.value,
           entry.timestamp,
         );
       }

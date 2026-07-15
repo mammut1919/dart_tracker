@@ -1,29 +1,33 @@
-import '../models/new_score_entry.dart';
+import '../models/entry_type.dart';
+import '../models/new_entry.dart';
 
 class BackupMapper {
   const BackupMapper();
 
   Map<String, dynamic> entryToJson(
-    NewScoreEntry entry,
+    NewEntry entry,
   ) {
     return {
-      'type': 'score_entry',
-      'score': entry.score,
+      'type': entry.type.name,
+      'value': entry.value,
       'timestamp': entry.timestamp.toIso8601String(),
     };
   }
 
-  NewScoreEntry entryFromJson(
+  NewEntry entryFromJson(
   Map<String, dynamic> json,
   ) {
-    if (json['type'] != 'score_entry') {
-      throw UnsupportedError(
-        'Unsupported entry type: ${json['type']}',
-      );
-    }
+    final type = EntryType.values.byName(
+      json['type'] as String,
+    );
 
-    return NewScoreEntry(
-      score: json['score'] as int,
+      final value =
+      json['value'] ??
+      json['score'];
+
+    return NewEntry(
+      type: type,
+      value: value as int,
       timestamp: DateTime.parse(
         json['timestamp'] as String,
       ),

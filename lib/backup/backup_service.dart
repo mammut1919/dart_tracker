@@ -1,7 +1,8 @@
 import 'dart:convert';
 
 import '../database/database.dart';
-import '../models/new_score_entry.dart';
+import '../models/entry_type.dart';
+import '../models/new_entry.dart';
 import '../settings/app_settings.dart';
 import 'backup_data.dart';
 import 'backup_mapper.dart';
@@ -28,8 +29,9 @@ class BackupService {
       settings: settings,
       entries: entries
           .map(
-            (entry) => NewScoreEntry(
-              score: entry.score,
+            (entry) => NewEntry(
+              type: EntryType.score,
+              value: entry.score,
               timestamp: entry.timestamp,
             ),
           )

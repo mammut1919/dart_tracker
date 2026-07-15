@@ -1,4 +1,4 @@
-import '../models/new_score_entry.dart';
+import '../models/new_entry.dart';
 import '../settings/app_settings.dart';
 
 import 'backup_mapper.dart';
@@ -12,7 +12,7 @@ class BackupData {
 
   final int version;
   final AppSettings settings;
-  final List<NewScoreEntry> entries;
+  final List<NewEntry> entries;
 
   Map<String, dynamic> toJson(
     BackupMapper mapper,

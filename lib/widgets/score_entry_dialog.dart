@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../models/new_score_entry.dart';
+import '../models/entry_type.dart';
+import '../models/new_entry.dart';
 
 class ScoreEntryDialog extends StatefulWidget {
   const ScoreEntryDialog({super.key});
@@ -39,8 +40,9 @@ class _ScoreEntryDialogState extends State<ScoreEntryDialog> {
 
     Navigator.pop(
       context,
-      NewScoreEntry(
-        score: _selectedScore,
+      NewEntry(
+        type: EntryType.score,
+        value: _selectedScore,
         timestamp: _selectedDate!,
       ),
     );
