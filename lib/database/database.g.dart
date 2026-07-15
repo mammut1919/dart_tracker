@@ -31,6 +31,16 @@ class $ScoreEntriesTable extends ScoreEntries
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _typeMeta = const VerificationMeta('type');
+  @override
+  late final GeneratedColumn<int> type = GeneratedColumn<int>(
+    'type',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
   static const VerificationMeta _timestampMeta = const VerificationMeta(
     'timestamp',
   );
@@ -43,7 +53,7 @@ class $ScoreEntriesTable extends ScoreEntries
     requiredDuringInsert: true,
   );
   @override
-  List<GeneratedColumn> get $columns => [id, score, timestamp];
+  List<GeneratedColumn> get $columns => [id, score, type, timestamp];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -66,6 +76,12 @@ class $ScoreEntriesTable extends ScoreEntries
       );
     } else if (isInserting) {
       context.missing(_scoreMeta);
+    }
+    if (data.containsKey('type')) {
+      context.handle(
+        _typeMeta,
+        type.isAcceptableOrUnknown(data['type']!, _typeMeta),
+      );
     }
     if (data.containsKey('timestamp')) {
       context.handle(
@@ -92,6 +108,10 @@ class $ScoreEntriesTable extends ScoreEntries
         DriftSqlType.int,
         data['${effectivePrefix}score'],
       )!,
+      type: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}type'],
+      )!,
       timestamp: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}timestamp'],
@@ -108,10 +128,12 @@ class $ScoreEntriesTable extends ScoreEntries
 class ScoreEntry extends DataClass implements Insertable<ScoreEntry> {
   final int id;
   final int score;
+  final int type;
   final DateTime timestamp;
   const ScoreEntry({
     required this.id,
     required this.score,
+    required this.type,
     required this.timestamp,
   });
   @override
@@ -119,6 +141,7 @@ class ScoreEntry extends DataClass implements Insertable<ScoreEntry> {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['score'] = Variable<int>(score);
+    map['type'] = Variable<int>(type);
     map['timestamp'] = Variable<DateTime>(timestamp);
     return map;
   }
@@ -127,6 +150,7 @@ class ScoreEntry extends DataClass implements Insertable<ScoreEntry> {
     return ScoreEntriesCompanion(
       id: Value(id),
       score: Value(score),
+      type: Value(type),
       timestamp: Value(timestamp),
     );
   }
@@ -139,6 +163,7 @@ class ScoreEntry extends DataClass implements Insertable<ScoreEntry> {
     return ScoreEntry(
       id: serializer.fromJson<int>(json['id']),
       score: serializer.fromJson<int>(json['score']),
+      type: serializer.fromJson<int>(json['type']),
       timestamp: serializer.fromJson<DateTime>(json['timestamp']),
     );
   }
@@ -148,19 +173,23 @@ class ScoreEntry extends DataClass implements Insertable<ScoreEntry> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'score': serializer.toJson<int>(score),
+      'type': serializer.toJson<int>(type),
       'timestamp': serializer.toJson<DateTime>(timestamp),
     };
   }
 
-  ScoreEntry copyWith({int? id, int? score, DateTime? timestamp}) => ScoreEntry(
-    id: id ?? this.id,
-    score: score ?? this.score,
-    timestamp: timestamp ?? this.timestamp,
-  );
+  ScoreEntry copyWith({int? id, int? score, int? type, DateTime? timestamp}) =>
+      ScoreEntry(
+        id: id ?? this.id,
+        score: score ?? this.score,
+        type: type ?? this.type,
+        timestamp: timestamp ?? this.timestamp,
+      );
   ScoreEntry copyWithCompanion(ScoreEntriesCompanion data) {
     return ScoreEntry(
       id: data.id.present ? data.id.value : this.id,
       score: data.score.present ? data.score.value : this.score,
+      type: data.type.present ? data.type.value : this.type,
       timestamp: data.timestamp.present ? data.timestamp.value : this.timestamp,
     );
   }
@@ -170,45 +199,52 @@ class ScoreEntry extends DataClass implements Insertable<ScoreEntry> {
     return (StringBuffer('ScoreEntry(')
           ..write('id: $id, ')
           ..write('score: $score, ')
+          ..write('type: $type, ')
           ..write('timestamp: $timestamp')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, score, timestamp);
+  int get hashCode => Object.hash(id, score, type, timestamp);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is ScoreEntry &&
           other.id == this.id &&
           other.score == this.score &&
+          other.type == this.type &&
           other.timestamp == this.timestamp);
 }
 
 class ScoreEntriesCompanion extends UpdateCompanion<ScoreEntry> {
   final Value<int> id;
   final Value<int> score;
+  final Value<int> type;
   final Value<DateTime> timestamp;
   const ScoreEntriesCompanion({
     this.id = const Value.absent(),
     this.score = const Value.absent(),
+    this.type = const Value.absent(),
     this.timestamp = const Value.absent(),
   });
   ScoreEntriesCompanion.insert({
     this.id = const Value.absent(),
     required int score,
+    this.type = const Value.absent(),
     required DateTime timestamp,
   }) : score = Value(score),
        timestamp = Value(timestamp);
   static Insertable<ScoreEntry> custom({
     Expression<int>? id,
     Expression<int>? score,
+    Expression<int>? type,
     Expression<DateTime>? timestamp,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (score != null) 'score': score,
+      if (type != null) 'type': type,
       if (timestamp != null) 'timestamp': timestamp,
     });
   }
@@ -216,11 +252,13 @@ class ScoreEntriesCompanion extends UpdateCompanion<ScoreEntry> {
   ScoreEntriesCompanion copyWith({
     Value<int>? id,
     Value<int>? score,
+    Value<int>? type,
     Value<DateTime>? timestamp,
   }) {
     return ScoreEntriesCompanion(
       id: id ?? this.id,
       score: score ?? this.score,
+      type: type ?? this.type,
       timestamp: timestamp ?? this.timestamp,
     );
   }
@@ -234,6 +272,9 @@ class ScoreEntriesCompanion extends UpdateCompanion<ScoreEntry> {
     if (score.present) {
       map['score'] = Variable<int>(score.value);
     }
+    if (type.present) {
+      map['type'] = Variable<int>(type.value);
+    }
     if (timestamp.present) {
       map['timestamp'] = Variable<DateTime>(timestamp.value);
     }
@@ -245,6 +286,7 @@ class ScoreEntriesCompanion extends UpdateCompanion<ScoreEntry> {
     return (StringBuffer('ScoreEntriesCompanion(')
           ..write('id: $id, ')
           ..write('score: $score, ')
+          ..write('type: $type, ')
           ..write('timestamp: $timestamp')
           ..write(')'))
         .toString();
@@ -266,12 +308,14 @@ typedef $$ScoreEntriesTableCreateCompanionBuilder =
     ScoreEntriesCompanion Function({
       Value<int> id,
       required int score,
+      Value<int> type,
       required DateTime timestamp,
     });
 typedef $$ScoreEntriesTableUpdateCompanionBuilder =
     ScoreEntriesCompanion Function({
       Value<int> id,
       Value<int> score,
+      Value<int> type,
       Value<DateTime> timestamp,
     });
 
@@ -291,6 +335,11 @@ class $$ScoreEntriesTableFilterComposer
 
   ColumnFilters<int> get score => $composableBuilder(
     column: $table.score,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get type => $composableBuilder(
+    column: $table.type,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -319,6 +368,11 @@ class $$ScoreEntriesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get timestamp => $composableBuilder(
     column: $table.timestamp,
     builder: (column) => ColumnOrderings(column),
@@ -339,6 +393,9 @@ class $$ScoreEntriesTableAnnotationComposer
 
   GeneratedColumn<int> get score =>
       $composableBuilder(column: $table.score, builder: (column) => column);
+
+  GeneratedColumn<int> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
 
   GeneratedColumn<DateTime> get timestamp =>
       $composableBuilder(column: $table.timestamp, builder: (column) => column);
@@ -377,20 +434,24 @@ class $$ScoreEntriesTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<int> score = const Value.absent(),
+                Value<int> type = const Value.absent(),
                 Value<DateTime> timestamp = const Value.absent(),
               }) => ScoreEntriesCompanion(
                 id: id,
                 score: score,
+                type: type,
                 timestamp: timestamp,
               ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 required int score,
+                Value<int> type = const Value.absent(),
                 required DateTime timestamp,
               }) => ScoreEntriesCompanion.insert(
                 id: id,
                 score: score,
+                type: type,
                 timestamp: timestamp,
               ),
           withReferenceMapper: (p0) => p0

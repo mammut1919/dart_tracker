@@ -1,4 +1,4 @@
-import '../database/database.dart';
+import '../models/new_entry.dart';
 
 class ChartRange {
   const ChartRange({
@@ -6,7 +6,7 @@ class ChartRange {
     required this.lastDate,
   });
 
-  factory ChartRange.fromEntries(List<ScoreEntry> entries) {
+  factory ChartRange.fromEntries(List<NewEntry> entries) {
     if (entries.isEmpty) {
       final now = DateTime.now();
 

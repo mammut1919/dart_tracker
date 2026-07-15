@@ -5,6 +5,7 @@ import 'backup/backup_service.dart';
 import 'backup/backup_file_service.dart';
 import 'database/database.dart';
 import 'database/score_storage.dart';
+import 'models/entry_type.dart';
 import 'models/new_entry.dart';
 import 'models/default_scores.dart';
 import 'settings/app_settings.dart';
@@ -42,7 +43,7 @@ class _HomePageState extends State<HomePage> {
 
   final DateFormat _dateFormat = DateFormat('dd.MM.yyyy');
 
-  List<ScoreEntry> _entries = [];
+  List<NewEntry> _entries = [];
 
   @override
   void initState() {
@@ -80,6 +81,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _addScore(int score) async {
     await _storage.add(
+      EntryType.score,
       score,
       DateTime.now(),
     );
@@ -98,6 +100,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     await _storage.add(
+      EntryType.score,
       entry.value,
       entry.timestamp,
     );
@@ -105,13 +108,13 @@ class _HomePageState extends State<HomePage> {
     await _loadEntries();
   }
 
-  Future<void> _confirmDelete(ScoreEntry entry) async {
+  Future<void> _confirmDelete(NewEntry entry) async {
     final delete = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Eintrag löschen'),
         content: Text(
-          'Möchtest du den Treffer ${entry.score} vom '
+          'Möchtest du den Treffer ${entry.value} vom '
           '${_dateFormat.format(entry.timestamp)} wirklich löschen?',
         ),
         actions: [
@@ -128,7 +131,7 @@ class _HomePageState extends State<HomePage> {
     );
 
     if (delete == true) {
-      await _deleteEntry(entry.id);
+      await _deleteEntry(entry.id!);
     }
   }
 
@@ -219,6 +222,7 @@ class _HomePageState extends State<HomePage> {
 
       for (final entry in backup.entries) {
         await _storage.add(
+          EntryType.score,
           entry.value,
           entry.timestamp,
         );
@@ -287,9 +291,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final count180 = _entries.where((e) => e.score == 180).length;
-    final count171 = _entries.where((e) => e.score == 171).length;
-    final count162 = _entries.where((e) => e.score == 162).length;
+    final count180 = _entries.where((e) => e.value == 180).length;
+    final count171 = _entries.where((e) => e.value == 171).length;
+    final count162 = _entries.where((e) => e.value == 162).length;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dart Tracker'),
@@ -398,7 +402,7 @@ class _HomePageState extends State<HomePage> {
                         return Dismissible(
                           key: ValueKey(entry.id),
                           direction: DismissDirection.endToStart,
-                          onDismissed: (_) => _deleteEntry(entry.id),
+                          onDismissed: (_) => _deleteEntry(entry.id!),
                           background: Container(
                             alignment: Alignment.centerRight,
                             padding: const EdgeInsets.only(right: 24),
@@ -412,7 +416,7 @@ class _HomePageState extends State<HomePage> {
                             child: ListTile(
                               onLongPress: () => _confirmDelete(entry),
                               leading: const Icon(Icons.sports_score),
-                              title: Text('${entry.score}'),
+                              title: Text('${entry.value}'),
                               subtitle: Text(
                                 _dateFormat.format(entry.timestamp),
                             ),

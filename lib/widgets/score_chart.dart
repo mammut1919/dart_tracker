@@ -5,8 +5,8 @@ import '../settings/app_settings.dart';
 import '../charts/chart_builder.dart';
 import '../charts/chart_data.dart';
 import '../charts/chart_range.dart';
-import '../database/database.dart';
 import '../models/default_scores.dart';
+import '../models/new_entry.dart';
 import '../models/score_definition.dart';
 
 class ScoreChart extends StatelessWidget {
@@ -24,7 +24,7 @@ class ScoreChart extends StatelessWidget {
     milliseconds: 350,
   );
 
-  final List<ScoreEntry> entries;
+  final List<NewEntry> entries;
   final AppSettings settings;
 
   @override

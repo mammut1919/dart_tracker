@@ -1,24 +1,42 @@
 import 'package:drift/drift.dart';
 
 import 'database.dart';
+import '../models/entry_type.dart';
+import '../models/new_entry.dart';
 
 class ScoreStorage {
   ScoreStorage(this._database);
 
   final AppDatabase _database;
 
-  Future<List<ScoreEntry>> getAll() {
-    return (_database.select(_database.scoreEntries)
+  Future<List<NewEntry>> getAll() async {
+    final rows = await (_database.select(_database.scoreEntries)
           ..orderBy([
             (t) => OrderingTerm.desc(t.timestamp),
           ]))
         .get();
+
+    return rows
+        .map(
+          (row) => NewEntry(
+            id: row.id,
+            type: EntryType.values[row.type],
+            value: row.score,
+            timestamp: row.timestamp,
+          ),
+        )
+        .toList();
   }
 
-  Future<void> add(int score, DateTime timestamp) async {
+  Future<void> add(
+    EntryType type,
+    int score,
+    DateTime timestamp
+  ) async {
     await _database.into(_database.scoreEntries).insert(
           ScoreEntriesCompanion.insert(
             score: score,
+            type: Value(type.index),
             timestamp: timestamp,
           ),
         );

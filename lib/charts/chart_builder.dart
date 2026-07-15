@@ -1,4 +1,4 @@
-import '../database/database.dart';
+import '../models/new_entry.dart';
 import 'chart_data.dart';
 import 'chart_point.dart';
 
@@ -6,14 +6,14 @@ class ChartBuilder {
   const ChartBuilder();
 
   ChartData buildStepChart({
-    required List<ScoreEntry> entries,
+    required List<NewEntry> entries,
     required int score,
     required int baseline,
     required DateTime chartStart,
     required DateTime chartEnd,
   }) {
     final filtered = entries
-        .where((e) => e.score == score)
+        .where((e) => e.value == score)
         .toList()
       ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
 

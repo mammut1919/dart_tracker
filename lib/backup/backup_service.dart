@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import '../database/database.dart';
-import '../models/entry_type.dart';
 import '../models/new_entry.dart';
 import '../settings/app_settings.dart';
 import 'backup_data.dart';
@@ -22,20 +20,12 @@ class BackupService {
 
   String export({
     required AppSettings settings,
-    required List<ScoreEntry> entries,
+    required List<NewEntry> entries,
   }) {
     final backup = BackupData(
       version: 1,
       settings: settings,
-      entries: entries
-          .map(
-            (entry) => NewEntry(
-              type: EntryType.score,
-              value: entry.score,
-              timestamp: entry.timestamp,
-            ),
-          )
-          .toList(),
+      entries: entries,
     );
 
     return exportToJson(backup);

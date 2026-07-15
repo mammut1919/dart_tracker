@@ -12,6 +12,10 @@ class ScoreEntries extends Table {
 
   IntColumn get score => integer()();
 
+  IntColumn get type => integer().withDefault(
+    const Constant(0),
+  )();
+
   DateTimeColumn get timestamp => dateTime()();
 }
 
@@ -24,8 +28,25 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (m) async {
+          await m.createAll();
+        },
+        onUpgrade: (m, from, to) async {
+          if (from < 2) {
+            await m.addColumn(
+              scoreEntries,
+              scoreEntries.type,
+            );
+          }
+        },
+      );
 }
+
+
 
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
