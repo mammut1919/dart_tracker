@@ -1,28 +1,28 @@
 import 'package:flutter/material.dart';
 
-import '../models/score_definition.dart';
-
-class ScoreButton extends StatelessWidget {
-  const ScoreButton({
+class EntryButton extends StatelessWidget {
+  const EntryButton({
     super.key,
-    required this.definition,
+    required this.label,
+    required this.color,
     required this.onPressed,
   });
 
-  final ScoreDefinition definition;
+  final String label;
+  final Color color;
   final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
     return FilledButton(
       style: FilledButton.styleFrom(
-        backgroundColor: definition.color,
+        backgroundColor: color,
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(vertical: 18),
       ),
       onPressed: onPressed,
       child: Text(
-        '${definition.score}',
+        label,
         style: const TextStyle(
           fontSize: 22,
           fontWeight: FontWeight.bold,

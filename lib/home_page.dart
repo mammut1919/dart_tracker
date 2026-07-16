@@ -5,6 +5,8 @@ import 'backup/backup_service.dart';
 import 'backup/backup_file_service.dart';
 import 'database/database.dart';
 import 'database/score_storage.dart';
+import 'models/entry_option.dart';
+import 'models/entry_options.dart';
 import 'models/entry_type.dart';
 import 'models/new_entry.dart';
 import 'models/default_scores.dart';
@@ -106,10 +108,14 @@ class _HomePageState extends State<HomePage> {
     await _loadEntries();
   }
 
-  Future<void> _showAddDialog() async {
+  Future<void> _showAddDialog({
+    EntryOption? initialOption,
+  })  async {
     final entry = await showDialog<NewEntry>(
       context: context,
-      builder: (_) => const ScoreEntryDialog(),
+      builder: (_) => ScoreEntryDialog(
+        initialOption: initialOption,
+      ),
     );
 
     if (entry == null) {
@@ -367,8 +373,9 @@ class _HomePageState extends State<HomePage> {
                 return Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 6),
-                    child: ScoreButton(
-                      definition: definition,
+                    child: EntryButton(
+                      label: '${definition.score}',
+                      color:  definition.color,
                       onPressed: () => _addEntry(
                         NewEntry(
                           type: EntryType.score,
@@ -413,14 +420,12 @@ class _HomePageState extends State<HomePage> {
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 6),
-                    child: FilledButton(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Colors.deepPurple,
+                    child: EntryButton(
+                      label: 'High Finish',
+                      color: Colors.deepPurple,
+                      onPressed: () => _showAddDialog(
+                        initialOption: highFinishOption,
                       ),
-                      onPressed: () {
-                        // kommt später
-                      },
-                      child: const Text('HIGH FINISH'),
                     ),
                   ),
                 ),
@@ -428,14 +433,12 @@ class _HomePageState extends State<HomePage> {
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 6),
-                    child: FilledButton(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Colors.teal,
+                    child: EntryButton(
+                      label: 'Short Leg',
+                      color: Colors.teal,
+                      onPressed: () => _showAddDialog(
+                        initialOption: shortLegOption,
                       ),
-                      onPressed: () {
-                        // kommt später
-                      },
-                      child: const Text('SHORT LEG'),
                     ),
                   ),
                 ),

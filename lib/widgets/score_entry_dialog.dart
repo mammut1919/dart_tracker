@@ -6,19 +6,32 @@ import '../models/entry_options.dart';
 import '../models/new_entry.dart';
 
 class ScoreEntryDialog extends StatefulWidget {
-  const ScoreEntryDialog({super.key});
+  const ScoreEntryDialog({
+    super.key,
+    this.initialOption,
+  });
+
+  final EntryOption? initialOption;
 
   @override
   State<ScoreEntryDialog> createState() => _ScoreEntryDialogState();
 }
 
 class _ScoreEntryDialogState extends State<ScoreEntryDialog> {
-  EntryOption _selectedOption = availableEntryOptions.first;
+  late EntryOption _selectedOption;
 
   DateTime _selectedDate = DateTime.now();
 
   final TextEditingController _valueController =
-    TextEditingController();
+      TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _selectedOption =
+        widget.initialOption ?? availableEntryOptions.first;
+  }
 
   Future<void> _pickDate() async {
     final date = await showDatePicker(
