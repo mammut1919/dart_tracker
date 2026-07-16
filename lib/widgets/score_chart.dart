@@ -139,15 +139,30 @@ class ScoreChart extends StatelessWidget {
       lineTouchData: LineTouchData(
         enabled: true,
         touchTooltipData: LineTouchTooltipData(
+          getTooltipColor: (_) => Colors.grey.shade100,
           getTooltipItems: (touchedSpots) {
             return touchedSpots.map((spot) {
               final currentSeries = series[spot.barIndex];
               final date = range.dateAt(spot.x);
 
+              var value = spot.y.toInt();
+
+              final points = currentSeries.chart.points;
+
+              if (spot.spotIndex + 1 < points.length) {
+                final next = points[spot.spotIndex + 1];
+
+                const epsilon = 0.001;
+
+                if ((next.x - spot.x).abs() < epsilon &&
+                    next.y > spot.y) {
+                  value = next.y.toInt();
+                }
+              }
+
               return LineTooltipItem(
                 '${DateFormat('dd.MM.yyyy').format(date)}\n'
-                '${currentSeries.label} '
-                '(${spot.y.toInt()})',
+                '${currentSeries.label} ($value)',
                 TextStyle(
                   color: currentSeries.color,
                   fontWeight: FontWeight.bold,
