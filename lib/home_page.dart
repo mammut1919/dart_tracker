@@ -516,7 +516,7 @@ class _HomePageState extends State<HomePage> {
                         leading: const Icon(Icons.sports_score),
                         title: Text(entry.type.format(entry.value),),
                         subtitle: Text(_dateFormat.format(entry.timestamp),),
-                    ),
+                      ),
                     ),
                   );
                 },
