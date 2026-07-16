@@ -5,9 +5,11 @@ import '../settings/app_settings.dart';
 import '../charts/chart_builder.dart';
 import '../charts/chart_data.dart';
 import '../charts/chart_range.dart';
+import '../charts/chart_series.dart';
 import '../models/default_scores.dart';
+import '../models/entry_type.dart';
 import '../models/new_entry.dart';
-import '../models/score_definition.dart';
+import '../theme/app_colors.dart';
 
 class ScoreChart extends StatelessWidget {
   const ScoreChart({
@@ -33,10 +35,19 @@ class ScoreChart extends StatelessWidget {
 
     final range = ChartRange.fromEntries(entries);
 
-    final lines = _buildLines(
+    final series = _buildSeries(
       builder,
       range,
     );
+
+    final lines = series
+      .map(
+        (s) => _buildLine(
+          chart: s.chart,
+          color: s.color,
+        ),
+      )
+      .toList();
 
     final maxDataY = _calculateMaxDataY(lines);
 
@@ -59,6 +70,7 @@ class ScoreChart extends StatelessWidget {
           padding: const EdgeInsets.all(_padding),
           child: LineChart(
             _buildChartData(
+              series,
               lines,
               range,
               minY,
@@ -75,6 +87,7 @@ class ScoreChart extends StatelessWidget {
   }
 
   LineChartData _buildChartData(
+    List<ChartSeries> series,
     List<LineChartBarData> lines,
     ChartRange range,
     double minY,
@@ -128,15 +141,15 @@ class ScoreChart extends StatelessWidget {
         touchTooltipData: LineTouchTooltipData(
           getTooltipItems: (touchedSpots) {
             return touchedSpots.map((spot) {
-              final definition = defaultScores[spot.barIndex];
+              final currentSeries = series[spot.barIndex];
               final date = range.dateAt(spot.x);
 
               return LineTooltipItem(
                 '${DateFormat('dd.MM.yyyy').format(date)}\n'
-                '${definition.score+1} '
+                '${currentSeries.label} '
                 '(${spot.y.toInt()})',
                 TextStyle(
-                  color: definition.color,
+                  color: currentSeries.color,
                   fontWeight: FontWeight.bold,
                 ),
               );
@@ -198,17 +211,17 @@ class ScoreChart extends StatelessWidget {
     );
   }
 
-  LineChartBarData _buildLine(
-    ChartData chart,
-    ScoreDefinition definition,
-  ) {
+  LineChartBarData _buildLine({
+    required ChartData chart,
+    required Color color,
+  }) {
     return LineChartBarData(
       spots: chart.points
           .map((point) => point.spot)
           .toList(),
       isCurved: false,
       isStrokeCapRound: true,
-      color: definition.color,
+      color: color,
       barWidth: _lineWidth,
       dotData: const FlDotData(
         show: false,
@@ -216,14 +229,15 @@ class ScoreChart extends StatelessWidget {
     );
   }
 
-  List<LineChartBarData> _buildLines(
+  List<ChartSeries> _buildSeries(
     ChartBuilder builder,
     ChartRange range,
   ) {
-    return defaultScores.map((definition) {
+    final series = defaultScores.map((definition) {
       final chart = builder.buildStepChart(
         entries: entries,
-        score: definition.score,
+        type: EntryType.score,
+        value: definition.score,
         baseline: settings.baselineFor(
           definition.score,
         ),
@@ -231,11 +245,46 @@ class ScoreChart extends StatelessWidget {
         chartEnd: range.lastDate,
       );
 
-      return _buildLine(
-        chart,
-        definition,
+      return ChartSeries(
+        label: '${definition.score}',
+        color: definition.color,
+        chart: chart,
       );
     }).toList();
+
+    final highFinishChart = builder.buildStepChart(
+      entries: entries,
+      type: EntryType.highFinish,
+      baseline: 0,
+      chartStart: range.firstDate,
+      chartEnd: range.lastDate,
+    );
+
+    series.add(
+      ChartSeries(
+        label: 'High Finish',
+        color: AppColors.highFinish,
+        chart: highFinishChart,
+      ),
+    );
+
+    final shortLegChart = builder.buildStepChart(
+      entries: entries,
+      type: EntryType.shortLeg,
+      baseline: 0,
+      chartStart: range.firstDate,
+      chartEnd: range.lastDate,
+    );
+
+    series.add(
+      ChartSeries(
+        label: 'Short Leg',
+        color: AppColors.shortLeg,
+        chart: shortLegChart,
+      ),
+    );
+
+    return series;
   }
 
   double _calculateMaxDataY(
@@ -254,15 +303,15 @@ class ScoreChart extends StatelessWidget {
     return maxDataY;
   }
 
-double _calculateMinY(AppSettings settings) {
-  final lowestBaseline = defaultScores
-      .map((e) => settings.baselineFor(e.score))
-      .reduce((a, b) => a < b ? a : b);
+  double _calculateMinY(AppSettings settings) {
+    final lowestBaseline = defaultScores
+        .map((e) => settings.baselineFor(e.score))
+        .reduce((a, b) => a < b ? a : b);
 
-  return lowestBaseline == 0
-      ? 0.0
-      : (lowestBaseline - 1).toDouble();
-}
+    return lowestBaseline == 0
+        ? 0.0
+        : (lowestBaseline - 1).toDouble();
+  }
 
   double _calculateYInterval(
     double minY,

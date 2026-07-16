@@ -12,6 +12,7 @@ import 'models/new_entry.dart';
 import 'models/default_scores.dart';
 import 'settings/app_settings.dart';
 import 'settings/settings_repository.dart';
+import 'theme/app_colors.dart';
 import 'widgets/score_button.dart';
 import 'widgets/score_chart.dart';
 import 'widgets/entry_dialog.dart';
@@ -422,7 +423,7 @@ class _HomePageState extends State<HomePage> {
                     padding: const EdgeInsets.symmetric(horizontal: 6),
                     child: EntryButton(
                       label: 'High Finish',
-                      color: Colors.deepPurple,
+                      color: AppColors.highFinish,
                       onPressed: () => _showAddDialog(
                         initialOption: highFinishOption,
                       ),
@@ -435,7 +436,7 @@ class _HomePageState extends State<HomePage> {
                     padding: const EdgeInsets.symmetric(horizontal: 6),
                     child: EntryButton(
                       label: 'Short Leg',
-                      color: Colors.teal,
+                      color: AppColors.shortLeg,
                       onPressed: () => _showAddDialog(
                         initialOption: shortLegOption,
                       ),
@@ -454,7 +455,7 @@ class _HomePageState extends State<HomePage> {
                     padding: const EdgeInsets.symmetric(horizontal: 6),
                     child: EntrySummaryCard(
                       count: countHF,
-                      color: Colors.deepPurple,
+                      color: AppColors.highFinish,
                       label: 'HF',
                     ),
                   ),
@@ -464,7 +465,7 @@ class _HomePageState extends State<HomePage> {
                     padding: const EdgeInsets.symmetric(horizontal: 6),
                     child: EntrySummaryCard(
                       count: countSL,
-                      color: Colors.teal,
+                      color: AppColors.shortLeg,
                       label: 'SL',
                     ),
                   ),

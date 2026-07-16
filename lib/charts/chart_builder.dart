@@ -1,3 +1,4 @@
+import '../models/entry_type.dart';
 import '../models/new_entry.dart';
 import 'chart_data.dart';
 import 'chart_point.dart';
@@ -7,14 +8,25 @@ class ChartBuilder {
 
   ChartData buildStepChart({
     required List<NewEntry> entries,
-    required int score,
+    required EntryType type,
+    int? value,
     required int baseline,
     required DateTime chartStart,
     required DateTime chartEnd,
   }) {
     final filtered = entries
-        .where((e) => e.value == score)
-        .toList()
+      .where((e) {
+        if (e.type != type) {
+          return false;
+        }
+
+        if (value != null) {
+          return e.value == value;
+        }
+
+        return true;
+      })
+      .toList()
       ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
     final points = <ChartPoint>[];
