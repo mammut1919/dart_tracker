@@ -517,7 +517,7 @@ class _HomePageState extends State<HomePage> {
                     child: Card(
                       child: ListTile(
                         onLongPress: () => _confirmDelete(entry),
-                        leading: const Icon(Icons.sports_score),
+                        leading: Icon(entry.type.icon),
                         title: Text(entry.type.format(entry.value),),
                         subtitle: Text(_dateFormat.format(entry.timestamp),),
                       ),

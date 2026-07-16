@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 enum EntryType {
   score,
   highFinish,
@@ -15,4 +17,17 @@ enum EntryType {
         return 'Short Leg: $value darts';
     }
   }
+
+  IconData get icon {
+  switch (this) {
+    case EntryType.score:
+      return Icons.gps_fixed;
+
+    case EntryType.highFinish:
+      return Icons.sports_score;
+
+    case EntryType.shortLeg:
+      return Icons.flash_on;
+  }
+}
 }
