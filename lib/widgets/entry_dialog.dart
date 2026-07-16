@@ -5,8 +5,8 @@ import '../models/entry_option.dart';
 import '../models/entry_options.dart';
 import '../models/new_entry.dart';
 
-class ScoreEntryDialog extends StatefulWidget {
-  const ScoreEntryDialog({
+class EntryDialog extends StatefulWidget {
+  const EntryDialog({
     super.key,
     this.initialOption,
   });
@@ -14,10 +14,10 @@ class ScoreEntryDialog extends StatefulWidget {
   final EntryOption? initialOption;
 
   @override
-  State<ScoreEntryDialog> createState() => _ScoreEntryDialogState();
+  State<EntryDialog> createState() => _EntryDialogState();
 }
 
-class _ScoreEntryDialogState extends State<ScoreEntryDialog> {
+class _EntryDialogState extends State<EntryDialog> {
   late EntryOption _selectedOption;
 
   DateTime _selectedDate = DateTime.now();

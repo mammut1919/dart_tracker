@@ -14,7 +14,7 @@ import 'settings/app_settings.dart';
 import 'settings/settings_repository.dart';
 import 'widgets/score_button.dart';
 import 'widgets/score_chart.dart';
-import 'widgets/score_entry_dialog.dart';
+import 'widgets/entry_dialog.dart';
 import 'widgets/entry_summary_card.dart';
 import 'widgets/settings_dialog.dart';
 
@@ -113,7 +113,7 @@ class _HomePageState extends State<HomePage> {
   })  async {
     final entry = await showDialog<NewEntry>(
       context: context,
-      builder: (_) => ScoreEntryDialog(
+      builder: (_) => EntryDialog(
         initialOption: initialOption,
       ),
     );
