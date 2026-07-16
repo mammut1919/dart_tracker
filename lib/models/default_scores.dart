@@ -1,18 +1,17 @@
-import 'package:flutter/material.dart';
-
 import 'score_definition.dart';
+import '../theme/app_colors.dart';
 
 const defaultScores = [
   ScoreDefinition(
     score: 180,
-    color: Colors.green,
+    color: AppColors.score180,
   ),
   ScoreDefinition(
     score: 171,
-    color: Colors.orange,
+    color: AppColors.score171,
   ),
   ScoreDefinition(
     score: 162,
-    color: Colors.blue,
+    color: AppColors.score162,
   ),
 ];

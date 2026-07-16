@@ -139,7 +139,7 @@ class ScoreChart extends StatelessWidget {
       lineTouchData: LineTouchData(
         enabled: true,
         touchTooltipData: LineTouchTooltipData(
-          getTooltipColor: (_) => Colors.grey.shade100,
+          getTooltipColor: (_) => AppColors.tooltipBackground,
           getTooltipItems: (touchedSpots) {
             return touchedSpots.map((spot) {
               final currentSeries = series[spot.barIndex];

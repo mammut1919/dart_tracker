@@ -18,13 +18,13 @@ class EntryButton extends StatelessWidget {
       style: FilledButton.styleFrom(
         backgroundColor: color,
         foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(vertical: 18),
+        padding: const EdgeInsets.symmetric(vertical: 12),
       ),
       onPressed: onPressed,
       child: Text(
         label,
         style: const TextStyle(
-          fontSize: 22,
+          fontSize: 18,
           fontWeight: FontWeight.bold,
         ),
       ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'home_page.dart';
 import 'settings/app_settings.dart';
 import 'settings/settings_repository.dart';
+import 'theme/app_colors.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,7 +34,7 @@ class DartTrackerApp extends StatelessWidget {
       title: 'Dart Tracker',
       theme: ThemeData(
         useMaterial3: true,
-        colorSchemeSeed: Colors.green,
+        colorSchemeSeed: AppColors.primary,
       ),
       home: HomePage(
         settings: settings,

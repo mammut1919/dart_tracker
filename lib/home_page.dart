@@ -508,7 +508,7 @@ class _HomePageState extends State<HomePage> {
                     background: Container(
                       alignment: Alignment.centerRight,
                       padding: const EdgeInsets.only(right: 24),
-                      color: Colors.red,
+                      color: AppColors.delete,
                       child: const Icon(
                         Icons.delete,
                         color: Colors.white,

@@ -18,7 +18,7 @@ class EntrySummaryCard extends StatelessWidget {
       elevation: 2,
       child: Padding(
         padding: const EdgeInsets.symmetric(
-          vertical: 4,
+          vertical: 1,
           horizontal: 8,
         ),
         child: Column(
@@ -27,6 +27,7 @@ class EntrySummaryCard extends StatelessWidget {
             '$count',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
+                fontSize: 16,
                 color: color,
               ),
             ),
