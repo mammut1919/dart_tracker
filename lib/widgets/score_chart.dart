@@ -347,7 +347,7 @@ class ScoreChart extends StatelessWidget {
     double maxValue,
     double interval,
   ) {
-    return (maxValue / interval).ceil() * interval;
+    return ((maxValue + 1) / interval).ceil() * interval;
   }
 
   double _calculateXInterval(ChartRange range) {

@@ -26,9 +26,13 @@ class ChartRange {
 
     final today = DateTime.now();
 
-    final chartEnd = lastDate.isBefore(today)
-        ? today
-        : lastDate.add(const Duration(days: 1));
+    final baseEnd = lastDate.isAfter(today)
+        ? lastDate
+        : today;
+
+    final chartEnd = baseEnd.add(
+      const Duration(days: 1),
+    );
 
     return ChartRange(
       firstDate: firstDate.subtract(const Duration(days: 1)),
