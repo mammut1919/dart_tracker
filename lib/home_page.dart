@@ -22,6 +22,7 @@ import 'widgets/settings_dialog.dart';
 enum _MenuAction {
   exportBackup,
   importBackup,
+  resetData,
   about,
 }
 
@@ -188,6 +189,10 @@ class _HomePageState extends State<HomePage> {
         await _importBackup();
         break;
 
+      case _MenuAction.resetData:
+        _confirmResetData();
+        break;
+
       case _MenuAction.about:
         break;
     }
@@ -242,7 +247,7 @@ class _HomePageState extends State<HomePage> {
 
       for (final entry in backup.entries) {
         await _storage.add(
-          EntryType.score,
+          entry.type,
           entry.value,
           entry.timestamp,
         );
@@ -303,6 +308,64 @@ class _HomePageState extends State<HomePage> {
     return result ?? false;
   }
 
+  Future<void> _confirmResetData() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Daten zurücksetzen'),
+          content: const Text(
+            'Alle erfassten Einträge werden dauerhaft gelöscht.\n\n'
+            'Die App wird auf die Werkseinstellungen zurückgesetzt \n\n'
+            'Möchtest du fortfahren?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Abbrechen'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Zurücksetzen'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) {
+      return;
+    }
+
+    await _resetData();
+  }
+
+  Future<void> _resetData() async {
+    await _storage.clear();
+
+    await _settingsRepository.save(
+      AppSettings.initial,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      _settings = AppSettings.initial;
+    });
+
+    await _loadEntries();
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Alle Daten wurden zurückgesetzt.',
+        ),
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _database.close();
@@ -354,6 +417,11 @@ class _HomePageState extends State<HomePage> {
               PopupMenuItem(
                 value: _MenuAction.importBackup,
                 child: Text('Backup importieren'),
+              ),
+              PopupMenuDivider(),
+              PopupMenuItem(
+                value: _MenuAction.resetData,
+                child: Text('Daten zurücksetzen'),
               ),
               PopupMenuDivider(),
               PopupMenuItem(
