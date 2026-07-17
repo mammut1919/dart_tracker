@@ -270,7 +270,7 @@ class ScoreChart extends StatelessWidget {
     final highFinishChart = builder.buildStepChart(
       entries: entries,
       type: EntryType.highFinish,
-      baseline: 0,
+      baseline: settings.baselineHighFinish,
       chartStart: range.firstDate,
       chartEnd: range.lastDate,
     );
@@ -286,7 +286,7 @@ class ScoreChart extends StatelessWidget {
     final shortLegChart = builder.buildStepChart(
       entries: entries,
       type: EntryType.shortLeg,
-      baseline: 0,
+      baseline: settings.baselineShortLeg,
       chartStart: range.firstDate,
       chartEnd: range.lastDate,
     );

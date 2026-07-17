@@ -23,6 +23,8 @@ class _SettingsDialogState
   late final TextEditingController _baseline180Controller;
   late final TextEditingController _baseline171Controller;
   late final TextEditingController _baseline162Controller;
+  late final TextEditingController _baselineHighFinishController;
+  late final TextEditingController _baselineShortLegController;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -41,6 +43,14 @@ class _SettingsDialogState
     _baseline162Controller = TextEditingController(
       text: widget.settings.baseline162.toString(),
     );
+  
+    _baselineHighFinishController = TextEditingController(
+      text: widget.settings.baselineHighFinish.toString(),
+    );
+
+    _baselineShortLegController = TextEditingController(
+      text: widget.settings.baselineShortLeg.toString(),
+    );
   }
 
   @override
@@ -48,6 +58,8 @@ class _SettingsDialogState
     _baseline180Controller.dispose();
     _baseline171Controller.dispose();
     _baseline162Controller.dispose();
+    _baselineHighFinishController.dispose();
+    _baselineShortLegController.dispose();
 
     super.dispose();
   }
@@ -56,7 +68,7 @@ class _SettingsDialogState
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text(
-        'Baselines',
+        'Startwerte',
       ),
       content: Form(
         key: _formKey,
@@ -74,6 +86,15 @@ class _SettingsDialogState
             _buildField(
               '162',
               _baseline162Controller,
+            ),
+            _buildField(
+            'High Finish',
+              _baselineHighFinishController,
+            ),
+
+            _buildField(
+              'Short Leg',
+              _baselineShortLegController,
             ),
           ],
         ),
@@ -107,6 +128,13 @@ class _SettingsDialogState
                     int.parse(
                       _baseline162Controller.text,
                     ),
+                baselineHighFinish: int.parse(
+                  _baselineHighFinishController.text,
+                ),
+
+                baselineShortLeg: int.parse(
+                  _baselineShortLegController.text,
+                ),
               ),
             );
           },
@@ -148,7 +176,7 @@ class _SettingsDialogState
           return null;
         },
         decoration: InputDecoration(
-          labelText: 'Startwert $label',
+          labelText: label,
         ),
       ),
     );

@@ -364,172 +364,167 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: Padding(
+      body: ListView(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            // score buttons
-            Row(
-              children: defaultScores.map((definition) {
-                return Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 6),
-                    child: EntryButton(
-                      label: '${definition.score}',
-                      color:  definition.color,
-                      onPressed: () => _addEntry(
-                        NewEntry(
-                          type: EntryType.score,
-                          value: definition.score,
-                          timestamp: DateTime.now(),
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 8),
-            // score summary cards
-            Row(
-              children: defaultScores.map((definition) {
-                final rawCount = switch (definition.score) {
-                  180 => count180,
-                  171 => count171,
-                  162 => count162,
-                  _ => 0,
-                };
-                final displayCount = rawCount +  _settings.baselineFor(definition.score);
-
-                return Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 6),
-                    child: EntrySummaryCard(
-                      count: displayCount,
-                      color: definition.color,
-                      label: '${definition.score}',
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 8),
-            // other buttons
-            Row(
-              children: [
-
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 6),
-                    child: EntryButton(
-                      label: 'High Finish',
-                      color: AppColors.highFinish,
-                      onPressed: () => _showAddDialog(
-                        initialOption: highFinishOption,
+        children: [
+          // score buttons
+          Row(
+            children: defaultScores.map((definition) {
+              return Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  child: EntryButton(
+                    label: '${definition.score}',
+                    color:  definition.color,
+                    onPressed: () => _addEntry(
+                      NewEntry(
+                        type: EntryType.score,
+                        value: definition.score,
+                        timestamp: DateTime.now(),
                       ),
                     ),
                   ),
                 ),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 8),
+          // score summary cards
+          Row(
+            children: defaultScores.map((definition) {
+              final rawCount = switch (definition.score) {
+                180 => count180,
+                171 => count171,
+                162 => count162,
+                _ => 0,
+              };
+              final displayCount = rawCount +  _settings.baselineFor(definition.score);
 
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 6),
-                    child: EntryButton(
-                      label: 'Short Leg',
-                      color: AppColors.shortLeg,
-                      onPressed: () => _showAddDialog(
-                        initialOption: shortLegOption,
-                      ),
-                    ),
+              return Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  child: EntrySummaryCard(
+                    count: displayCount,
+                    color: definition.color,
+                    label: '${definition.score}',
                   ),
                 ),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 8),
+          // other buttons
+          Row(
+            children: [
 
-              ],
-            ),
-            const SizedBox(height: 8),
-            // other summary cards
-            Row(
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 6),
-                    child: EntrySummaryCard(
-                      count: countHF,
-                      color: AppColors.highFinish,
-                      label: 'HF',
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  child: EntryButton(
+                    label: 'High Finish',
+                    color: AppColors.highFinish,
+                    onPressed: () => _showAddDialog(
+                      initialOption: highFinishOption,
                     ),
                   ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 6),
-                    child: EntrySummaryCard(
-                      count: countSL,
-                      color: AppColors.shortLeg,
-                      label: 'SL',
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            // score chart
-            ScoreChart(
-              entries: _entries,
-              settings: _settings,
-            ),
-            const SizedBox(height: 24),
-            // Hostory
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Historie',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
                 ),
               ),
+
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  child: EntryButton(
+                    label: 'Short Leg',
+                    color: AppColors.shortLeg,
+                    onPressed: () => _showAddDialog(
+                      initialOption: shortLegOption,
+                    ),
+                  ),
+                ),
+              ),
+
+            ],
+          ),
+          const SizedBox(height: 8),
+          // other summary cards
+          Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  child: EntrySummaryCard(
+                    count: countHF + _settings.baselineHighFinish,
+                    color: AppColors.highFinish,
+                    label: 'HF',
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  child: EntrySummaryCard(
+                    count: countSL + _settings.baselineShortLeg,
+                    color: AppColors.shortLeg,
+                    label: 'SL',
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // score chart
+          ScoreChart(
+            entries: _entries,
+            settings: _settings,
+          ),
+          const SizedBox(height: 24),
+          // Hostory
+          const Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'Historie',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            const SizedBox(height: 8),
-            // List of historic scores
-            Expanded(
-              child: _entries.isEmpty 
-              ? const Center(
+          ),
+          const SizedBox(height: 8),
+          // List of historic scores
+          if (_entries.isEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 32),
+              child: Center(
                 child: Text('Noch keine Treffer erfasst.'),
-              )
-              : ListView.builder(
-                itemCount: _entries.length,
-                itemBuilder: (context, index) {
-                  final entry = _entries[index];
-                  return Dismissible(
-                    key: ValueKey(entry.id),
-                    direction: DismissDirection.endToStart,
-                    onDismissed: (_) => _deleteEntry(entry.id!),
-                    background: Container(
-                      alignment: Alignment.centerRight,
-                      padding: const EdgeInsets.only(right: 24),
-                      color: AppColors.delete,
-                      child: const Icon(
-                        Icons.delete,
-                        color: Colors.white,
-                      ),
-                    ),
-                    child: Card(
-                      child: ListTile(
-                        onLongPress: () => _confirmDelete(entry),
-                        leading: Icon(entry.type.icon),
-                        title: Text(entry.type.format(entry.value),),
-                        subtitle: Text(_dateFormat.format(entry.timestamp),),
-                      ),
-                    ),
-                  );
-                },
               ),
-            ),
-          ],
-        ),
+            )
+        else
+          ..._entries.map<Widget>((entry) {
+            return Dismissible(
+              key: ValueKey(entry.id),
+              direction: DismissDirection.endToStart,
+              onDismissed: (_) => _deleteEntry(entry.id!),
+              background: Container(
+                alignment: Alignment.centerRight,
+                padding: const EdgeInsets.only(right: 24),
+                color: AppColors.delete,
+                child: const Icon(
+                  Icons.delete,
+                  color: Colors.white,
+                ),
+              ),
+              child: Card(
+                child: ListTile(
+                  onLongPress: () => _confirmDelete(entry),
+                  leading: Icon(entry.type.icon),
+                  title: Text(entry.type.format(entry.value)),
+                  subtitle: Text(_dateFormat.format(entry.timestamp)),
+                ),
+              ),
+            );
+          }),
+        ],
       ),
     );
   }
-
 }
