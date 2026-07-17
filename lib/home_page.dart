@@ -13,10 +13,10 @@ import 'models/default_scores.dart';
 import 'settings/app_settings.dart';
 import 'settings/settings_repository.dart';
 import 'theme/app_colors.dart';
+import 'widgets/entry_button.dart';
 import 'widgets/entry_dialog.dart';
 import 'widgets/about_dart_tracker_dialog.dart';
 import 'widgets/entry_summary_card.dart';
-import 'widgets/score_button.dart';
 import 'widgets/score_chart.dart';
 import 'widgets/settings_dialog.dart';
 
