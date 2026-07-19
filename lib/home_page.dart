@@ -546,12 +546,15 @@ class _HomePageState extends State<HomePage> {
           ),
           const SizedBox(height: 8),
           // score chart
-          ScoreChart(
-            entries: _entries,
-            settings: _settings,
-          ),
+          if (_entries.isNotEmpty) ...[
+            ScoreChart(
+              entries: _entries,
+              settings: _settings,
+            ),
+            const SizedBox(height: 24),
+          ],
           const SizedBox(height: 24),
-          // Hostory
+          // history
           const Align(
             alignment: Alignment.centerLeft,
             child: Text(
@@ -563,7 +566,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           const SizedBox(height: 8),
-          // List of historic scores
+          // list of historic scores
           if (_entries.isEmpty)
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 32),
