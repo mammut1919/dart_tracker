@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../models/finish_fields.dart';
+
 class FinishGrid extends StatelessWidget {
   const FinishGrid({
     super.key,
@@ -17,16 +19,16 @@ class FinishGrid extends StatelessWidget {
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: 20,
+          itemCount: finishFields.length,
           gridDelegate:
               const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 5,
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8,
+            crossAxisCount: 7,
+            crossAxisSpacing: 4,
+            mainAxisSpacing: 4,
             mainAxisExtent: _buttonHeight,
           ),
           itemBuilder: (context, index) {
-            final field = index + 1;
+            final field = finishFields[index];
 
             return FilledButton(
               style: FilledButton.styleFrom(
@@ -37,7 +39,7 @@ class FinishGrid extends StatelessWidget {
               ),
               onPressed: () => onSelected(field),
               child: Text(
-                '$field',
+                finishButtonLabel(field),
                 maxLines: 1,
                 softWrap: false,
                 overflow: TextOverflow.visible,
@@ -48,29 +50,6 @@ class FinishGrid extends StatelessWidget {
               ),
             );
           },
-        ),
-        const SizedBox(height: 12),
-        Center(
-          child: SizedBox(
-            width: 60,
-            height: _buttonHeight,
-            child: FilledButton(
-              style: FilledButton.styleFrom(
-                padding: EdgeInsets.zero,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
-              onPressed: () => onSelected(50),
-              child: const Text(
-                'Bull',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
         ),
       ],
     );

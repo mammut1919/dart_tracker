@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../models/new_finish_entry.dart';
+import '../widgets/finish_chart.dart';
 import '../widgets/finish_grid.dart';
+
 
 class FinishesPage extends StatelessWidget {
   const FinishesPage({
@@ -39,6 +41,12 @@ class FinishesPage extends StatelessWidget {
                     ),
                   );
                 },
+              ),
+
+              const SizedBox(height: 16),
+
+              FinishChart(
+                finishes: finishes,
               ),
 
               const SizedBox(height: 24),
