@@ -1,75 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
-import '../database/database.dart';
-import '../database/finish_storage.dart';
 import '../models/new_finish_entry.dart';
 import '../widgets/finish_grid.dart';
 
-class FinishesPage extends StatefulWidget {
+class FinishesPage extends StatelessWidget {
   const FinishesPage({
     super.key,
+    required this.finishes,
+    required this.onSaveFinish,
+    required this.onDeleteFinish,
   });
 
-  @override
-  State<FinishesPage> createState() =>
-      _FinishesPageState();
-}
+  final List<NewFinishEntry> finishes;
 
-class _FinishesPageState extends State<FinishesPage> {
-  final _database = AppDatabase();
+  final Future<void> Function(NewFinishEntry) onSaveFinish;
 
-  late final FinishStorage _storage;
-
-  List<NewFinishEntry> _finishes = [];
-
-  @override
-  void initState() {
-    super.initState();
-
-    _storage = FinishStorage(_database);
-
-    _loadFinishes();
-  }
-
-  Future<void> _loadFinishes() async {
-    final finishes = await _storage.getAll();
-
-    if (!mounted) {
-      return;
-    }
-
-    setState(() {
-      _finishes = finishes;
-    });
-  }
-
-  Future<void> _saveFinish(
-    int field,
-  ) async {
-    HapticFeedback.selectionClick();
-
-    await _storage.add(
-      field,
-      DateTime.now(),
-    );
-
-    await _loadFinishes();
-
-    if (!mounted) {
-      return;
-    }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          field == 50
-              ? 'Bull gespeichert.'
-              : 'D$field gespeichert.',
-        ),
-      ),
-    );
-  }
+  final Future<void> Function(NewFinishEntry) onDeleteFinish;
 
   @override
   Widget build(
@@ -85,7 +31,14 @@ class _FinishesPageState extends State<FinishesPage> {
                 CrossAxisAlignment.stretch,
             children: [
               FinishGrid(
-                onSelected: _saveFinish,
+                onSelected: (field) {
+                  onSaveFinish(
+                    NewFinishEntry(
+                      field: field,
+                      timestamp: DateTime.now(),
+                    ),
+                  );
+                },
               ),
 
               const SizedBox(height: 24),
@@ -100,7 +53,7 @@ class _FinishesPageState extends State<FinishesPage> {
 
               const SizedBox(height: 12),
 
-              if (_finishes.isEmpty)
+              if (finishes.isEmpty)
                 const Card(
                   child: ListTile(
                     title: Text(
@@ -109,7 +62,7 @@ class _FinishesPageState extends State<FinishesPage> {
                   ),
                 ),
 
-              ..._finishes.map(
+              ...finishes.map(
                 (finish) => Card(
                   child: ListTile(
                     leading: const Icon(

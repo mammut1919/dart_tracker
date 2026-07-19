@@ -5,6 +5,7 @@ import 'backup/backup_service.dart';
 import 'backup/backup_file_service.dart';
 import 'database/database.dart';
 import 'database/score_storage.dart';
+import 'database/finish_storage.dart';
 import 'models/app_page.dart';
 import 'models/entry_option.dart';
 import 'models/new_entry.dart';
@@ -42,6 +43,7 @@ class _RootPageState extends State<RootPage> {
 
   late final AppDatabase _database;
   late final ScoreStorage _storage;
+  late final FinishStorage _finishStorage;
   late final SettingsRepository _settingsRepository;
 
   final DateFormat _dateFormat = DateFormat('dd.MM.yyyy');
@@ -60,11 +62,12 @@ class _RootPageState extends State<RootPage> {
 
     _database = AppDatabase();
     _storage = ScoreStorage(_database);
+    _finishStorage = FinishStorage(_database);
 
     _settingsRepository = SettingsRepository();
 
-
     _loadEntries();
+    _loadFinishes();
   }
 
   Future<void> _loadEntries() async {
@@ -74,6 +77,16 @@ class _RootPageState extends State<RootPage> {
 
     setState(() {
       _entries = entries;
+    });
+  }
+
+  Future<void> _loadFinishes() async {
+    final finishes = await _finishStorage.getAll();
+
+    if (!mounted) return;
+
+    setState(() {
+      _finishes = finishes;
     });
   }
 
@@ -95,6 +108,31 @@ class _RootPageState extends State<RootPage> {
     );
 
     await _loadEntries();
+  }
+
+  Future<void> _deleteEntry(int id) async {
+    await _storage.delete(id);
+
+    await _loadEntries();
+  }
+
+  Future<void> _saveFinish(NewFinishEntry finish) async {
+    await _finishStorage.add(
+      finish.field,
+      finish.timestamp,
+    );
+
+    await _loadFinishes();
+  }
+
+  Future<void> _deleteFinish(NewFinishEntry finish) async {
+    if (finish.id == null) {
+      return;
+    }
+
+    await _finishStorage.delete(finish.id!);
+
+    await _loadFinishes();
   }
 
   Future<void> _showAddDialog({
@@ -141,12 +179,6 @@ class _RootPageState extends State<RootPage> {
     if (delete == true) {
       await _deleteEntry(entry.id!);
     }
-  }
-
-  Future<void> _deleteEntry(int id) async {
-    await _storage.delete(id);
-
-    await _loadEntries();
   }
 
   Future<void> _showSettingsDialog() async {
@@ -423,7 +455,11 @@ class _RootPageState extends State<RootPage> {
             onShowAddDialog: _showAddDialog,
             onConfirmDelete: _confirmDelete,
           ),
-          const FinishesPage(),
+          FinishesPage(
+            finishes: _finishes,
+            onSaveFinish: _saveFinish,
+            onDeleteFinish: _deleteFinish,
+          ),
         ],
       ),     
     );
