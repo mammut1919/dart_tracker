@@ -66,8 +66,7 @@ class _RootPageState extends State<RootPage> {
 
     _settingsRepository = SettingsRepository();
 
-    _loadEntries();
-    _loadFinishes();
+    _reloadData();
   }
 
   Future<void> _loadEntries() async {
@@ -88,6 +87,11 @@ class _RootPageState extends State<RootPage> {
     setState(() {
       _finishes = finishes;
     });
+  }
+
+  Future<void> _reloadData() async {
+    await _loadEntries();
+    await _loadFinishes();
   }
 
   Future<void> _updateSettings(
@@ -277,6 +281,13 @@ class _RootPageState extends State<RootPage> {
         );
       }
 
+      for (final finish in backup.finishes) {
+        await _finishStorage.add(
+          finish.field,
+          finish.timestamp,
+        );
+      }
+
       await _settingsRepository.save(backup.settings);
 
       if (!mounted) return;
@@ -285,7 +296,7 @@ class _RootPageState extends State<RootPage> {
         _settings = backup.settings;
       });
 
-      await _loadEntries();
+      await _reloadData();
 
       if (!mounted) return;
 
@@ -364,8 +375,13 @@ class _RootPageState extends State<RootPage> {
     await _resetData();
   }
 
-  Future<void> _resetData() async {
+  Future<void> _clearAllData() async {
     await _storage.clear();
+    await _finishStorage.clear();
+  }
+
+  Future<void> _resetData() async {
+    await _clearAllData();
 
     await _settingsRepository.save(
       AppSettings.initial,
@@ -377,7 +393,7 @@ class _RootPageState extends State<RootPage> {
       _settings = AppSettings.initial;
     });
 
-    await _loadEntries();
+    await _reloadData();
 
     if (!mounted) return;
 
@@ -389,7 +405,7 @@ class _RootPageState extends State<RootPage> {
       ),
     );
   }
-
+  
   @override
   void dispose() {
     _database.close();

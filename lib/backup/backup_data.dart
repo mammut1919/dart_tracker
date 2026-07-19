@@ -39,7 +39,7 @@ class BackupData {
   ) {
     final version = json['version'] as int;
 
-    if (version != 1) {
+    if (version < 1 || version > 2) {
       throw UnsupportedError(
         'Unsupported backup version: $version',
       );
@@ -64,6 +64,6 @@ class BackupData {
           ),
         )
         .toList(),
-    );
+      );
   }
 }
