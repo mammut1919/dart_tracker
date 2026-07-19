@@ -48,7 +48,7 @@ class _RootPageState extends State<RootPage> {
 
   final DateFormat _dateFormat = DateFormat('dd.MM.yyyy');
 
-  AppPage _currentPage = AppPage.finishes;
+  AppPage _currentPage = AppPage.entries;
 
 
   List<NewEntry> _entries = [];

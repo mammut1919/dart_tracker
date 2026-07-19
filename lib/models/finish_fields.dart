@@ -1,4 +1,4 @@
-import '../models/finish_multiplier_selector.dart';
+import '../models/finish_multiplier.dart';
 
 const finishFields = [
   1,

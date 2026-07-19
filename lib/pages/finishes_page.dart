@@ -5,7 +5,7 @@ import '../models/new_finish_entry.dart';
 import '../theme/app_colors.dart';
 import '../widgets/finish_chart.dart';
 import '../widgets/finish_grid.dart';
-
+import '../widgets/finish_multiplier_selector.dart';
 
 class FinishesPage extends StatelessWidget {
   const FinishesPage({
@@ -64,6 +64,8 @@ class FinishesPage extends StatelessWidget {
             crossAxisAlignment:
                 CrossAxisAlignment.stretch,
             children: [
+              const FinishMultiplierSelector(),
+              const SizedBox(height: 12),
               FinishGrid(
                 onSelected: (field) {
                   onSaveFinish(

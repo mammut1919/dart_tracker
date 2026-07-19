@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../models/finish_multiplier_selector.dart';
+import '../models/finish_multiplier.dart';
 import '../models/finish_fields.dart';
 import '../models/new_finish_entry.dart';
 
