@@ -293,15 +293,268 @@ class ScoreEntriesCompanion extends UpdateCompanion<ScoreEntry> {
   }
 }
 
+class $FinishEntriesTable extends FinishEntries
+    with TableInfo<$FinishEntriesTable, FinishEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FinishEntriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _fieldMeta = const VerificationMeta('field');
+  @override
+  late final GeneratedColumn<int> field = GeneratedColumn<int>(
+    'field',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _timestampMeta = const VerificationMeta(
+    'timestamp',
+  );
+  @override
+  late final GeneratedColumn<DateTime> timestamp = GeneratedColumn<DateTime>(
+    'timestamp',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, field, timestamp];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'finish_entries';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FinishEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('field')) {
+      context.handle(
+        _fieldMeta,
+        field.isAcceptableOrUnknown(data['field']!, _fieldMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_fieldMeta);
+    }
+    if (data.containsKey('timestamp')) {
+      context.handle(
+        _timestampMeta,
+        timestamp.isAcceptableOrUnknown(data['timestamp']!, _timestampMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_timestampMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  FinishEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FinishEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      field: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}field'],
+      )!,
+      timestamp: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}timestamp'],
+      )!,
+    );
+  }
+
+  @override
+  $FinishEntriesTable createAlias(String alias) {
+    return $FinishEntriesTable(attachedDatabase, alias);
+  }
+}
+
+class FinishEntry extends DataClass implements Insertable<FinishEntry> {
+  final int id;
+  final int field;
+  final DateTime timestamp;
+  const FinishEntry({
+    required this.id,
+    required this.field,
+    required this.timestamp,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['field'] = Variable<int>(field);
+    map['timestamp'] = Variable<DateTime>(timestamp);
+    return map;
+  }
+
+  FinishEntriesCompanion toCompanion(bool nullToAbsent) {
+    return FinishEntriesCompanion(
+      id: Value(id),
+      field: Value(field),
+      timestamp: Value(timestamp),
+    );
+  }
+
+  factory FinishEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FinishEntry(
+      id: serializer.fromJson<int>(json['id']),
+      field: serializer.fromJson<int>(json['field']),
+      timestamp: serializer.fromJson<DateTime>(json['timestamp']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'field': serializer.toJson<int>(field),
+      'timestamp': serializer.toJson<DateTime>(timestamp),
+    };
+  }
+
+  FinishEntry copyWith({int? id, int? field, DateTime? timestamp}) =>
+      FinishEntry(
+        id: id ?? this.id,
+        field: field ?? this.field,
+        timestamp: timestamp ?? this.timestamp,
+      );
+  FinishEntry copyWithCompanion(FinishEntriesCompanion data) {
+    return FinishEntry(
+      id: data.id.present ? data.id.value : this.id,
+      field: data.field.present ? data.field.value : this.field,
+      timestamp: data.timestamp.present ? data.timestamp.value : this.timestamp,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FinishEntry(')
+          ..write('id: $id, ')
+          ..write('field: $field, ')
+          ..write('timestamp: $timestamp')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, field, timestamp);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FinishEntry &&
+          other.id == this.id &&
+          other.field == this.field &&
+          other.timestamp == this.timestamp);
+}
+
+class FinishEntriesCompanion extends UpdateCompanion<FinishEntry> {
+  final Value<int> id;
+  final Value<int> field;
+  final Value<DateTime> timestamp;
+  const FinishEntriesCompanion({
+    this.id = const Value.absent(),
+    this.field = const Value.absent(),
+    this.timestamp = const Value.absent(),
+  });
+  FinishEntriesCompanion.insert({
+    this.id = const Value.absent(),
+    required int field,
+    required DateTime timestamp,
+  }) : field = Value(field),
+       timestamp = Value(timestamp);
+  static Insertable<FinishEntry> custom({
+    Expression<int>? id,
+    Expression<int>? field,
+    Expression<DateTime>? timestamp,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (field != null) 'field': field,
+      if (timestamp != null) 'timestamp': timestamp,
+    });
+  }
+
+  FinishEntriesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? field,
+    Value<DateTime>? timestamp,
+  }) {
+    return FinishEntriesCompanion(
+      id: id ?? this.id,
+      field: field ?? this.field,
+      timestamp: timestamp ?? this.timestamp,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (field.present) {
+      map['field'] = Variable<int>(field.value);
+    }
+    if (timestamp.present) {
+      map['timestamp'] = Variable<DateTime>(timestamp.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FinishEntriesCompanion(')
+          ..write('id: $id, ')
+          ..write('field: $field, ')
+          ..write('timestamp: $timestamp')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $ScoreEntriesTable scoreEntries = $ScoreEntriesTable(this);
+  late final $FinishEntriesTable finishEntries = $FinishEntriesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [scoreEntries];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+    scoreEntries,
+    finishEntries,
+  ];
 }
 
 typedef $$ScoreEntriesTableCreateCompanionBuilder =
@@ -479,10 +732,168 @@ typedef $$ScoreEntriesTableProcessedTableManager =
       ScoreEntry,
       PrefetchHooks Function()
     >;
+typedef $$FinishEntriesTableCreateCompanionBuilder =
+    FinishEntriesCompanion Function({
+      Value<int> id,
+      required int field,
+      required DateTime timestamp,
+    });
+typedef $$FinishEntriesTableUpdateCompanionBuilder =
+    FinishEntriesCompanion Function({
+      Value<int> id,
+      Value<int> field,
+      Value<DateTime> timestamp,
+    });
+
+class $$FinishEntriesTableFilterComposer
+    extends Composer<_$AppDatabase, $FinishEntriesTable> {
+  $$FinishEntriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get field => $composableBuilder(
+    column: $table.field,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get timestamp => $composableBuilder(
+    column: $table.timestamp,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$FinishEntriesTableOrderingComposer
+    extends Composer<_$AppDatabase, $FinishEntriesTable> {
+  $$FinishEntriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get field => $composableBuilder(
+    column: $table.field,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get timestamp => $composableBuilder(
+    column: $table.timestamp,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$FinishEntriesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FinishEntriesTable> {
+  $$FinishEntriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get field =>
+      $composableBuilder(column: $table.field, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get timestamp =>
+      $composableBuilder(column: $table.timestamp, builder: (column) => column);
+}
+
+class $$FinishEntriesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $FinishEntriesTable,
+          FinishEntry,
+          $$FinishEntriesTableFilterComposer,
+          $$FinishEntriesTableOrderingComposer,
+          $$FinishEntriesTableAnnotationComposer,
+          $$FinishEntriesTableCreateCompanionBuilder,
+          $$FinishEntriesTableUpdateCompanionBuilder,
+          (
+            FinishEntry,
+            BaseReferences<_$AppDatabase, $FinishEntriesTable, FinishEntry>,
+          ),
+          FinishEntry,
+          PrefetchHooks Function()
+        > {
+  $$FinishEntriesTableTableManager(_$AppDatabase db, $FinishEntriesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FinishEntriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FinishEntriesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FinishEntriesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> field = const Value.absent(),
+                Value<DateTime> timestamp = const Value.absent(),
+              }) => FinishEntriesCompanion(
+                id: id,
+                field: field,
+                timestamp: timestamp,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int field,
+                required DateTime timestamp,
+              }) => FinishEntriesCompanion.insert(
+                id: id,
+                field: field,
+                timestamp: timestamp,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$FinishEntriesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $FinishEntriesTable,
+      FinishEntry,
+      $$FinishEntriesTableFilterComposer,
+      $$FinishEntriesTableOrderingComposer,
+      $$FinishEntriesTableAnnotationComposer,
+      $$FinishEntriesTableCreateCompanionBuilder,
+      $$FinishEntriesTableUpdateCompanionBuilder,
+      (
+        FinishEntry,
+        BaseReferences<_$AppDatabase, $FinishEntriesTable, FinishEntry>,
+      ),
+      FinishEntry,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
   $$ScoreEntriesTableTableManager get scoreEntries =>
       $$ScoreEntriesTableTableManager(_db, _db.scoreEntries);
+  $$FinishEntriesTableTableManager get finishEntries =>
+      $$FinishEntriesTableTableManager(_db, _db.finishEntries);
 }

@@ -1,5 +1,6 @@
 import '../models/entry_type.dart';
 import '../models/new_entry.dart';
+import '../models/new_finish_entry.dart';
 
 class BackupMapper {
   const BackupMapper();
@@ -11,6 +12,15 @@ class BackupMapper {
       'type': entry.type.name,
       'value': entry.value,
       'timestamp': entry.timestamp.toIso8601String(),
+    };
+  }
+
+  Map<String, dynamic> finishToJson(
+    NewFinishEntry finish,
+  ) {
+    return {
+      'field': finish.field,
+      'timestamp': finish.timestamp.toIso8601String(),
     };
   }
 
@@ -28,6 +38,17 @@ class BackupMapper {
     return NewEntry(
       type: type,
       value: value as int,
+      timestamp: DateTime.parse(
+        json['timestamp'] as String,
+      ),
+    );
+  }
+
+  NewFinishEntry finishFromJson(
+    Map<String, dynamic> json,
+  ) {
+    return NewFinishEntry(
+      field: json['field'] as int,
       timestamp: DateTime.parse(
         json['timestamp'] as String,
       ),

@@ -19,34 +19,46 @@ class ScoreEntries extends Table {
   DateTimeColumn get timestamp => dateTime()();
 }
 
+class FinishEntries extends Table {
+  IntColumn get id => integer().autoIncrement()();
+
+  IntColumn get field => integer()();
+
+  DateTimeColumn get timestamp => dateTime()();
+}
+
 @DriftDatabase(
   tables: [
     ScoreEntries,
+    FinishEntries,
   ],
 )
+
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (m) async {
-          await m.createAll();
-        },
-        onUpgrade: (m, from, to) async {
-          if (from < 2) {
-            await m.addColumn(
-              scoreEntries,
-              scoreEntries.type,
-            );
-          }
-        },
-      );
+    onCreate: (m) async {
+      await m.createAll();
+    },
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        await m.addColumn(
+          scoreEntries,
+          scoreEntries.type,
+        );
+      }
+
+      if (from < 3) {
+        await m.createTable(finishEntries);
+      }
+    },
+  );
 }
-
-
 
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {

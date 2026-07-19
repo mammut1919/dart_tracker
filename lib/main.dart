@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
-import 'home_page.dart';
+import 'root_page.dart';
 import 'settings/app_settings.dart';
 import 'settings/settings_repository.dart';
 import 'theme/app_colors.dart';
@@ -46,9 +46,7 @@ class DartTrackerApp extends StatelessWidget {
         useMaterial3: true,
         colorSchemeSeed: AppColors.primary,
       ),
-      home: HomePage(
-        settings: settings,
-      ),
+      home: RootPage(settings: settings),
     );
   }
 }
