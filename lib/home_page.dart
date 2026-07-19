@@ -576,7 +576,10 @@ class _HomePageState extends State<HomePage> {
             return Dismissible(
               key: ValueKey(entry.id),
               direction: DismissDirection.endToStart,
-              onDismissed: (_) => _deleteEntry(entry.id!),
+              confirmDismiss: (_) async {
+                await _confirmDelete(entry);
+                return false;
+              },
               background: Container(
                 alignment: Alignment.centerRight,
                 padding: const EdgeInsets.only(right: 24),
