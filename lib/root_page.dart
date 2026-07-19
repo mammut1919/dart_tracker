@@ -5,15 +5,18 @@ import 'backup/backup_service.dart';
 import 'backup/backup_file_service.dart';
 import 'database/database.dart';
 import 'database/score_storage.dart';
+import 'models/app_page.dart';
 import 'models/entry_option.dart';
 import 'models/new_entry.dart';
 import 'models/new_finish_entry.dart';
 import 'pages/entries_page.dart';
+import 'pages/finishes_page.dart';
 import 'settings/app_settings.dart';
 import 'settings/settings_repository.dart';
 import 'widgets/entry_dialog.dart';
 import 'widgets/about_dart_tracker_dialog.dart';
 import 'widgets/settings_dialog.dart';
+import 'widgets/page_selector.dart';
 
 enum _MenuAction {
   exportBackup,
@@ -42,6 +45,9 @@ class _RootPageState extends State<RootPage> {
   late final SettingsRepository _settingsRepository;
 
   final DateFormat _dateFormat = DateFormat('dd.MM.yyyy');
+
+  AppPage _currentPage = AppPage.entries;
+
 
   List<NewEntry> _entries = [];
   List<NewFinishEntry> _finishes = [];
@@ -362,7 +368,14 @@ class _RootPageState extends State<RootPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dart Tracker'),
+        title: PageSelector(
+          page: _currentPage,
+          onChanged: (page) {
+            setState(() {
+              _currentPage = page;
+            });
+          },
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
@@ -399,14 +412,20 @@ class _RootPageState extends State<RootPage> {
           ),
         ],
       ),
-      body: EntriesPage(
-        entries: _entries,
-        settings: _settings,
-        dateFormat: _dateFormat,
-        onAddEntry: _addEntry,
-        onShowAddDialog: _showAddDialog,
-        onConfirmDelete: _confirmDelete,
-      ),      
+      body: IndexedStack(
+        index: _currentPage.index,
+        children: [
+          EntriesPage(
+            entries: _entries,
+            settings: _settings,
+            dateFormat: _dateFormat,
+            onAddEntry: _addEntry,
+            onShowAddDialog: _showAddDialog,
+            onConfirmDelete: _confirmDelete,
+          ),
+          const FinishesPage(),
+        ],
+      ),     
     );
   }
 }

@@ -76,11 +76,7 @@ class _FinishesPageState extends State<FinishesPage> {
     BuildContext context,
   ) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Finishes',
-        ),
-      ),
+      
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),

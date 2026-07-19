@@ -14,7 +14,7 @@ class PageSelector extends StatelessWidget {
 
   String get _title {
     switch (page) {
-      case AppPage.home:
+      case AppPage.entries:
         return 'Dart Tracker';
       case AppPage.finishes:
         return 'Finishes';
@@ -28,10 +28,10 @@ class PageSelector extends StatelessWidget {
       onSelected: onChanged,
       itemBuilder: (context) => [
         PopupMenuItem(
-          value: AppPage.home,
+          value: AppPage.entries,
           child: Row(
             children: [
-              if (page == AppPage.home)
+              if (page == AppPage.entries)
                 const Icon(Icons.check, size: 18)
               else
                 const SizedBox(width: 18),

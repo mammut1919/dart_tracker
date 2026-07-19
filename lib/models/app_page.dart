@@ -1,4 +1,4 @@
 enum AppPage {
-  home,
+  entries,
   finishes,
 }
