@@ -571,8 +571,8 @@ class _HomePageState extends State<HomePage> {
                 child: Text('Noch keine Treffer erfasst.'),
               ),
             )
-        else
-          ..._entries.map<Widget>((entry) {
+          else
+            ..._entries.map<Widget>((entry) {
             return Dismissible(
               key: ValueKey(entry.id),
               direction: DismissDirection.endToStart,

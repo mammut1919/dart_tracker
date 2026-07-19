@@ -319,9 +319,13 @@ class ScoreChart extends StatelessWidget {
   }
 
   double _calculateMinY(AppSettings settings) {
-    final lowestBaseline = defaultScores
-        .map((e) => settings.baselineFor(e.score))
-        .reduce((a, b) => a < b ? a : b);
+    final lowestBaseline = [
+      settings.baseline180,
+      settings.baseline171,
+      settings.baseline162,
+      settings.baselineHighFinish,
+      settings.baselineShortLeg,
+    ].reduce((a, b) => a < b ? a : b);
 
     return lowestBaseline == 0
         ? 0.0
