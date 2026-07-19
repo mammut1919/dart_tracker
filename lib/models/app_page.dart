@@ -1,4 +1,1 @@
-enum AppPage {
-  entries,
-  finishes,
-}
+enum AppPage { entries, finishes }

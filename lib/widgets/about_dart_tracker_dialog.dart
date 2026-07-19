@@ -2,18 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class AboutDartTrackerDialog extends StatefulWidget {
-  const AboutDartTrackerDialog({
-    super.key,
-  });
+  const AboutDartTrackerDialog({super.key});
 
   @override
-  State<AboutDartTrackerDialog> createState() =>
-      _AboutDartTrackerDialogState();
+  State<AboutDartTrackerDialog> createState() => _AboutDartTrackerDialogState();
 }
 
-class _AboutDartTrackerDialogState
-  extends State<AboutDartTrackerDialog> {
-
+class _AboutDartTrackerDialogState extends State<AboutDartTrackerDialog> {
   String _version = '';
 
   @override
@@ -45,9 +40,7 @@ class _AboutDartTrackerDialogState
           children: [
             Text(
               'Version $_version',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 16),
             Text(_aboutText),
@@ -65,21 +58,22 @@ class _AboutDartTrackerDialogState
 }
 
 const _aboutText = '''
-Der Dart Tracker hilft dabei, besondere Erfolge beim Darts dauerhaft festzuhalten und ihren Verlauf über die Zeit zu verfolgen.
+Dart Tracker
 
-Erfasst werden können:
+Version 1.3.0
 
-• 180er
-• 171er
-• 162er
-• High Finishes
-• Short Legs
+Dart Tracker unterstützt dich beim Erfassen deiner persönlichen Trainingsstatistiken – schnell, einfach und ohne unnötigen Aufwand.
 
-Für jede Kategorie können Startwerte hinterlegt werden. So lassen sich bereits erzielte Erfolge übernehmen, ohne alle bisherigen Ergebnisse nachträglich erfassen zu müssen.
+Features:
+• Erfassung von 180, 171 und 162
+• High Finishes und Short Legs
+• Checkout-Übersicht mit Finish-Chart
+• Backup und Wiederherstellung aller Daten
+• Individuelle Baselines für persönliche Statistiken
 
-Alle Einträge werden in einem gemeinsamen Diagramm dargestellt. Dadurch lässt sich die persönliche Entwicklung über einen beliebigen Zeitraum nachvollziehen.
+Die App konzentriert sich bewusst auf die wichtigsten Trainingsdaten und verzichtet auf komplexes Match-Tracking.
 
-Die Daten werden ausschließlich lokal auf deinem Gerät gespeichert. Über die integrierte Backup-Funktion können sie exportiert und bei Bedarf jederzeit wieder importiert werden.
-
+Vielen
 Gut Dart!
+
 ''';

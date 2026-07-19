@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/finish_fields.dart';
 
 class FinishGrid extends StatelessWidget {
-  const FinishGrid({
-    super.key,
-    required this.onSelected,
-  });
+  const FinishGrid({super.key, required this.onSelected});
 
   static const _buttonHeight = 32.0;
 
@@ -20,8 +17,7 @@ class FinishGrid extends StatelessWidget {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: finishFields.length,
-          gridDelegate:
-              const SliverGridDelegateWithFixedCrossAxisCount(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 7,
             crossAxisSpacing: 4,
             mainAxisSpacing: 4,

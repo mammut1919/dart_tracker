@@ -19,15 +19,15 @@ enum EntryType {
   }
 
   IconData get icon {
-  switch (this) {
-    case EntryType.score:
-      return Icons.gps_fixed;
+    switch (this) {
+      case EntryType.score:
+        return Icons.gps_fixed;
 
-    case EntryType.highFinish:
-      return Icons.sports_score;
+      case EntryType.highFinish:
+        return Icons.sports_score;
 
-    case EntryType.shortLeg:
-      return Icons.flash_on;
+      case EntryType.shortLeg:
+        return Icons.flash_on;
+    }
   }
-}
 }

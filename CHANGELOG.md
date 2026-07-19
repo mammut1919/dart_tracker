@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.3.0] - 2026-07-19
+
+### Added
+- New Finishes page
+- Finish tracking with dedicated history
+- Finish chart showing checkout distribution
+- Finish grid for quick finish entry
+- Finish multiplier selector (currently Double only)
+- Backup support for finish entries
+- Page selector for switching between Entries and Finishes
+
+### Changed
+- Refactored HomePage into RootPage, EntriesPage and FinishesPage
+- Improved application structure and navigation
+- Compact finish entry layout
+- Reset now clears both entries and finishes
+
+### Fixed
+- Backup import/export compatibility for finish data
+
+---
+
 ## [1.2.1] - 2026-07-20
 
 ### Fixed

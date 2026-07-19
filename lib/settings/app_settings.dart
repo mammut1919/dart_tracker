@@ -13,11 +13,11 @@ class AppSettings {
     required this.baseline162,
     required this.baselineHighFinish,
     required this.baselineShortLeg,
-  })  : assert(baseline180 >= 0),
-        assert(baseline171 >= 0),
-        assert(baseline162 >= 0),
-        assert(baselineHighFinish >= 0),
-        assert(baselineShortLeg >= 0);
+  }) : assert(baseline180 >= 0),
+       assert(baseline171 >= 0),
+       assert(baseline162 >= 0),
+       assert(baselineHighFinish >= 0),
+       assert(baselineShortLeg >= 0);
 
   final int baseline180;
   final int baseline171;
@@ -38,7 +38,6 @@ class AppSettings {
       baseline162: baseline162 ?? this.baseline162,
       baselineHighFinish: baselineHighFinish ?? this.baselineHighFinish,
       baselineShortLeg: baselineShortLeg ?? this.baselineShortLeg,
-
     );
   }
 
@@ -65,9 +64,7 @@ class AppSettings {
     };
   }
 
-  factory AppSettings.fromJson(
-    Map<String, dynamic> json,
-  ) {
+  factory AppSettings.fromJson(Map<String, dynamic> json) {
     return AppSettings(
       baseline180: json['baseline180'] as int,
       baseline171: json['baseline171'] as int,

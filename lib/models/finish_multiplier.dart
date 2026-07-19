@@ -1,8 +1,4 @@
-enum FinishMultiplier {
-  single,
-  double,
-  triple,
-}
+enum FinishMultiplier { single, double, triple }
 
 extension FinishMultiplierExtension on FinishMultiplier {
   String get label {

@@ -3,23 +3,16 @@ import 'package:flutter/services.dart';
 
 import '../settings/app_settings.dart';
 
-
 class SettingsDialog extends StatefulWidget {
-  const SettingsDialog({
-    super.key,
-    required this.settings,
-  });
+  const SettingsDialog({super.key, required this.settings});
 
   final AppSettings settings;
 
   @override
-  State<SettingsDialog> createState() =>
-      _SettingsDialogState();
+  State<SettingsDialog> createState() => _SettingsDialogState();
 }
 
-class _SettingsDialogState
-    extends State<SettingsDialog> {
-
+class _SettingsDialogState extends State<SettingsDialog> {
   late final TextEditingController _baseline180Controller;
   late final TextEditingController _baseline171Controller;
   late final TextEditingController _baseline162Controller;
@@ -43,7 +36,7 @@ class _SettingsDialogState
     _baseline162Controller = TextEditingController(
       text: widget.settings.baseline162.toString(),
     );
-  
+
     _baselineHighFinishController = TextEditingController(
       text: widget.settings.baselineHighFinish.toString(),
     );
@@ -67,35 +60,18 @@ class _SettingsDialogState
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text(
-        'Startwerte',
-      ),
+      title: const Text('Startwerte'),
       content: Form(
         key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildField(
-              '180',
-              _baseline180Controller,
-            ),
-            _buildField(
-              '171',
-              _baseline171Controller,
-            ),
-            _buildField(
-              '162',
-              _baseline162Controller,
-            ),
-            _buildField(
-            'High Finish',
-              _baselineHighFinishController,
-            ),
+            _buildField('180', _baseline180Controller),
+            _buildField('171', _baseline171Controller),
+            _buildField('162', _baseline162Controller),
+            _buildField('High Finish', _baselineHighFinishController),
 
-            _buildField(
-              'Short Leg',
-              _baselineShortLegController,
-            ),
+            _buildField('Short Leg', _baselineShortLegController),
           ],
         ),
       ),
@@ -104,9 +80,7 @@ class _SettingsDialogState
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text(
-            'Abbrechen',
-          ),
+          child: const Text('Abbrechen'),
         ),
         FilledButton(
           onPressed: () {
@@ -116,48 +90,30 @@ class _SettingsDialogState
             Navigator.pop(
               context,
               widget.settings.copyWith(
-                baseline180:
-                    int.parse(
-                      _baseline180Controller.text,
-                    ),
-                baseline171:
-                    int.parse(
-                      _baseline171Controller.text,
-                    ),
-                baseline162:
-                    int.parse(
-                      _baseline162Controller.text,
-                    ),
+                baseline180: int.parse(_baseline180Controller.text),
+                baseline171: int.parse(_baseline171Controller.text),
+                baseline162: int.parse(_baseline162Controller.text),
                 baselineHighFinish: int.parse(
                   _baselineHighFinishController.text,
                 ),
 
-                baselineShortLeg: int.parse(
-                  _baselineShortLegController.text,
-                ),
+                baselineShortLeg: int.parse(_baselineShortLegController.text),
               ),
             );
           },
-          child: const Text(
-            'Speichern',
-          ),
+          child: const Text('Speichern'),
         ),
       ],
     );
   }
 
-  Widget _buildField(
-    String label,
-    TextEditingController controller,
-  ) {
+  Widget _buildField(String label, TextEditingController controller) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(
         controller: controller,
         keyboardType: TextInputType.number,
-        inputFormatters: [
-          FilteringTextInputFormatter.digitsOnly,
-        ],
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         validator: (value) {
           if (value == null || value.isEmpty) {
             return 'Bitte eingeben';
@@ -175,9 +131,7 @@ class _SettingsDialogState
 
           return null;
         },
-        decoration: InputDecoration(
-          labelText: label,
-        ),
+        decoration: InputDecoration(labelText: label),
       ),
     );
   }

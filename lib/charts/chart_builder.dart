@@ -14,75 +14,42 @@ class ChartBuilder {
     required DateTime chartStart,
     required DateTime chartEnd,
   }) {
-    final filtered = entries
-      .where((e) {
-        if (e.type != type) {
-          return false;
-        }
+    final filtered = entries.where((e) {
+      if (e.type != type) {
+        return false;
+      }
 
-        if (value != null) {
-          return e.value == value;
-        }
+      if (value != null) {
+        return e.value == value;
+      }
 
-        return true;
-      })
-      .toList()
-      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+      return true;
+    }).toList()..sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
     final points = <ChartPoint>[];
 
     var current = baseline;
 
     // Baseline am linken Rand
-    points.add(
-      ChartPoint(
-        x: 0,
-        y: current.toDouble(),
-      ),
-    );
+    points.add(ChartPoint(x: 0, y: current.toDouble()));
 
     for (final entry in filtered) {
-      final x = entry.timestamp
-          .difference(chartStart)
-          .inDays
-          .toDouble();
+      final x = entry.timestamp.difference(chartStart).inDays.toDouble();
 
       // waagerechte Linie bis zum Treffer
-      points.add(
-        ChartPoint(
-          x: x,
-          y: current.toDouble(),
-        ),
-      );
+      points.add(ChartPoint(x: x, y: current.toDouble()));
 
       current++;
 
       // senkrechter Sprung
-      points.add(
-        ChartPoint(
-          x: x,
-          y: current.toDouble(),
-        ),
-      );
+      points.add(ChartPoint(x: x, y: current.toDouble()));
     }
 
     // Linie bis zum rechten Diagrammrand verlängern
-    final endX = chartEnd
-        .difference(chartStart)
-        .inDays
-        .toDouble();
+    final endX = chartEnd.difference(chartStart).inDays.toDouble();
 
-    points.add(
-      ChartPoint(
-        x: endX,
-        y: current.toDouble(),
-      ),
-    );
+    points.add(ChartPoint(x: endX, y: current.toDouble()));
 
-    return ChartData(
-      points: points,
-      firstDate: chartStart,
-      lastDate: chartEnd,
-    );
+    return ChartData(points: points, firstDate: chartStart, lastDate: chartEnd);
   }
 }

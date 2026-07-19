@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/finish_multiplier.dart';
 
 class FinishMultiplierSelector extends StatelessWidget {
-  const FinishMultiplierSelector({
-    super.key,
-  });
+  const FinishMultiplierSelector({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,10 +14,7 @@ class FinishMultiplierSelector extends StatelessWidget {
         //  label: Text('Single'),
         //  enabled: false,
         //),
-        ButtonSegment(
-          value: FinishMultiplier.double,
-          label: Text('Double'),
-        ),
+        ButtonSegment(value: FinishMultiplier.double, label: Text('Double')),
         ButtonSegment(
           value: FinishMultiplier.triple,
           label: Text('Triple'),

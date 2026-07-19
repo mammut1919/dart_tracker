@@ -3,11 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/app_page.dart';
 
 class PageSelector extends StatelessWidget {
-  const PageSelector({
-    super.key,
-    required this.page,
-    required this.onChanged,
-  });
+  const PageSelector({super.key, required this.page, required this.onChanged});
 
   final AppPage page;
   final ValueChanged<AppPage> onChanged;
@@ -57,10 +53,7 @@ class PageSelector extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            _title,
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
+          Text(_title, style: Theme.of(context).textTheme.headlineSmall),
           const Icon(Icons.arrow_drop_down),
         ],
       ),

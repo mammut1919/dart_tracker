@@ -12,9 +12,7 @@ class ScoreEntries extends Table {
 
   IntColumn get score => integer()();
 
-  IntColumn get type => integer().withDefault(
-    const Constant(0),
-  )();
+  IntColumn get type => integer().withDefault(const Constant(0))();
 
   DateTimeColumn get timestamp => dateTime()();
 }
@@ -27,13 +25,7 @@ class FinishEntries extends Table {
   DateTimeColumn get timestamp => dateTime()();
 }
 
-@DriftDatabase(
-  tables: [
-    ScoreEntries,
-    FinishEntries,
-  ],
-)
-
+@DriftDatabase(tables: [ScoreEntries, FinishEntries])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
@@ -47,10 +39,7 @@ class AppDatabase extends _$AppDatabase {
     },
     onUpgrade: (m, from, to) async {
       if (from < 2) {
-        await m.addColumn(
-          scoreEntries,
-          scoreEntries.type,
-        );
+        await m.addColumn(scoreEntries, scoreEntries.type);
       }
 
       if (from < 3) {
@@ -64,9 +53,7 @@ LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final directory = await getApplicationDocumentsDirectory();
 
-    final file = File(
-      p.join(directory.path, 'dart_tracker.sqlite'),
-    );
+    final file = File(p.join(directory.path, 'dart_tracker.sqlite'));
 
     return NativeDatabase.createInBackground(file);
   });

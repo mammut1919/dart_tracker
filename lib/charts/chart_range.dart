@@ -1,10 +1,7 @@
 import '../models/new_entry.dart';
 
 class ChartRange {
-  const ChartRange({
-    required this.firstDate,
-    required this.lastDate,
-  });
+  const ChartRange({required this.firstDate, required this.lastDate});
 
   factory ChartRange.fromEntries(List<NewEntry> entries) {
     if (entries.isEmpty) {
@@ -26,13 +23,9 @@ class ChartRange {
 
     final today = DateTime.now();
 
-    final baseEnd = lastDate.isAfter(today)
-        ? lastDate
-        : today;
+    final baseEnd = lastDate.isAfter(today) ? lastDate : today;
 
-    final chartEnd = baseEnd.add(
-      const Duration(days: 1),
-    );
+    final chartEnd = baseEnd.add(const Duration(days: 1));
 
     return ChartRange(
       firstDate: firstDate.subtract(const Duration(days: 1)),
@@ -43,12 +36,9 @@ class ChartRange {
   final DateTime firstDate;
   final DateTime lastDate;
 
-  double get maxX =>
-      lastDate.difference(firstDate).inDays.toDouble();
+  double get maxX => lastDate.difference(firstDate).inDays.toDouble();
 
   DateTime dateAt(double x) {
-    return firstDate.add(
-      Duration(days: x.round()),
-    );
+    return firstDate.add(Duration(days: x.round()));
   }
 }

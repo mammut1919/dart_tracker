@@ -16,18 +16,11 @@ Future<void> main() async {
 
   final settings = await repository.load();
 
-  runApp(
-    DartTrackerApp(
-      settings: settings,
-    ),
-  );
+  runApp(DartTrackerApp(settings: settings));
 }
 
 class DartTrackerApp extends StatelessWidget {
-  const DartTrackerApp({
-    super.key,
-    required this.settings,
-    });
+  const DartTrackerApp({super.key, required this.settings});
 
   final AppSettings settings;
 
@@ -37,15 +30,9 @@ class DartTrackerApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Dart Tracker',
       locale: const Locale('de', 'DE'),
-      supportedLocales: const [
-        Locale('de', 'DE'),
-      ],
-      localizationsDelegates:
-          GlobalMaterialLocalizations.delegates,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorSchemeSeed: AppColors.primary,
-      ),
+      supportedLocales: const [Locale('de', 'DE')],
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      theme: ThemeData(useMaterial3: true, colorSchemeSeed: AppColors.primary),
       home: RootPage(settings: settings),
     );
   }

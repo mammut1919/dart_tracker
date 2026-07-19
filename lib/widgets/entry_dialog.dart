@@ -6,10 +6,7 @@ import '../models/entry_options.dart';
 import '../models/new_entry.dart';
 
 class EntryDialog extends StatefulWidget {
-  const EntryDialog({
-    super.key,
-    this.initialOption,
-  });
+  const EntryDialog({super.key, this.initialOption});
 
   final EntryOption? initialOption;
 
@@ -22,15 +19,13 @@ class _EntryDialogState extends State<EntryDialog> {
 
   DateTime _selectedDate = DateTime.now();
 
-  final TextEditingController _valueController =
-      TextEditingController();
+  final TextEditingController _valueController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
 
-    _selectedOption =
-        widget.initialOption ?? availableEntryOptions.first;
+    _selectedOption = widget.initialOption ?? availableEntryOptions.first;
   }
 
   Future<void> _pickDate() async {
@@ -92,17 +87,15 @@ class _EntryDialogState extends State<EntryDialog> {
         children: [
           DropdownButtonFormField<EntryOption>(
             initialValue: _selectedOption,
-            decoration: const InputDecoration(
-              labelText: 'Eintrag',
-            ),
+            decoration: const InputDecoration(labelText: 'Eintrag'),
             items: availableEntryOptions
-              .map(
-                (option) => DropdownMenuItem(
-                  value: option,
-                  child: Text(option.label),
-                ),
-              )
-              .toList(),
+                .map(
+                  (option) => DropdownMenuItem(
+                    value: option,
+                    child: Text(option.label),
+                  ),
+                )
+                .toList(),
             onChanged: (option) {
               if (option != null) {
                 setState(() {
@@ -115,23 +108,21 @@ class _EntryDialogState extends State<EntryDialog> {
           FilledButton.tonal(
             onPressed: _pickDate,
             child: Text(
-               '${_selectedDate.day}.${_selectedDate.month}.${_selectedDate.year}',
+              '${_selectedDate.day}.${_selectedDate.month}.${_selectedDate.year}',
             ),
           ),
           if (_selectedOption.requiresInput) ...[
             const SizedBox(height: 16),
             TextFormField(
               controller: _valueController,
-                onChanged: (_) {
-                  setState(() {});
-                },
+              onChanged: (_) {
+                setState(() {});
+              },
               keyboardType: const TextInputType.numberWithOptions(
                 signed: false,
                 decimal: false,
               ),
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-              ],
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               decoration: InputDecoration(
                 labelText: _selectedOption.inputLabelWithRange,
               ),

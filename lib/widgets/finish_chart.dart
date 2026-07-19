@@ -5,15 +5,11 @@ import '../models/finish_fields.dart';
 import '../models/new_finish_entry.dart';
 
 class FinishChart extends StatelessWidget {
-  FinishChart({
-    super.key,
-    required this.finishes,
-  });
+  FinishChart({super.key, required this.finishes});
 
   final List<NewFinishEntry> finishes;
 
-  final finishOrder = [...finishFields]
-    ..sort((a, b) => b.compareTo(a));
+  final finishOrder = [...finishFields]..sort((a, b) => b.compareTo(a));
 
   Map<int, int> _buildCounts() {
     final counts = <int, int>{};
@@ -25,16 +21,11 @@ class FinishChart extends StatelessWidget {
 
     // Treffer zählen
     for (final finish in finishes) {
-      counts.update(
-        finish.field,
-        (value) => value + 1,
-        ifAbsent: () => 1,
-      );
+      counts.update(finish.field, (value) => value + 1, ifAbsent: () => 1);
     }
 
     return counts;
   }
-
 
   int _maxCount(Map<int, int> counts) {
     return counts.values.fold(0, (max, value) {
@@ -63,9 +54,7 @@ class FinishChart extends StatelessWidget {
                     width: 40,
                     child: Text(
                       finishChartLabel(field, FinishMultiplier.double),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
                   ),
 
@@ -78,9 +67,7 @@ class FinishChart extends StatelessWidget {
                         height: 14,
                         child: Stack(
                           children: [
-                            Container(
-                              color: Colors.grey.shade300,
-                            ),
+                            Container(color: Colors.grey.shade300),
                             FractionallySizedBox(
                               alignment: Alignment.centerLeft,
                               widthFactor: factor,
@@ -101,9 +88,7 @@ class FinishChart extends StatelessWidget {
                     child: Text(
                       '$count',
                       textAlign: TextAlign.end,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],

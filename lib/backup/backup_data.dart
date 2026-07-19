@@ -16,54 +16,32 @@ class BackupData {
   final AppSettings settings;
   final List<NewEntry> entries;
   final List<NewFinishEntry> finishes;
-  
 
-  Map<String, dynamic> toJson(
-    BackupMapper mapper,
-  ) {
+  Map<String, dynamic> toJson(BackupMapper mapper) {
     return {
       'version': version,
       'settings': settings.toJson(),
-      'entries': entries
-        .map(mapper.entryToJson)
-        .toList(),
-      'finishes': finishes
-        .map(mapper.finishToJson)
-        .toList(),
+      'entries': entries.map(mapper.entryToJson).toList(),
+      'finishes': finishes.map(mapper.finishToJson).toList(),
     };
   }
 
-  factory BackupData.fromJson(
-    Map<String, dynamic> json,
-    BackupMapper mapper,
-  ) {
+  factory BackupData.fromJson(Map<String, dynamic> json, BackupMapper mapper) {
     final version = json['version'] as int;
 
     if (version < 1 || version > 2) {
-      throw UnsupportedError(
-        'Unsupported backup version: $version',
-      );
+      throw UnsupportedError('Unsupported backup version: $version');
     }
 
     return BackupData(
       version: version,
-      settings: AppSettings.fromJson(
-        json['settings'] as Map<String, dynamic>,
-      ),
+      settings: AppSettings.fromJson(json['settings'] as Map<String, dynamic>),
       entries: (json['entries'] as List)
-        .map(
-          (entry) => mapper.entryFromJson(
-            entry as Map<String, dynamic>,
-          ),
-        )
-        .toList(),
+          .map((entry) => mapper.entryFromJson(entry as Map<String, dynamic>))
+          .toList(),
       finishes: (json['finishes'] as List? ?? [])
-        .map(
-          (entry) => mapper.finishFromJson(
-            entry as Map<String, dynamic>,
-          ),
-        )
-        .toList(),
-      );
+          .map((entry) => mapper.finishFromJson(entry as Map<String, dynamic>))
+          .toList(),
+    );
   }
 }

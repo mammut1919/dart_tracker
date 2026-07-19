@@ -19,18 +19,10 @@ import 'widgets/about_dart_tracker_dialog.dart';
 import 'widgets/settings_dialog.dart';
 import 'widgets/page_selector.dart';
 
-enum _MenuAction {
-  exportBackup,
-  importBackup,
-  resetData,
-  about,
-}
+enum _MenuAction { exportBackup, importBackup, resetData, about }
 
 class RootPage extends StatefulWidget {
-  const RootPage({
-    super.key,
-    required this.settings
-  });
+  const RootPage({super.key, required this.settings});
 
   final AppSettings settings;
 
@@ -49,7 +41,6 @@ class _RootPageState extends State<RootPage> {
   final DateFormat _dateFormat = DateFormat('dd.MM.yyyy');
 
   AppPage _currentPage = AppPage.entries;
-
 
   List<NewEntry> _entries = [];
   List<NewFinishEntry> _finishes = [];
@@ -94,9 +85,7 @@ class _RootPageState extends State<RootPage> {
     await _loadFinishes();
   }
 
-  Future<void> _updateSettings(
-    AppSettings settings,
-  ) async {
+  Future<void> _updateSettings(AppSettings settings) async {
     await _settingsRepository.save(settings);
 
     setState(() {
@@ -105,11 +94,7 @@ class _RootPageState extends State<RootPage> {
   }
 
   Future<void> _addEntry(NewEntry entry) async {
-    await _storage.add(
-      entry.type,
-      entry.value,
-      entry.timestamp,
-    );
+    await _storage.add(entry.type, entry.value, entry.timestamp);
 
     await _loadEntries();
   }
@@ -121,10 +106,7 @@ class _RootPageState extends State<RootPage> {
   }
 
   Future<void> _saveFinish(NewFinishEntry finish) async {
-    await _finishStorage.add(
-      finish.field,
-      finish.timestamp,
-    );
+    await _finishStorage.add(finish.field, finish.timestamp);
 
     await _loadFinishes();
   }
@@ -139,14 +121,10 @@ class _RootPageState extends State<RootPage> {
     await _loadFinishes();
   }
 
-  Future<void> _showAddDialog({
-    EntryOption? initialOption,
-  })  async {
+  Future<void> _showAddDialog({EntryOption? initialOption}) async {
     final entry = await showDialog<NewEntry>(
       context: context,
-      builder: (_) => EntryDialog(
-        initialOption: initialOption,
-      ),
+      builder: (_) => EntryDialog(initialOption: initialOption),
     );
 
     if (entry == null) {
@@ -188,9 +166,7 @@ class _RootPageState extends State<RootPage> {
   Future<void> _showSettingsDialog() async {
     final settings = await showDialog<AppSettings>(
       context: context,
-      builder: (context) => SettingsDialog(
-        settings: _settings,
-      ),
+      builder: (context) => SettingsDialog(settings: _settings),
     );
 
     if (settings == null) {
@@ -200,9 +176,7 @@ class _RootPageState extends State<RootPage> {
     await _updateSettings(settings);
   }
 
-  Future<void> _onMenuSelected(
-    _MenuAction action,
-  ) async {
+  Future<void> _onMenuSelected(_MenuAction action) async {
     switch (action) {
       case _MenuAction.exportBackup:
         await _exportBackup();
@@ -274,18 +248,11 @@ class _RootPageState extends State<RootPage> {
       await _storage.clear();
 
       for (final entry in backup.entries) {
-        await _storage.add(
-          entry.type,
-          entry.value,
-          entry.timestamp,
-        );
+        await _storage.add(entry.type, entry.value, entry.timestamp);
       }
 
       for (final finish in backup.finishes) {
-        await _finishStorage.add(
-          finish.field,
-          finish.timestamp,
-        );
+        await _finishStorage.add(finish.field, finish.timestamp);
       }
 
       await _settingsRepository.save(backup.settings);
@@ -301,18 +268,14 @@ class _RootPageState extends State<RootPage> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Backup erfolgreich importiert.'),
-        ),
+        const SnackBar(content: Text('Backup erfolgreich importiert.')),
       );
     } catch (_) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Ungültige Backup-Datei.'),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Ungültige Backup-Datei.')));
     }
   }
 
@@ -383,9 +346,7 @@ class _RootPageState extends State<RootPage> {
   Future<void> _resetData() async {
     await _clearAllData();
 
-    await _settingsRepository.save(
-      AppSettings.initial,
-    );
+    await _settingsRepository.save(AppSettings.initial);
 
     if (!mounted) return;
 
@@ -398,14 +359,10 @@ class _RootPageState extends State<RootPage> {
     if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Alle Daten wurden zurückgesetzt.',
-        ),
-      ),
+      const SnackBar(content: Text('Alle Daten wurden zurückgesetzt.')),
     );
   }
-  
+
   @override
   void dispose() {
     _database.close();
@@ -477,7 +434,7 @@ class _RootPageState extends State<RootPage> {
             onDeleteFinish: _deleteFinish,
           ),
         ],
-      ),     
+      ),
     );
   }
 }

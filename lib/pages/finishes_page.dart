@@ -53,48 +53,35 @@ class FinishesPage extends StatelessWidget {
   }
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const FinishMultiplierSelector(),
               const SizedBox(height: 12),
               FinishGrid(
                 onSelected: (field) {
                   onSaveFinish(
-                    NewFinishEntry(
-                      field: field,
-                      timestamp: DateTime.now(),
-                    ),
+                    NewFinishEntry(field: field, timestamp: DateTime.now()),
                   );
                 },
               ),
               const SizedBox(height: 16),
-              FinishChart(
-                finishes: finishes,
-              ),
+              FinishChart(finishes: finishes),
               const SizedBox(height: 24),
               const Text(
                 'Historie',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
               if (finishes.isEmpty)
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 32),
-                  child: Center(
-                    child: Text('Noch keine Finishes erfasst.'),
-                  ),
+                  child: Center(child: Text('Noch keine Finishes erfasst.')),
                 )
               else
                 ...finishes.map<Widget>((finish) {
@@ -109,14 +96,12 @@ class FinishesPage extends StatelessWidget {
                       alignment: Alignment.centerRight,
                       padding: const EdgeInsets.only(right: 24),
                       color: AppColors.delete,
-                      child: const Icon(
-                        Icons.delete,
-                        color: Colors.white,
-                      ),
+                      child: const Icon(Icons.delete, color: Colors.white),
                     ),
                     child: Card(
                       child: ListTile(
-                        onLongPress: () => _confirmDeleteFinish(context, finish),
+                        onLongPress: () =>
+                            _confirmDeleteFinish(context, finish),
                         leading: const Icon(Icons.gps_fixed),
                         title: Text(
                           finish.field == 50 ? 'Bull' : 'D${finish.field}',

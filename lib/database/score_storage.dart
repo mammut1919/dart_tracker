@@ -10,11 +10,9 @@ class ScoreStorage {
   final AppDatabase _database;
 
   Future<List<NewEntry>> getAll() async {
-    final rows = await (_database.select(_database.scoreEntries)
-          ..orderBy([
-            (t) => OrderingTerm.desc(t.timestamp),
-          ]))
-        .get();
+    final rows = await (_database.select(
+      _database.scoreEntries,
+    )..orderBy([(t) => OrderingTerm.desc(t.timestamp)])).get();
 
     return rows
         .map(
@@ -28,12 +26,10 @@ class ScoreStorage {
         .toList();
   }
 
-  Future<void> add(
-    EntryType type,
-    int score,
-    DateTime timestamp
-  ) async {
-    await _database.into(_database.scoreEntries).insert(
+  Future<void> add(EntryType type, int score, DateTime timestamp) async {
+    await _database
+        .into(_database.scoreEntries)
+        .insert(
           ScoreEntriesCompanion.insert(
             score: score,
             type: Value(type.index),
@@ -43,9 +39,9 @@ class ScoreStorage {
   }
 
   Future<void> delete(int id) async {
-    await (_database.delete(_database.scoreEntries)
-          ..where((t) => t.id.equals(id)))
-        .go();
+    await (_database.delete(
+      _database.scoreEntries,
+    )..where((t) => t.id.equals(id))).go();
   }
 
   Future<void> clear() async {

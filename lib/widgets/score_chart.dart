@@ -12,19 +12,13 @@ import '../models/new_entry.dart';
 import '../theme/app_colors.dart';
 
 class ScoreChart extends StatelessWidget {
-  const ScoreChart({
-    super.key,
-    required this.entries,
-    required this.settings,
-  });
+  const ScoreChart({super.key, required this.entries, required this.settings});
 
-    static const _chartHeight = 250.0;
-    static const _padding = 16.0;
-    static const _axisReservedSize = 34.0;
-    static const _lineWidth = 3.0;
-    static const _animationDuration = Duration(
-    milliseconds: 350,
-  );
+  static const _chartHeight = 250.0;
+  static const _padding = 16.0;
+  static const _axisReservedSize = 34.0;
+  static const _lineWidth = 3.0;
+  static const _animationDuration = Duration(milliseconds: 350);
 
   final List<NewEntry> entries;
   final AppSettings settings;
@@ -35,33 +29,19 @@ class ScoreChart extends StatelessWidget {
 
     final range = ChartRange.fromEntries(entries);
 
-    final series = _buildSeries(
-      builder,
-      range,
-    );
+    final series = _buildSeries(builder, range);
 
     final lines = series
-      .map(
-        (s) => _buildLine(
-          chart: s.chart,
-          color: s.color,
-        ),
-      )
-      .toList();
+        .map((s) => _buildLine(chart: s.chart, color: s.color))
+        .toList();
 
     final maxDataY = _calculateMaxDataY(lines);
 
     final minY = _calculateMinY(settings);
 
-    final yInterval = _calculateYInterval(
-      minY,
-      maxDataY,
-    );
+    final yInterval = _calculateYInterval(minY, maxDataY);
 
-    final chartMaxY = _calculateChartMaxY(
-      maxDataY,
-      yInterval,
-    );
+    final chartMaxY = _calculateChartMaxY(maxDataY, yInterval);
 
     return Card(
       child: SizedBox(
@@ -76,7 +56,7 @@ class ScoreChart extends StatelessWidget {
               minY,
               maxDataY,
               yInterval,
-              chartMaxY
+              chartMaxY,
             ),
             duration: _animationDuration,
             curve: Curves.easeOutCubic,
@@ -93,10 +73,8 @@ class ScoreChart extends StatelessWidget {
     double minY,
     double maxY,
     double yInterval,
-    double chartMaxY
+    double chartMaxY,
   ) {
-
-
     final xInterval = _calculateXInterval(range);
 
     return LineChartData(
@@ -120,21 +98,13 @@ class ScoreChart extends StatelessWidget {
 
         checkToShowVerticalLine: (value) {
           final remainder = value % xInterval;
-          return remainder.abs() < 0.1 ||
-              (xInterval - remainder).abs() < 0.1;
+          return remainder.abs() < 0.1 || (xInterval - remainder).abs() < 0.1;
         },
       ),
 
-      borderData: FlBorderData(
-        show: true,
-      ),
+      borderData: FlBorderData(show: true),
 
-      titlesData: _buildTitlesData(
-        range,
-        xInterval,
-        yInterval,
-        chartMaxY,
-      ),
+      titlesData: _buildTitlesData(range, xInterval, yInterval, chartMaxY),
 
       lineTouchData: LineTouchData(
         enabled: true,
@@ -154,8 +124,7 @@ class ScoreChart extends StatelessWidget {
 
                 const epsilon = 0.001;
 
-                if ((next.x - spot.x).abs() < epsilon &&
-                    next.y > spot.y) {
+                if ((next.x - spot.x).abs() < epsilon && next.y > spot.y) {
                   value = next.y.toInt();
                 }
               }
@@ -182,12 +151,8 @@ class ScoreChart extends StatelessWidget {
     double chartMaxY,
   ) {
     return FlTitlesData(
-      topTitles: const AxisTitles(
-        sideTitles: SideTitles(showTitles: false),
-      ),
-      rightTitles: const AxisTitles(
-        sideTitles: SideTitles(showTitles: false),
-      ),
+      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
       leftTitles: AxisTitles(
         sideTitles: SideTitles(
           showTitles: true,
@@ -231,31 +196,22 @@ class ScoreChart extends StatelessWidget {
     required Color color,
   }) {
     return LineChartBarData(
-      spots: chart.points
-          .map((point) => point.spot)
-          .toList(),
+      spots: chart.points.map((point) => point.spot).toList(),
       isCurved: false,
       isStrokeCapRound: true,
       color: color,
       barWidth: _lineWidth,
-      dotData: const FlDotData(
-        show: false,
-      ),
+      dotData: const FlDotData(show: false),
     );
   }
 
-  List<ChartSeries> _buildSeries(
-    ChartBuilder builder,
-    ChartRange range,
-  ) {
+  List<ChartSeries> _buildSeries(ChartBuilder builder, ChartRange range) {
     final series = defaultScores.map((definition) {
       final chart = builder.buildStepChart(
         entries: entries,
         type: EntryType.score,
         value: definition.score,
-        baseline: settings.baselineFor(
-          definition.score,
-        ),
+        baseline: settings.baselineFor(definition.score),
         chartStart: range.firstDate,
         chartEnd: range.lastDate,
       );
@@ -302,9 +258,7 @@ class ScoreChart extends StatelessWidget {
     return series;
   }
 
-  double _calculateMaxDataY(
-    List<LineChartBarData> chartLines,
-  ) {
+  double _calculateMaxDataY(List<LineChartBarData> chartLines) {
     double maxDataY = 0;
 
     for (final line in chartLines) {
@@ -327,15 +281,10 @@ class ScoreChart extends StatelessWidget {
       settings.baselineShortLeg,
     ].reduce((a, b) => a < b ? a : b);
 
-    return lowestBaseline == 0
-        ? 0.0
-        : (lowestBaseline - 1).toDouble();
+    return lowestBaseline == 0 ? 0.0 : (lowestBaseline - 1).toDouble();
   }
 
-  double _calculateYInterval(
-    double minY,
-    double maxY,
-  ) {
+  double _calculateYInterval(double minY, double maxY) {
     final range = maxY - minY;
 
     if (range <= 10) return 1;
@@ -347,10 +296,7 @@ class ScoreChart extends StatelessWidget {
     return 50;
   }
 
-  double _calculateChartMaxY(
-    double maxValue,
-    double interval,
-  ) {
+  double _calculateChartMaxY(double maxValue, double interval) {
     return ((maxValue + 1) / interval).ceil() * interval;
   }
 

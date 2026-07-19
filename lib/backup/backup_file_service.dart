@@ -32,9 +32,7 @@ class BackupFileService {
       final result = await FlutterFileDialog.saveFile(
         params: SaveFileDialogParams(
           fileName: _backupFileName(),
-          data: Uint8List.fromList(
-            utf8.encode(json),
-          ),
+          data: Uint8List.fromList(utf8.encode(json)),
         ),
       );
 
@@ -53,7 +51,6 @@ class BackupFileService {
   }
 
   Future<String?> loadBackup() async {
-
     final result = await FilePicker.platform.pickFiles(
       dialogTitle: 'Backup auswählen',
       type: FileType.custom,
@@ -74,7 +71,7 @@ class BackupFileService {
 
     return file.readAsString();
   }
-  
+
   String _backupFileName() {
     final formatter = DateFormat('yyyy-MM-dd');
 

@@ -17,15 +17,12 @@ class EntrySummaryCard extends StatelessWidget {
     return Card(
       elevation: 2,
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          vertical: 1,
-          horizontal: 8,
-        ),
+        padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 8),
         child: Column(
           children: [
             Text(
-            '$count',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              '$count',
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
                 color: color,

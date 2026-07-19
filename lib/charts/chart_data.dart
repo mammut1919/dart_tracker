@@ -12,12 +12,9 @@ class ChartData {
   final DateTime firstDate;
   final DateTime lastDate;
 
-  double get maxX =>
-      lastDate.difference(firstDate).inDays.toDouble();
+  double get maxX => lastDate.difference(firstDate).inDays.toDouble();
 
   DateTime dateAt(double x) {
-    return firstDate.add(
-      Duration(days: x.round()),
-    );
+    return firstDate.add(Duration(days: x.round()));
   }
 }

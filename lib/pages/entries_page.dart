@@ -27,15 +27,10 @@ class EntriesPage extends StatelessWidget {
   final AppSettings settings;
   final DateFormat dateFormat;
   final ValueChanged<NewEntry> onAddEntry;
-  final Future<void> Function({
-    EntryOption? initialOption,
-  }) onShowAddDialog;
+  final Future<void> Function({EntryOption? initialOption}) onShowAddDialog;
   final Future<void> Function(NewEntry) onConfirmDelete;
 
-  int _countEntries({
-    required EntryType type,
-    int? value,
-  }) {
+  int _countEntries({required EntryType type, int? value}) {
     return entries.where((entry) {
       if (entry.type != type) {
         return false;
@@ -47,25 +42,12 @@ class EntriesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final count180 = _countEntries(
-      type: EntryType.score,
-      value: 180,
-    );
-    final count171 = _countEntries(
-      type: EntryType.score,
-      value: 171,
-    );
-    final count162 = _countEntries(
-      type: EntryType.score,
-      value: 162,
-    );
-    final countHF = _countEntries(
-      type: EntryType.highFinish,
-    );
+    final count180 = _countEntries(type: EntryType.score, value: 180);
+    final count171 = _countEntries(type: EntryType.score, value: 171);
+    final count162 = _countEntries(type: EntryType.score, value: 162);
+    final countHF = _countEntries(type: EntryType.highFinish);
 
-    final countSL = _countEntries(
-      type: EntryType.shortLeg,
-    );
+    final countSL = _countEntries(type: EntryType.shortLeg);
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -77,7 +59,7 @@ class EntriesPage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 child: EntryButton(
                   label: '${definition.score}',
-                  color:  definition.color,
+                  color: definition.color,
                   onPressed: () => onAddEntry(
                     NewEntry(
                       type: EntryType.score,
@@ -100,7 +82,8 @@ class EntriesPage extends StatelessWidget {
               162 => count162,
               _ => 0,
             };
-            final displayCount = rawCount +  settings.baselineFor(definition.score);
+            final displayCount =
+                rawCount + settings.baselineFor(definition.score);
 
             return Expanded(
               child: Padding(
@@ -118,16 +101,14 @@ class EntriesPage extends StatelessWidget {
         // other buttons
         Row(
           children: [
-
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 child: EntryButton(
                   label: 'High Finish',
                   color: AppColors.highFinish,
-                  onPressed: () => onShowAddDialog(
-                    initialOption: highFinishOption,
-                  ),
+                  onPressed: () =>
+                      onShowAddDialog(initialOption: highFinishOption),
                 ),
               ),
             ),
@@ -138,13 +119,11 @@ class EntriesPage extends StatelessWidget {
                 child: EntryButton(
                   label: 'Short Leg',
                   color: AppColors.shortLeg,
-                  onPressed: () => onShowAddDialog(
-                    initialOption: shortLegOption,
-                  ),
+                  onPressed: () =>
+                      onShowAddDialog(initialOption: shortLegOption),
                 ),
               ),
             ),
-
           ],
         ),
         const SizedBox(height: 8),
@@ -176,10 +155,7 @@ class EntriesPage extends StatelessWidget {
         const SizedBox(height: 8),
         // score chart
         if (entries.isNotEmpty) ...[
-          ScoreChart(
-            entries: entries,
-            settings: settings,
-          ),
+          ScoreChart(entries: entries, settings: settings),
           const SizedBox(height: 24),
         ],
         const SizedBox(height: 24),
@@ -188,10 +164,7 @@ class EntriesPage extends StatelessWidget {
           alignment: Alignment.centerLeft,
           child: Text(
             'Historie',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ),
         const SizedBox(height: 8),
@@ -199,38 +172,33 @@ class EntriesPage extends StatelessWidget {
         if (entries.isEmpty)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 32),
-            child: Center(
-              child: Text('Noch keine Treffer erfasst.'),
-            ),
+            child: Center(child: Text('Noch keine Treffer erfasst.')),
           )
         else
           ...entries.map<Widget>((entry) {
-          return Dismissible(
-            key: ValueKey(entry.id),
-            direction: DismissDirection.endToStart,
-            confirmDismiss: (_) async {
-              await onConfirmDelete(entry);
-              return false;
-            },
-            background: Container(
-              alignment: Alignment.centerRight,
-              padding: const EdgeInsets.only(right: 24),
-              color: AppColors.delete,
-              child: const Icon(
-                Icons.delete,
-                color: Colors.white,
+            return Dismissible(
+              key: ValueKey(entry.id),
+              direction: DismissDirection.endToStart,
+              confirmDismiss: (_) async {
+                await onConfirmDelete(entry);
+                return false;
+              },
+              background: Container(
+                alignment: Alignment.centerRight,
+                padding: const EdgeInsets.only(right: 24),
+                color: AppColors.delete,
+                child: const Icon(Icons.delete, color: Colors.white),
               ),
-            ),
-            child: Card(
-              child: ListTile(
-                onLongPress: () => onConfirmDelete(entry),
-                leading: Icon(entry.type.icon),
-                title: Text(entry.type.format(entry.value)),
-                subtitle: Text(dateFormat.format(entry.timestamp)),
+              child: Card(
+                child: ListTile(
+                  onLongPress: () => onConfirmDelete(entry),
+                  leading: Icon(entry.type.icon),
+                  title: Text(entry.type.format(entry.value)),
+                  subtitle: Text(dateFormat.format(entry.timestamp)),
+                ),
               ),
-            ),
-          );
-        }),
+            );
+          }),
       ],
     );
   }

@@ -9,14 +9,10 @@ import 'backup_mapper.dart';
 class BackupService {
   const BackupService();
 
-  String exportToJson(
-    BackupData backup,
-  ) {
+  String exportToJson(BackupData backup) {
     final mapper = BackupMapper();
 
-    return const JsonEncoder.withIndent('  ').convert(
-      backup.toJson(mapper),
-    );
+    return const JsonEncoder.withIndent('  ').convert(backup.toJson(mapper));
   }
 
   String export({
@@ -34,16 +30,11 @@ class BackupService {
     return exportToJson(backup);
   }
 
-  BackupData importFromJson(
-    String json,
-  ) {
+  BackupData importFromJson(String json) {
     final mapper = BackupMapper();
 
     final map = jsonDecode(json) as Map<String, dynamic>;
 
-    return BackupData.fromJson(
-      map,
-      mapper,
-    );
+    return BackupData.fromJson(map, mapper);
   }
 }
