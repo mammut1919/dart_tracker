@@ -1,5 +1,5 @@
 name: dart_tracker
-description: A Flutter application to track high dart scores.
+description: Track your dart training, finishes and personal milestones.
 publish_to: "none"
 
 version: 1.3.0+4

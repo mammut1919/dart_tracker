@@ -1,29 +1,30 @@
-# Dart Tracker – iOS Build Anleitung
+# Dart Tracker – iOS Setup
 
-Diese Anleitung beschreibt, wie Dart Tracker auf einem Mac gebaut und auf einem iPhone installiert werden kann.
+Diese Anleitung beschreibt, wie **Dart Tracker** auf einem Mac gebaut und auf einem iPhone oder im iOS Simulator getestet werden kann.
 
 ## Voraussetzungen
 
 ### Hardware
 
 - Mac mit aktuellem macOS
-- iPhone (optional, aber empfohlen)
+- Optional: iPhone
 
 ### Software
 
 - Xcode (aktuelle Version)
 - Flutter SDK
 - Git
+- CocoaPods
 
 ---
 
 # 1. Xcode installieren
 
-Xcode aus dem Mac App Store installieren.
+Xcode über den Mac App Store installieren.
 
-Nach der Installation einmal starten und die Lizenzbedingungen akzeptieren.
+Nach der Installation Xcode einmal starten und die Lizenzbedingungen akzeptieren.
 
-Anschließend im Terminal:
+Im Terminal anschließend:
 
 ```bash
 sudo xcode-select --switch /Applications/Xcode.app
@@ -34,17 +35,17 @@ sudo xcodebuild -runFirstLaunch
 
 # 2. Flutter installieren
 
-Flutter installieren:
+Flutter gemäß der offiziellen Dokumentation installieren:
 
 https://docs.flutter.dev/get-started/install/macos
 
-Anschließend prüfen:
+Installation prüfen:
 
 ```bash
-flutter doctor
+flutter doctor -v
 ```
 
-Alle Punkte sollten grün sein.
+Alle Punkte sollten erfolgreich sein.
 
 Falls CocoaPods fehlt:
 
@@ -58,7 +59,6 @@ sudo gem install cocoapods
 
 ```bash
 git clone https://github.com/mammut1919/dart_tracker.git
-
 cd dart_tracker
 ```
 
@@ -72,7 +72,7 @@ flutter pub get
 
 ---
 
-# 5. iOS-Abhängigkeiten installieren
+# 5. CocoaPods installieren
 
 ```bash
 cd ios
@@ -90,19 +90,13 @@ cd ..
 flutter devices
 ```
 
-Beispiel:
-
-```
-iPhone 15 Pro
-macOS
-Chrome
-```
+Es sollte mindestens ein iOS Simulator oder ein angeschlossenes iPhone angezeigt werden.
 
 ---
 
-# 7. Projekt starten
+# 7. App starten
 
-Mit Simulator:
+Simulator:
 
 ```bash
 flutter run
@@ -111,10 +105,10 @@ flutter run
 oder
 
 ```bash
-flutter run -d "iPhone 15 Pro"
+flutter run -d "iPhone 16"
 ```
 
-Mit angeschlossenem iPhone:
+Falls ein iPhone angeschlossen ist:
 
 ```bash
 flutter run
@@ -122,27 +116,7 @@ flutter run
 
 ---
 
-# 8. Release Build
-
-APK gibt es unter iOS natürlich nicht.
-
-Ein Release-Build wird erzeugt mit:
-
-```bash
-flutter build ios
-```
-
-oder
-
-```bash
-flutter build ipa
-```
-
-Für den ersten Test genügt jedoch `flutter run`.
-
----
-
-# 9. Falls Xcode Signing verlangt
+# 8. Falls Xcode Signing verlangt
 
 Projekt öffnen:
 
@@ -158,7 +132,7 @@ Runner
 
 - Team auswählen
 - Apple-ID auswählen
-- Bundle Identifier ggf. anpassen
+- Bundle Identifier prüfen
 
 Danach erneut:
 
@@ -168,9 +142,17 @@ flutter run
 
 ---
 
-# 10. Bekannte Probleme
+# 9. Bekannte Probleme
 
-## CocoaPods
+## Flutter prüfen
+
+```bash
+flutter doctor -v
+```
+
+---
+
+## CocoaPods aktualisieren
 
 ```bash
 pod repo update
@@ -179,15 +161,7 @@ pod install
 
 ---
 
-## Flutter prüfen
-
-```bash
-flutter doctor
-```
-
----
-
-## Build bereinigen
+## Projekt bereinigen
 
 ```bash
 flutter clean
@@ -205,15 +179,50 @@ flutter run
 
 ---
 
+# Testumfang
+
+Bitte folgende Funktionen prüfen:
+
+## Allgemein
+
+- App startet
+- Navigation zwischen Entries und Finishes
+- App nach Neustart weiterhin funktionsfähig
+
+## Entries
+
+- 180 erfassen
+- 171 erfassen
+- 162 erfassen
+- High Finish
+- Short Leg
+- Löschen
+
+## Finishes
+
+- Finish erfassen
+- Finish-Historie
+- Finish Chart
+- Löschen
+
+## Daten
+
+- Reset
+- Backup Export
+- Backup Import
+
+---
+
 # Feedback
 
-Bitte insbesondere prüfen:
+Bitte insbesondere melden:
 
-- Startet die App?
-- Funktionieren Entries?
-- Funktionieren Finishes?
-- Funktioniert Backup Import/Export?
-- Gibt es Darstellungsfehler?
-- Gibt es Bedienprobleme auf dem iPhone?
+- Abstürze
+- Darstellungsfehler
+- Probleme beim Dateidialog
+- Auffälligkeiten auf iPhone oder iPad
+- Bedienprobleme während des Trainings
 
-Vielen Dank fürs Testen!
+---
+
+Dokumentversion: passend zu Dart Tracker v1.3.0
