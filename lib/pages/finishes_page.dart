@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../models/date_filter.dart';
 import '../models/new_finish_entry.dart';
 import '../theme/app_colors.dart';
+import '../widgets/date_filter_selector.dart';
 import '../widgets/finish_chart.dart';
 import '../widgets/finish_grid.dart';
 import '../widgets/finish_multiplier_selector.dart';
@@ -11,14 +13,16 @@ class FinishesPage extends StatelessWidget {
   const FinishesPage({
     super.key,
     required this.finishes,
+    required this.selectedDateFilter,
+    required this.onDateFilterChanged,
     required this.onSaveFinish,
     required this.onDeleteFinish,
   });
 
   final List<NewFinishEntry> finishes;
-
+  final DateFilter selectedDateFilter;
+  final ValueChanged<DateFilter> onDateFilterChanged;
   final Future<void> Function(NewFinishEntry) onSaveFinish;
-
   final Future<void> Function(NewFinishEntry) onDeleteFinish;
 
   Future<void> _confirmDeleteFinish(
@@ -57,11 +61,20 @@ class FinishesPage extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const FinishMultiplierSelector(),
+              Row(
+                children: [
+                  DateFilterSelector(
+                    selectedFilter: selectedDateFilter,
+                    onSelectionChanged: onDateFilterChanged,
+                  ),
+                  const Spacer(),
+                  const FinishMultiplierSelector(),
+                ],
+              ),
               const SizedBox(height: 12),
               FinishGrid(
                 onSelected: (field) {

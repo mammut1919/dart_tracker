@@ -8,6 +8,7 @@ import 'database/score_storage.dart';
 import 'database/finish_storage.dart';
 import 'models/app_page.dart';
 import 'models/entry_option.dart';
+import 'models/date_filter.dart';
 import 'models/new_entry.dart';
 import 'models/new_finish_entry.dart';
 import 'pages/entries_page.dart';
@@ -39,6 +40,7 @@ class _RootPageState extends State<RootPage> {
   late final SettingsRepository _settingsRepository;
 
   final DateFormat _dateFormat = DateFormat('dd.MM.yyyy');
+  DateFilter _selectedDateFilter = DateFilter.allTime;
 
   AppPage _currentPage = AppPage.entries;
 
@@ -58,6 +60,12 @@ class _RootPageState extends State<RootPage> {
     _settingsRepository = SettingsRepository();
 
     _reloadData();
+  }
+
+  void _setDateFilter(DateFilter filter) {
+    setState(() {
+      _selectedDateFilter = filter;
+    });
   }
 
   Future<void> _loadEntries() async {
@@ -363,6 +371,34 @@ class _RootPageState extends State<RootPage> {
     );
   }
 
+  List<NewEntry> get _filteredEntries {
+    final startDate = _selectedDateFilter.startDate;
+
+    if (startDate == null) {
+      return _entries;
+    }
+
+    return _entries
+        .where(
+          (entry) => !entry.timestamp.isBefore(startDate),
+        )
+        .toList();
+  }
+
+  List<NewFinishEntry> get _filteredFinishes {
+    final startDate = _selectedDateFilter.startDate;
+
+    if (startDate == null) {
+      return _finishes;
+    }
+
+    return _finishes
+        .where(
+          (finish) => !finish.timestamp.isBefore(startDate),
+        )
+        .toList();
+  }
+
   @override
   void dispose() {
     _database.close();
@@ -421,15 +457,19 @@ class _RootPageState extends State<RootPage> {
         index: _currentPage.index,
         children: [
           EntriesPage(
-            entries: _entries,
+            entries: _filteredEntries,
             settings: _settings,
             dateFormat: _dateFormat,
+            selectedDateFilter: _selectedDateFilter,
+            onDateFilterChanged: _setDateFilter,
             onAddEntry: _addEntry,
             onShowAddDialog: _showAddDialog,
             onConfirmDelete: _confirmDelete,
           ),
           FinishesPage(
-            finishes: _finishes,
+            finishes: _filteredFinishes,
+            selectedDateFilter: _selectedDateFilter,
+            onDateFilterChanged: _setDateFilter,
             onSaveFinish: _saveFinish,
             onDeleteFinish: _deleteFinish,
           ),

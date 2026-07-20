@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../models/date_filter.dart';
 import '../models/default_scores.dart';
 import '../models/entry_option.dart';
 import '../models/entry_options.dart';
@@ -8,6 +9,7 @@ import '../models/entry_type.dart';
 import '../models/new_entry.dart';
 import '../settings/app_settings.dart';
 import '../theme/app_colors.dart';
+import '../widgets/date_filter_selector.dart';
 import '../widgets/entry_button.dart';
 import '../widgets/entry_summary_card.dart';
 import '../widgets/score_chart.dart';
@@ -18,6 +20,8 @@ class EntriesPage extends StatelessWidget {
     required this.entries,
     required this.settings,
     required this.dateFormat,
+    required this.selectedDateFilter,
+    required this.onDateFilterChanged,
     required this.onAddEntry,
     required this.onShowAddDialog,
     required this.onConfirmDelete,
@@ -26,6 +30,8 @@ class EntriesPage extends StatelessWidget {
   final List<NewEntry> entries;
   final AppSettings settings;
   final DateFormat dateFormat;
+  final DateFilter selectedDateFilter;
+  final ValueChanged<DateFilter> onDateFilterChanged;
   final ValueChanged<NewEntry> onAddEntry;
   final Future<void> Function({EntryOption? initialOption}) onShowAddDialog;
   final Future<void> Function(NewEntry) onConfirmDelete;
@@ -45,12 +51,26 @@ class EntriesPage extends StatelessWidget {
     final count180 = _countEntries(type: EntryType.score, value: 180);
     final count171 = _countEntries(type: EntryType.score, value: 171);
     final count162 = _countEntries(type: EntryType.score, value: 162);
-    final countHF = _countEntries(type: EntryType.highFinish);
-
+    final countHighFinish = _countEntries(type: EntryType.highFinish);
     final countSL = _countEntries(type: EntryType.shortLeg);
+    
+    final highFinishBaseline = selectedDateFilter.includesBaseline
+      ? settings.baselineHighFinish
+      : 0;
+
+    final shortLegBaseline = selectedDateFilter.includesBaseline
+      ? settings.baselineShortLeg
+      : 0;
+
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       children: [
+        // date selector
+        DateFilterSelector(
+          selectedFilter: selectedDateFilter,
+          onSelectionChanged: onDateFilterChanged,
+        ),
+        const SizedBox(height: 8),
         // score buttons
         Row(
           children: defaultScores.map((definition) {
@@ -82,8 +102,11 @@ class EntriesPage extends StatelessWidget {
               162 => count162,
               _ => 0,
             };
+            final baseline = selectedDateFilter.includesBaseline
+              ? settings.baselineFor(definition.score)
+              : 0;
             final displayCount =
-                rawCount + settings.baselineFor(definition.score);
+                rawCount + baseline;
 
             return Expanded(
               child: Padding(
@@ -134,7 +157,7 @@ class EntriesPage extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 child: EntrySummaryCard(
-                  count: countHF + settings.baselineHighFinish,
+                  count: countHighFinish + highFinishBaseline,
                   color: AppColors.highFinish,
                   label: 'HF',
                 ),
@@ -144,7 +167,7 @@ class EntriesPage extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 child: EntrySummaryCard(
-                  count: countSL + settings.baselineShortLeg,
+                  count: countSL + shortLegBaseline,
                   color: AppColors.shortLeg,
                   label: 'SL',
                 ),
@@ -155,7 +178,11 @@ class EntriesPage extends StatelessWidget {
         const SizedBox(height: 8),
         // score chart
         if (entries.isNotEmpty) ...[
-          ScoreChart(entries: entries, settings: settings),
+          ScoreChart(
+            entries: entries, 
+            settings: settings,
+            includeBaseline: selectedDateFilter.includesBaseline,
+          ),
           const SizedBox(height: 24),
         ],
         const SizedBox(height: 24),

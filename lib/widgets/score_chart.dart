@@ -12,16 +12,22 @@ import '../models/new_entry.dart';
 import '../theme/app_colors.dart';
 
 class ScoreChart extends StatelessWidget {
-  const ScoreChart({super.key, required this.entries, required this.settings});
+  const ScoreChart({
+    super.key,
+    required this.entries, 
+    required this.settings,
+    required this.includeBaseline,
+  });
+
+  final List<NewEntry> entries;
+  final AppSettings settings;
+  final bool includeBaseline;
 
   static const _chartHeight = 250.0;
   static const _padding = 16.0;
   static const _axisReservedSize = 34.0;
   static const _lineWidth = 3.0;
   static const _animationDuration = Duration(milliseconds: 350);
-
-  final List<NewEntry> entries;
-  final AppSettings settings;
 
   @override
   Widget build(BuildContext context) {
@@ -211,7 +217,9 @@ class ScoreChart extends StatelessWidget {
         entries: entries,
         type: EntryType.score,
         value: definition.score,
-        baseline: settings.baselineFor(definition.score),
+        baseline: includeBaseline
+          ? settings.baselineFor(definition.score)
+          : 0,
         chartStart: range.firstDate,
         chartEnd: range.lastDate,
       );
@@ -226,7 +234,9 @@ class ScoreChart extends StatelessWidget {
     final highFinishChart = builder.buildStepChart(
       entries: entries,
       type: EntryType.highFinish,
-      baseline: settings.baselineHighFinish,
+      baseline: includeBaseline
+        ? settings.baselineHighFinish
+        : 0,
       chartStart: range.firstDate,
       chartEnd: range.lastDate,
     );
@@ -242,7 +252,9 @@ class ScoreChart extends StatelessWidget {
     final shortLegChart = builder.buildStepChart(
       entries: entries,
       type: EntryType.shortLeg,
-      baseline: settings.baselineShortLeg,
+      baseline: includeBaseline
+        ? settings.baselineShortLeg
+        : 0,
       chartStart: range.firstDate,
       chartEnd: range.lastDate,
     );
@@ -273,6 +285,10 @@ class ScoreChart extends StatelessWidget {
   }
 
   double _calculateMinY(AppSettings settings) {
+    if (!includeBaseline) {
+      return 0;
+    }
+
     final lowestBaseline = [
       settings.baseline180,
       settings.baseline171,
@@ -281,7 +297,9 @@ class ScoreChart extends StatelessWidget {
       settings.baselineShortLeg,
     ].reduce((a, b) => a < b ? a : b);
 
-    return lowestBaseline == 0 ? 0.0 : (lowestBaseline - 1).toDouble();
+    return lowestBaseline == 0
+        ? 0.0
+        : (lowestBaseline - 1).toDouble();
   }
 
   double _calculateYInterval(double minY, double maxY) {
