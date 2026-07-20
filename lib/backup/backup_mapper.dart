@@ -1,4 +1,5 @@
 import '../models/entry_type.dart';
+import '../models/finish_multiplier.dart';
 import '../models/new_entry.dart';
 import '../models/new_finish_entry.dart';
 
@@ -16,6 +17,7 @@ class BackupMapper {
   Map<String, dynamic> finishToJson(NewFinishEntry finish) {
     return {
       'field': finish.field,
+      'multiplier': finish.multiplier.name,
       'timestamp': finish.timestamp.toIso8601String(),
     };
   }
@@ -35,7 +37,12 @@ class BackupMapper {
   NewFinishEntry finishFromJson(Map<String, dynamic> json) {
     return NewFinishEntry(
       field: json['field'] as int,
-      timestamp: DateTime.parse(json['timestamp'] as String),
+      multiplier: FinishMultiplier.values.byName(
+        json['multiplier'] as String? ?? 'double',
+      ),
+      timestamp: DateTime.parse(
+        json['timestamp'] as String,
+      ),
     );
   }
 }

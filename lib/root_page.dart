@@ -114,7 +114,11 @@ class _RootPageState extends State<RootPage> {
   }
 
   Future<void> _saveFinish(NewFinishEntry finish) async {
-    await _finishStorage.add(finish.field, finish.timestamp);
+    await _finishStorage.add(
+      finish.field,
+      finish.multiplier,
+      finish.timestamp,
+    );
 
     await _loadFinishes();
   }
@@ -260,7 +264,11 @@ class _RootPageState extends State<RootPage> {
       }
 
       for (final finish in backup.finishes) {
-        await _finishStorage.add(finish.field, finish.timestamp);
+        await _finishStorage.add(
+          finish.field,
+          finish.multiplier,
+          finish.timestamp
+        );
       }
 
       await _settingsRepository.save(backup.settings);

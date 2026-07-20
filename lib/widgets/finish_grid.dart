@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
 
+import '../models/finish_multiplier.dart';
 import '../models/finish_fields.dart';
 
 class FinishGrid extends StatelessWidget {
-  const FinishGrid({super.key, required this.onSelected});
+  const FinishGrid({
+    super.key,
+    required this.onSelected,
+    required this.multiplier,
+  });
+
+  final FinishMultiplier multiplier;
+  final ValueChanged<int> onSelected;
 
   static const _buttonHeight = 32.0;
 
-  final ValueChanged<int> onSelected;
-
   @override
   Widget build(BuildContext context) {
+    final bullEnabled = multiplier == FinishMultiplier.double;
+
     return Column(
       children: [
         GridView.builder(
@@ -26,6 +34,8 @@ class FinishGrid extends StatelessWidget {
           itemBuilder: (context, index) {
             final field = finishFields[index];
 
+            final enabled = field != 50 || bullEnabled;
+
             return FilledButton(
               style: FilledButton.styleFrom(
                 padding: EdgeInsets.zero,
@@ -33,7 +43,9 @@ class FinishGrid extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
-              onPressed: () => onSelected(field),
+              onPressed: enabled
+                  ? () => onSelected(field)
+                  : null,
               child: Text(
                 finishButtonLabel(field),
                 maxLines: 1,

@@ -22,6 +22,9 @@ class FinishEntries extends Table {
 
   IntColumn get field => integer()();
 
+  TextColumn get multiplier =>
+    text().withDefault(const Constant('double'))();
+
   DateTimeColumn get timestamp => dateTime()();
 }
 
@@ -30,7 +33,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -44,6 +47,13 @@ class AppDatabase extends _$AppDatabase {
 
       if (from < 3) {
         await m.createTable(finishEntries);
+      }
+
+      if (from < 4) {
+        await m.addColumn(
+          finishEntries,
+          finishEntries.multiplier,
+        );
       }
     },
   );

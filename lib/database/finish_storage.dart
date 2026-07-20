@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import 'database.dart';
+import '../models/finish_multiplier.dart';
 import '../models/new_finish_entry.dart';
 
 class FinishStorage {
@@ -18,17 +19,26 @@ class FinishStorage {
           (row) => NewFinishEntry(
             id: row.id,
             field: row.field,
+            multiplier: FinishMultiplier.values.byName(row.multiplier),
             timestamp: row.timestamp,
           ),
         )
         .toList();
   }
 
-  Future<void> add(int field, DateTime timestamp) async {
+  Future<void> add(
+    int field,
+    FinishMultiplier multiplier,
+    DateTime timestamp,
+  ) async {
     await _database
         .into(_database.finishEntries)
         .insert(
-          FinishEntriesCompanion.insert(field: field, timestamp: timestamp),
+          FinishEntriesCompanion.insert(
+            field: field,
+            multiplier: Value(multiplier.name),
+            timestamp: timestamp,
+          ),
         );
   }
 

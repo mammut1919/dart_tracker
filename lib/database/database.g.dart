@@ -321,6 +321,18 @@ class $FinishEntriesTable extends FinishEntries
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _multiplierMeta = const VerificationMeta(
+    'multiplier',
+  );
+  @override
+  late final GeneratedColumn<String> multiplier = GeneratedColumn<String>(
+    'multiplier',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('double'),
+  );
   static const VerificationMeta _timestampMeta = const VerificationMeta(
     'timestamp',
   );
@@ -333,7 +345,7 @@ class $FinishEntriesTable extends FinishEntries
     requiredDuringInsert: true,
   );
   @override
-  List<GeneratedColumn> get $columns => [id, field, timestamp];
+  List<GeneratedColumn> get $columns => [id, field, multiplier, timestamp];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -356,6 +368,12 @@ class $FinishEntriesTable extends FinishEntries
       );
     } else if (isInserting) {
       context.missing(_fieldMeta);
+    }
+    if (data.containsKey('multiplier')) {
+      context.handle(
+        _multiplierMeta,
+        multiplier.isAcceptableOrUnknown(data['multiplier']!, _multiplierMeta),
+      );
     }
     if (data.containsKey('timestamp')) {
       context.handle(
@@ -382,6 +400,10 @@ class $FinishEntriesTable extends FinishEntries
         DriftSqlType.int,
         data['${effectivePrefix}field'],
       )!,
+      multiplier: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}multiplier'],
+      )!,
       timestamp: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}timestamp'],
@@ -398,10 +420,12 @@ class $FinishEntriesTable extends FinishEntries
 class FinishEntry extends DataClass implements Insertable<FinishEntry> {
   final int id;
   final int field;
+  final String multiplier;
   final DateTime timestamp;
   const FinishEntry({
     required this.id,
     required this.field,
+    required this.multiplier,
     required this.timestamp,
   });
   @override
@@ -409,6 +433,7 @@ class FinishEntry extends DataClass implements Insertable<FinishEntry> {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['field'] = Variable<int>(field);
+    map['multiplier'] = Variable<String>(multiplier);
     map['timestamp'] = Variable<DateTime>(timestamp);
     return map;
   }
@@ -417,6 +442,7 @@ class FinishEntry extends DataClass implements Insertable<FinishEntry> {
     return FinishEntriesCompanion(
       id: Value(id),
       field: Value(field),
+      multiplier: Value(multiplier),
       timestamp: Value(timestamp),
     );
   }
@@ -429,6 +455,7 @@ class FinishEntry extends DataClass implements Insertable<FinishEntry> {
     return FinishEntry(
       id: serializer.fromJson<int>(json['id']),
       field: serializer.fromJson<int>(json['field']),
+      multiplier: serializer.fromJson<String>(json['multiplier']),
       timestamp: serializer.fromJson<DateTime>(json['timestamp']),
     );
   }
@@ -438,20 +465,29 @@ class FinishEntry extends DataClass implements Insertable<FinishEntry> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'field': serializer.toJson<int>(field),
+      'multiplier': serializer.toJson<String>(multiplier),
       'timestamp': serializer.toJson<DateTime>(timestamp),
     };
   }
 
-  FinishEntry copyWith({int? id, int? field, DateTime? timestamp}) =>
-      FinishEntry(
-        id: id ?? this.id,
-        field: field ?? this.field,
-        timestamp: timestamp ?? this.timestamp,
-      );
+  FinishEntry copyWith({
+    int? id,
+    int? field,
+    String? multiplier,
+    DateTime? timestamp,
+  }) => FinishEntry(
+    id: id ?? this.id,
+    field: field ?? this.field,
+    multiplier: multiplier ?? this.multiplier,
+    timestamp: timestamp ?? this.timestamp,
+  );
   FinishEntry copyWithCompanion(FinishEntriesCompanion data) {
     return FinishEntry(
       id: data.id.present ? data.id.value : this.id,
       field: data.field.present ? data.field.value : this.field,
+      multiplier: data.multiplier.present
+          ? data.multiplier.value
+          : this.multiplier,
       timestamp: data.timestamp.present ? data.timestamp.value : this.timestamp,
     );
   }
@@ -461,45 +497,52 @@ class FinishEntry extends DataClass implements Insertable<FinishEntry> {
     return (StringBuffer('FinishEntry(')
           ..write('id: $id, ')
           ..write('field: $field, ')
+          ..write('multiplier: $multiplier, ')
           ..write('timestamp: $timestamp')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, field, timestamp);
+  int get hashCode => Object.hash(id, field, multiplier, timestamp);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is FinishEntry &&
           other.id == this.id &&
           other.field == this.field &&
+          other.multiplier == this.multiplier &&
           other.timestamp == this.timestamp);
 }
 
 class FinishEntriesCompanion extends UpdateCompanion<FinishEntry> {
   final Value<int> id;
   final Value<int> field;
+  final Value<String> multiplier;
   final Value<DateTime> timestamp;
   const FinishEntriesCompanion({
     this.id = const Value.absent(),
     this.field = const Value.absent(),
+    this.multiplier = const Value.absent(),
     this.timestamp = const Value.absent(),
   });
   FinishEntriesCompanion.insert({
     this.id = const Value.absent(),
     required int field,
+    this.multiplier = const Value.absent(),
     required DateTime timestamp,
   }) : field = Value(field),
        timestamp = Value(timestamp);
   static Insertable<FinishEntry> custom({
     Expression<int>? id,
     Expression<int>? field,
+    Expression<String>? multiplier,
     Expression<DateTime>? timestamp,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (field != null) 'field': field,
+      if (multiplier != null) 'multiplier': multiplier,
       if (timestamp != null) 'timestamp': timestamp,
     });
   }
@@ -507,11 +550,13 @@ class FinishEntriesCompanion extends UpdateCompanion<FinishEntry> {
   FinishEntriesCompanion copyWith({
     Value<int>? id,
     Value<int>? field,
+    Value<String>? multiplier,
     Value<DateTime>? timestamp,
   }) {
     return FinishEntriesCompanion(
       id: id ?? this.id,
       field: field ?? this.field,
+      multiplier: multiplier ?? this.multiplier,
       timestamp: timestamp ?? this.timestamp,
     );
   }
@@ -525,6 +570,9 @@ class FinishEntriesCompanion extends UpdateCompanion<FinishEntry> {
     if (field.present) {
       map['field'] = Variable<int>(field.value);
     }
+    if (multiplier.present) {
+      map['multiplier'] = Variable<String>(multiplier.value);
+    }
     if (timestamp.present) {
       map['timestamp'] = Variable<DateTime>(timestamp.value);
     }
@@ -536,6 +584,7 @@ class FinishEntriesCompanion extends UpdateCompanion<FinishEntry> {
     return (StringBuffer('FinishEntriesCompanion(')
           ..write('id: $id, ')
           ..write('field: $field, ')
+          ..write('multiplier: $multiplier, ')
           ..write('timestamp: $timestamp')
           ..write(')'))
         .toString();
@@ -736,12 +785,14 @@ typedef $$FinishEntriesTableCreateCompanionBuilder =
     FinishEntriesCompanion Function({
       Value<int> id,
       required int field,
+      Value<String> multiplier,
       required DateTime timestamp,
     });
 typedef $$FinishEntriesTableUpdateCompanionBuilder =
     FinishEntriesCompanion Function({
       Value<int> id,
       Value<int> field,
+      Value<String> multiplier,
       Value<DateTime> timestamp,
     });
 
@@ -761,6 +812,11 @@ class $$FinishEntriesTableFilterComposer
 
   ColumnFilters<int> get field => $composableBuilder(
     column: $table.field,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get multiplier => $composableBuilder(
+    column: $table.multiplier,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -789,6 +845,11 @@ class $$FinishEntriesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get multiplier => $composableBuilder(
+    column: $table.multiplier,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get timestamp => $composableBuilder(
     column: $table.timestamp,
     builder: (column) => ColumnOrderings(column),
@@ -809,6 +870,11 @@ class $$FinishEntriesTableAnnotationComposer
 
   GeneratedColumn<int> get field =>
       $composableBuilder(column: $table.field, builder: (column) => column);
+
+  GeneratedColumn<String> get multiplier => $composableBuilder(
+    column: $table.multiplier,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get timestamp =>
       $composableBuilder(column: $table.timestamp, builder: (column) => column);
@@ -847,20 +913,24 @@ class $$FinishEntriesTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<int> field = const Value.absent(),
+                Value<String> multiplier = const Value.absent(),
                 Value<DateTime> timestamp = const Value.absent(),
               }) => FinishEntriesCompanion(
                 id: id,
                 field: field,
+                multiplier: multiplier,
                 timestamp: timestamp,
               ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 required int field,
+                Value<String> multiplier = const Value.absent(),
                 required DateTime timestamp,
               }) => FinishEntriesCompanion.insert(
                 id: id,
                 field: field,
+                multiplier: multiplier,
                 timestamp: timestamp,
               ),
           withReferenceMapper: (p0) => p0
