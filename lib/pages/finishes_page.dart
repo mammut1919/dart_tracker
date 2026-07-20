@@ -43,7 +43,11 @@ class _FinishesPageState extends State<FinishesPage> {
         return AlertDialog(
           title: const Text('Finish löschen?'),
           content: Text(
-            'Soll ${finish.field == 50 ? "Bull" : "D${finish.field}"} wirklich gelöscht werden?',
+            'Soll ${
+              finish.field == 50
+                ? "Bull"
+                : "${finish.multiplier == FinishMultiplier.double ? 'D' : 'T'}${finish.field}"
+            } wirklich gelöscht werden?',
           ),
           actions: [
             TextButton(
@@ -66,6 +70,9 @@ class _FinishesPageState extends State<FinishesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final visibleFinishes = widget.finishes
+      .where((finish) => finish.multiplier == _selectedMultiplier)
+      .toList();
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -104,20 +111,20 @@ class _FinishesPageState extends State<FinishesPage> {
                 },
               ),
               const SizedBox(height: 16),
-              FinishChart(finishes: widget.finishes),
+              FinishChart(finishes: visibleFinishes),
               const SizedBox(height: 24),
               const Text(
                 'Historie',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
-              if (widget.finishes.isEmpty)
+              if (visibleFinishes.isEmpty)
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 32),
                   child: Center(child: Text('Noch keine Finishes erfasst.')),
                 )
               else
-                ...widget.finishes.map<Widget>((finish) {
+                ...visibleFinishes.map<Widget>((finish) {
                   return Dismissible(
                     key: ValueKey(finish.id),
                     direction: DismissDirection.endToStart,
@@ -137,7 +144,9 @@ class _FinishesPageState extends State<FinishesPage> {
                             _confirmDeleteFinish(context, finish),
                         leading: const Icon(Icons.gps_fixed),
                         title: Text(
-                          finish.field == 50 ? 'Bull' : 'D${finish.field}',
+                          finish.field == 50
+                            ? 'Bull'
+                            : '${finish.multiplier == FinishMultiplier.double ? 'D' : 'T'}${finish.field}',
                         ),
                         subtitle: Text(
                           DateFormat('dd.MM.yyyy').format(finish.timestamp),
