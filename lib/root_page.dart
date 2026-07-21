@@ -6,7 +6,6 @@ import 'backup/backup_file_service.dart';
 import 'database/database.dart';
 import 'database/score_storage.dart';
 import 'database/finish_storage.dart';
-import 'dialogs/about_dart_tracker_dialog.dart';
 import 'dialogs/settings_dialog.dart';
 import 'models/app_page.dart';
 import 'models/entry_option.dart';
@@ -19,8 +18,6 @@ import 'settings/app_settings.dart';
 import 'settings/settings_repository.dart';
 import 'widgets/entry_dialog.dart';
 import 'widgets/page_selector.dart';
-
-enum _MenuAction { exportBackup, importBackup, resetData, about }
 
 class RootPage extends StatefulWidget {
   const RootPage({super.key, required this.settings});
@@ -178,7 +175,12 @@ class _RootPageState extends State<RootPage> {
   Future<void> _showSettingsDialog() async {
     final settings = await showDialog<AppSettings>(
       context: context,
-      builder: (context) => SettingsDialog(settings: _settings),
+      builder: (_) => SettingsDialog(
+        settings: _settings,
+        onExportBackup: _exportBackup,
+        onImportBackup: _importBackup,
+        onResetData: _confirmResetData,
+      ), 
     );
 
     if (settings == null) {
@@ -186,29 +188,6 @@ class _RootPageState extends State<RootPage> {
     }
 
     await _updateSettings(settings);
-  }
-
-  Future<void> _onMenuSelected(_MenuAction action) async {
-    switch (action) {
-      case _MenuAction.exportBackup:
-        await _exportBackup();
-        break;
-
-      case _MenuAction.importBackup:
-        await _importBackup();
-        break;
-
-      case _MenuAction.resetData:
-        _confirmResetData();
-        break;
-
-      case _MenuAction.about:
-        showDialog(
-          context: context,
-          builder: (_) => const AboutDartTrackerDialog(),
-        );
-        break;
-    }
   }
 
   Future<void> _exportBackup() async {
@@ -427,38 +406,18 @@ class _RootPageState extends State<RootPage> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: _showSettingsDialog,
-            tooltip: 'Einstellungen',
-          ),
-          IconButton(
             icon: const Icon(Icons.add),
             onPressed: _showAddDialog,
             tooltip: 'Eintrag hinzufügen',
           ),
-          PopupMenuButton<_MenuAction>(
-            onSelected: _onMenuSelected,
-            itemBuilder: (context) => const [
-              PopupMenuItem(
-                value: _MenuAction.exportBackup,
-                child: Text('Backup exportieren'),
-              ),
-              PopupMenuItem(
-                value: _MenuAction.importBackup,
-                child: Text('Backup importieren'),
-              ),
-              PopupMenuDivider(),
-              PopupMenuItem(
-                value: _MenuAction.resetData,
-                child: Text('Daten zurücksetzen'),
-              ),
-              PopupMenuDivider(),
-              PopupMenuItem(
-                value: _MenuAction.about,
-                child: Text('Über Dart Tracker'),
-              ),
-            ],
-          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: _showSettingsDialog,
+              tooltip: 'Einstellungen',
+            ),
+          ) 
         ],
       ),
       body: IndexedStack(

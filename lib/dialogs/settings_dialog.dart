@@ -1,137 +1,99 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
+import 'about_dart_tracker_dialog.dart';
+import 'appearance_dialog.dart';
+import 'data_dialog.dart';
+import 'statistics_dialog.dart';
 import '../settings/app_settings.dart';
 
-class SettingsDialog extends StatefulWidget {
-  const SettingsDialog({super.key, required this.settings});
+class SettingsDialog extends StatelessWidget {
+  const SettingsDialog({
+    super.key,
+    required this.settings,
+    required this.onExportBackup,
+    required this.onImportBackup,
+    required this.onResetData,
+  });
 
   final AppSettings settings;
+  final Future<void> Function() onExportBackup;
+  final Future<void> Function() onImportBackup;
+  final VoidCallback onResetData;
 
-  @override
-  State<SettingsDialog> createState() => _SettingsDialogState();
-}
-
-class _SettingsDialogState extends State<SettingsDialog> {
-  late final TextEditingController _baseline180Controller;
-  late final TextEditingController _baseline171Controller;
-  late final TextEditingController _baseline162Controller;
-  late final TextEditingController _baselineHighFinishController;
-  late final TextEditingController _baselineShortLegController;
-
-  final _formKey = GlobalKey<FormState>();
-
-  @override
-  void initState() {
-    super.initState();
-
-    _baseline180Controller = TextEditingController(
-      text: widget.settings.baseline180.toString(),
-    );
-
-    _baseline171Controller = TextEditingController(
-      text: widget.settings.baseline171.toString(),
-    );
-
-    _baseline162Controller = TextEditingController(
-      text: widget.settings.baseline162.toString(),
-    );
-
-    _baselineHighFinishController = TextEditingController(
-      text: widget.settings.baselineHighFinish.toString(),
-    );
-
-    _baselineShortLegController = TextEditingController(
-      text: widget.settings.baselineShortLeg.toString(),
-    );
-  }
-
-  @override
-  void dispose() {
-    _baseline180Controller.dispose();
-    _baseline171Controller.dispose();
-    _baseline162Controller.dispose();
-    _baselineHighFinishController.dispose();
-    _baselineShortLegController.dispose();
-
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Startwerte'),
-      content: Form(
-        key: _formKey,
+      title: const Text('Einstellungen'),
+      content: SizedBox(
+        width: 320,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildField('180', _baseline180Controller),
-            _buildField('171', _baseline171Controller),
-            _buildField('162', _baseline162Controller),
-            _buildField('High Finish', _baselineHighFinishController),
+            // statistics
+            ListTile(
+              leading: const Icon(Icons.bar_chart),
+              title: const Text('Statistik'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                Navigator.pop(context);
 
-            _buildField('Short Leg', _baselineShortLegController),
+                showDialog(
+                  context: context,
+                  builder: (_) => StatisticsDialog(
+                    settings: settings,
+                  ),
+                );
+              },
+            ),
+            // data
+            ListTile(
+            leading: const Icon(Icons.storage),
+            title: const Text('Daten'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.pop(context);
+
+              showDialog(
+                context: context,
+                builder: (_) => DataDialog(
+                  onExportBackup: onExportBackup,
+                  onImportBackup: onImportBackup,
+                  onResetData: onResetData,
+                ),
+              );
+            },
+          ),
+            // appearence
+            ListTile(
+              leading: const Icon(Icons.palette),
+              title: const Text('Darstellung'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                Navigator.pop(context);
+
+                showDialog(
+                  context: context,
+                  builder: (_) => const AppearanceDialog(),
+                );
+              },
+            ),
+            // about
+            ListTile(
+              leading: const Icon(Icons.info_outline),
+              title: const Text('Über Dart Tracker'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                Navigator.pop(context);
+
+                showDialog(
+                  context: context,
+                  builder: (_) => const AboutDartTrackerDialog(),
+                );
+              },
+            ),
           ],
         ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: const Text('Abbrechen'),
-        ),
-        FilledButton(
-          onPressed: () {
-            if (!_formKey.currentState!.validate()) {
-              return;
-            }
-            Navigator.pop(
-              context,
-              widget.settings.copyWith(
-                baseline180: int.parse(_baseline180Controller.text),
-                baseline171: int.parse(_baseline171Controller.text),
-                baseline162: int.parse(_baseline162Controller.text),
-                baselineHighFinish: int.parse(
-                  _baselineHighFinishController.text,
-                ),
-
-                baselineShortLeg: int.parse(_baselineShortLegController.text),
-              ),
-            );
-          },
-          child: const Text('Speichern'),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildField(String label, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: TextFormField(
-        controller: controller,
-        keyboardType: TextInputType.number,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Bitte eingeben';
-          }
-
-          final number = int.tryParse(value);
-
-          if (number == null) {
-            return 'Ungültige Zahl';
-          }
-
-          if (number < 0) {
-            return 'Muss ≥ 0 sein';
-          }
-
-          return null;
-        },
-        decoration: InputDecoration(labelText: label),
       ),
     );
   }
