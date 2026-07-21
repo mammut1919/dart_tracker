@@ -111,7 +111,10 @@ class _FinishesPageState extends State<FinishesPage> {
                 },
               ),
               const SizedBox(height: 16),
-              FinishChart(finishes: visibleFinishes),
+              FinishChart(
+                finishes: visibleFinishes,
+                multiplier: _selectedMultiplier
+              ),
               const SizedBox(height: 24),
               const Text(
                 'Historie',

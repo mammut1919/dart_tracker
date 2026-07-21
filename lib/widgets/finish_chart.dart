@@ -5,11 +5,14 @@ import '../models/finish_fields.dart';
 import '../models/new_finish_entry.dart';
 
 class FinishChart extends StatelessWidget {
-  FinishChart({super.key, required this.finishes});
+  const FinishChart({
+    super.key,
+    required this.finishes,
+    required this.multiplier,  
+  });
 
   final List<NewFinishEntry> finishes;
-
-  final finishOrder = [...finishFields]..sort((a, b) => b.compareTo(a));
+  final FinishMultiplier multiplier;
 
   Map<int, int> _buildCounts() {
     final counts = <int, int>{};
@@ -38,6 +41,13 @@ class FinishChart extends StatelessWidget {
     final counts = _buildCounts();
     final maxCount = _maxCount(counts);
 
+    final finishOrder = [
+      ...finishFields.where(
+        (field) =>
+            multiplier == FinishMultiplier.double || field != 50,
+      ),
+    ]..sort((a, b) => b.compareTo(a));
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -53,7 +63,7 @@ class FinishChart extends StatelessWidget {
                   SizedBox(
                     width: 40,
                     child: Text(
-                      finishChartLabel(field, FinishMultiplier.double),
+                      finishChartLabel(field, multiplier),
                       style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
                   ),
