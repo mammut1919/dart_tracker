@@ -6,6 +6,8 @@ import 'backup/backup_file_service.dart';
 import 'database/database.dart';
 import 'database/score_storage.dart';
 import 'database/finish_storage.dart';
+import 'dialogs/about_dart_tracker_dialog.dart';
+import 'dialogs/settings_dialog.dart';
 import 'models/app_page.dart';
 import 'models/entry_option.dart';
 import 'models/date_filter.dart';
@@ -16,8 +18,6 @@ import 'pages/finishes_page.dart';
 import 'settings/app_settings.dart';
 import 'settings/settings_repository.dart';
 import 'widgets/entry_dialog.dart';
-import 'widgets/about_dart_tracker_dialog.dart';
-import 'widgets/settings_dialog.dart';
 import 'widgets/page_selector.dart';
 
 enum _MenuAction { exportBackup, importBackup, resetData, about }
