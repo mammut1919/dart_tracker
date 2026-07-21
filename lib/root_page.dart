@@ -93,6 +93,11 @@ class _RootPageState extends State<RootPage> {
   Future<void> _updateSettings(AppSettings settings) async {
     await _settingsRepository.save(settings);
 
+    debugPrint(
+      '180 alt: ${_settings.score180ColorValue}, '
+      'neu: ${settings.score180ColorValue}',
+    );
+
     setState(() {
       _settings = settings;
     });
@@ -177,6 +182,7 @@ class _RootPageState extends State<RootPage> {
       context: context,
       builder: (_) => SettingsDialog(
         settings: _settings,
+        onSettingsChanged: _updateSettings,
         onExportBackup: _exportBackup,
         onImportBackup: _importBackup,
         onResetData: _confirmResetData,

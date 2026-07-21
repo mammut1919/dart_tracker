@@ -10,12 +10,14 @@ class SettingsDialog extends StatelessWidget {
   const SettingsDialog({
     super.key,
     required this.settings,
+    required this.onSettingsChanged,
     required this.onExportBackup,
     required this.onImportBackup,
     required this.onResetData,
   });
 
   final AppSettings settings;
+  final ValueChanged<AppSettings> onSettingsChanged;
   final Future<void> Function() onExportBackup;
   final Future<void> Function() onImportBackup;
   final VoidCallback onResetData;
@@ -69,13 +71,19 @@ class SettingsDialog extends StatelessWidget {
               leading: const Icon(Icons.palette),
               title: const Text('Darstellung'),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () {
+              onTap: () async {
                 Navigator.pop(context);
 
-                showDialog(
+                final result = await showDialog<AppSettings>(
                   context: context,
-                  builder: (_) => const AppearanceDialog(),
+                  builder: (_) => AppearanceDialog(
+                    settings: settings,
+                  ),
                 );
+
+                if (result != null) {
+                  onSettingsChanged(result);
+                }
               },
             ),
             // about
