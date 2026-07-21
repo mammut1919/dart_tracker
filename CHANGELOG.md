@@ -1,5 +1,31 @@
 # Changelog
 
+## [1.4.0] - 2026-07-22
+
+### ✨ New
+- Added date range filter for statistics
+- Added date range filter for finish tracker
+- Added support for Double and Triple finish tracking
+- Added separate statistics and charts for Double and Triple finishes
+- Added finish multiplier to backup format
+- Prepared iOS project for beta testing
+
+### 🎨 Improved
+- Baseline values are only applied when using the "Gesamt" date filter
+- Improved finish chart labels (Double / Triple)
+- Bull is hidden in Triple mode
+- Improved filter layout for a cleaner UI
+
+### 🔧 Changed
+- Finish history now reflects the selected multiplier
+- Finish charts now update according to the selected multiplier
+
+### 🐞 Fixed
+- Various UI improvements
+- Several small stability fixes
+
+---
+
 ## [1.3.0] - 2026-07-19
 
 ### Added

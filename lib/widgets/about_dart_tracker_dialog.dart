@@ -60,20 +60,23 @@ class _AboutDartTrackerDialogState extends State<AboutDartTrackerDialog> {
 const _aboutText = '''
 Dart Tracker
 
-Version 1.3.0
+Version 1.4.0
 
-Dart Tracker unterstützt dich beim Erfassen deiner persönlichen Trainingsstatistiken – schnell, einfach und ohne unnötigen Aufwand.
+Dart Tracker unterstützt dich beim Erfassen deiner persönlichen Trainingsstatistiken - schnell, einfach und ohne unnötigen Aufwand.
 
 Features:
 • Erfassung von 180, 171 und 162
 • High Finishes und Short Legs
-• Checkout-Übersicht mit Finish-Chart
+• Double- und Triple-Finish-Tracking
+• Zeitraumfilter für Statistiken und Finishes
+• Interaktive Diagramme und Finish-Übersicht
 • Backup und Wiederherstellung aller Daten
 • Individuelle Baselines für persönliche Statistiken
 
 Die App konzentriert sich bewusst auf die wichtigsten Trainingsdaten und verzichtet auf komplexes Match-Tracking.
 
-Vielen
+Vielen Dank an alle Beta-Tester für ihr wertvolles Feedback.
+
 Gut Dart!
 
 ''';
