@@ -79,7 +79,7 @@ class EntriesPage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 child: EntryButton(
                   label: '${definition.score}',
-                  color: definition.color,
+                  color: settings.colorFor(definition.score),
                   onPressed: () => onAddEntry(
                     NewEntry(
                       type: EntryType.score,
@@ -113,7 +113,7 @@ class EntriesPage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 child: EntrySummaryCard(
                   count: displayCount,
-                  color: definition.color,
+                  color: settings.colorFor(definition.score),
                   label: '${definition.score}',
                 ),
               ),

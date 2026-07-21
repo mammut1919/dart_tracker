@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
-
 class ScoreDefinition {
-  const ScoreDefinition({required this.score, required this.color});
+  const ScoreDefinition({
+    required this.score
+  });
 
   final int score;
-  final Color color;
 }

@@ -226,7 +226,7 @@ class ScoreChart extends StatelessWidget {
 
       return ChartSeries(
         label: '${definition.score}',
-        color: definition.color,
+        color: settings.colorFor(definition.score),
         chart: chart,
       );
     }).toList();
@@ -244,7 +244,7 @@ class ScoreChart extends StatelessWidget {
     series.add(
       ChartSeries(
         label: 'High Finish',
-        color: AppColors.highFinish,
+        color: settings.colorForEntryType(EntryType.highFinish),
         chart: highFinishChart,
       ),
     );
@@ -262,7 +262,7 @@ class ScoreChart extends StatelessWidget {
     series.add(
       ChartSeries(
         label: 'Short Leg',
-        color: AppColors.shortLeg,
+        color: settings.colorForEntryType(EntryType.shortLeg),
         chart: shortLegChart,
       ),
     );
