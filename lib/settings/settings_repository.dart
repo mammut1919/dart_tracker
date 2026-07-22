@@ -13,6 +13,7 @@ class SettingsRepository {
   static const _score162ColorKey = 'score162Color';
   static const _highFinishColorKey = 'highFinishColor';
   static const _shortLegColorKey = 'shortLegColor';
+  static const _themeModeKey = 'themeMode';
 
   Future<AppSettings> load() async {
     final prefs = await SharedPreferences.getInstance();
@@ -49,7 +50,12 @@ class SettingsRepository {
       shortLegColorValue:
           prefs.getInt(_shortLegColorKey) ??
           AppSettings.initial.shortLegColorValue,
-          );
+
+      themeMode:
+          prefs.getString(_themeModeKey) ??
+          AppSettings.initial.themeMode,
+    );
+
   }
 
   Future<void> save(AppSettings settings) async {
@@ -65,5 +71,6 @@ class SettingsRepository {
     await prefs.setInt(_score162ColorKey, settings.score162ColorValue);
     await prefs.setInt(_highFinishColorKey, settings.highFinishColorValue);
     await prefs.setInt(_shortLegColorKey, settings.shortLegColorValue);
+    await prefs.setString(_themeModeKey, settings.themeMode);
   }
 }

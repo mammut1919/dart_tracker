@@ -15,6 +15,8 @@ class AppSettings {
     score162ColorValue: 0xFF0000FF,
     highFinishColorValue: 0xFF673AB7,
     shortLegColorValue: 0xFFF44336,
+
+    themeMode: 'light',
   );
 
   const AppSettings({
@@ -28,6 +30,7 @@ class AppSettings {
     required this.score162ColorValue,
     required this.highFinishColorValue,
     required this.shortLegColorValue,
+    required this.themeMode,
   }) : assert(baseline180 >= 0),
        assert(baseline171 >= 0),
        assert(baseline162 >= 0),
@@ -44,6 +47,7 @@ class AppSettings {
   final int score162ColorValue;
   final int highFinishColorValue;
   final int shortLegColorValue;
+  final String themeMode;
 
   Color get score180Color => Color(score180ColorValue);
   Color get score171Color => Color(score171ColorValue);
@@ -62,6 +66,7 @@ class AppSettings {
     int? score162ColorValue,
     int? highFinishColorValue,
     int? shortLegColorValue,
+    String? themeMode,
   }) {
     return AppSettings(
       baseline180: baseline180 ?? this.baseline180,
@@ -74,6 +79,7 @@ class AppSettings {
       score162ColorValue: score162ColorValue ?? this.score162ColorValue,
       highFinishColorValue: highFinishColorValue ?? this.highFinishColorValue,
       shortLegColorValue: shortLegColorValue ?? this.shortLegColorValue,
+      themeMode: themeMode ?? this.themeMode,
     );
   }
 
@@ -131,6 +137,7 @@ class AppSettings {
       'score162ColorValue': score162ColorValue,
       'highFinishColorValue': highFinishColorValue,
       'shortLegColorValue': shortLegColorValue,
+      'themeMode': themeMode,
     };
   }
 
@@ -151,6 +158,7 @@ class AppSettings {
           AppSettings.initial.highFinishColorValue,
       shortLegColorValue: json['shortLegColorValue'] as int? ??
           AppSettings.initial.shortLegColorValue,
+      themeMode: json['themeMode'] as String? ?? 'light',
     );
   }
 }

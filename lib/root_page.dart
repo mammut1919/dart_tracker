@@ -93,11 +93,6 @@ class _RootPageState extends State<RootPage> {
   Future<void> _updateSettings(AppSettings settings) async {
     await _settingsRepository.save(settings);
 
-    debugPrint(
-      '180 alt: ${_settings.score180ColorValue}, '
-      'neu: ${settings.score180ColorValue}',
-    );
-
     setState(() {
       _settings = settings;
     });
@@ -271,9 +266,7 @@ class _RootPageState extends State<RootPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Backup erfolgreich importiert.')),
       );
-    } catch (e, stackTrace) {
-      debugPrint(e.toString());
-      debugPrint(stackTrace.toString());
+    } catch (_) {
       
       if (!mounted) return;
 

@@ -28,14 +28,13 @@ class _AppearanceDialogState extends State<AppearanceDialog> {
   void initState() {
     super.initState();
 
-    _themeMode = ThemeMode.system;
-
     _score180Color = widget.settings.score180Color;
     _score171Color = widget.settings.score171Color;
     _score162Color = widget.settings.score162Color;
-
     _highFinishColor = widget.settings.highFinishColor;
     _shortLegColor = widget.settings.shortLegColor;
+
+    _themeMode = _themeModeFromString(widget.settings.themeMode);
   }
 
   Widget _buildColorRow({
@@ -119,6 +118,17 @@ class _AppearanceDialogState extends State<AppearanceDialog> {
 
   void _resetColors() {
     // TODO
+  }
+
+  ThemeMode _themeModeFromString(String value) {
+    switch (value) {
+      case 'dark':
+        return ThemeMode.dark;
+
+      case 'light':
+      default:
+        return ThemeMode.light;
+    }
   }
 
   @override
@@ -240,6 +250,9 @@ class _AppearanceDialogState extends State<AppearanceDialog> {
             Navigator.pop(
               context,
               widget.settings.copyWith(
+                themeMode: _themeMode == ThemeMode.dark
+                  ? 'dark'
+                  : 'light',
                 score180ColorValue: _score180Color.toARGB32(),
                 score171ColorValue: _score171Color.toARGB32(),
                 score162ColorValue: _score162Color.toARGB32(),
