@@ -41,6 +41,10 @@ class FinishChart extends StatelessWidget {
     final counts = _buildCounts();
     final maxCount = _maxCount(counts);
 
+    final colorScheme = Theme.of(context).colorScheme;
+    final backgroundColor = colorScheme.surfaceContainerHighest;
+    //final barColor = color;
+
     final finishOrder = [
       ...finishFields.where(
         (field) =>
@@ -77,7 +81,9 @@ class FinishChart extends StatelessWidget {
                         height: 14,
                         child: Stack(
                           children: [
-                            Container(color: Colors.grey.shade300),
+                            Container(
+                              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                            ),
                             FractionallySizedBox(
                               alignment: Alignment.centerLeft,
                               widthFactor: factor,
