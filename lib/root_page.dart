@@ -20,9 +20,14 @@ import 'widgets/entry_dialog.dart';
 import 'widgets/page_selector.dart';
 
 class RootPage extends StatefulWidget {
-  const RootPage({super.key, required this.settings});
+  const RootPage({
+    super.key,
+    required this.settings,
+    required this.onSettingsChanged,
+  });
 
   final AppSettings settings;
+  final ValueChanged<AppSettings> onSettingsChanged;
 
   @override
   State<RootPage> createState() => _RootPageState();
@@ -96,8 +101,9 @@ class _RootPageState extends State<RootPage> {
     setState(() {
       _settings = settings;
     });
-  }
 
+    widget.onSettingsChanged(settings);
+  }
   Future<void> _addEntry(NewEntry entry) async {
     await _storage.add(entry.type, entry.value, entry.timestamp);
 

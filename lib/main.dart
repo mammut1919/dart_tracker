@@ -19,10 +19,33 @@ Future<void> main() async {
   runApp(DartTrackerApp(settings: settings));
 }
 
-class DartTrackerApp extends StatelessWidget {
-  const DartTrackerApp({super.key, required this.settings});
+class DartTrackerApp extends StatefulWidget {
+  const DartTrackerApp({
+    super.key,
+    required this.settings
+  });
 
   final AppSettings settings;
+
+  @override
+  State<DartTrackerApp> createState() => _DartTrackerAppState();
+}
+
+class _DartTrackerAppState extends State<DartTrackerApp> {
+  late AppSettings _settings;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _settings = widget.settings;
+  }
+
+  void _updateSettings(AppSettings settings) {
+    setState(() {
+      _settings = settings;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,8 +55,22 @@ class DartTrackerApp extends StatelessWidget {
       locale: const Locale('de', 'DE'),
       supportedLocales: const [Locale('de', 'DE')],
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
-      theme: ThemeData(useMaterial3: true, colorSchemeSeed: AppColors.primary),
-      home: RootPage(settings: settings),
+
+      theme: ThemeData(
+        useMaterial3: true,
+        colorSchemeSeed: AppColors.primary,
+      ),
+
+      darkTheme: ThemeData.dark(useMaterial3: true),
+
+      themeMode: _settings.themeMode == 'dark'
+          ? ThemeMode.dark
+          : ThemeMode.light,
+
+      home: RootPage(
+        settings: _settings,
+        onSettingsChanged: _updateSettings,
+      ),
     );
   }
 }
