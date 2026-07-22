@@ -23,7 +23,13 @@ class BackupMapper {
   }
 
   NewEntry entryFromJson(Map<String, dynamic> json) {
-    final type = EntryType.values.byName(json['type'] as String);
+
+    final typeName = json['type'] as String;
+
+    final type = switch (typeName) {
+      'score_entry' => EntryType.score,
+      _ => EntryType.values.byName(typeName),
+    };
 
     final value = json['value'] ?? json['score'];
 

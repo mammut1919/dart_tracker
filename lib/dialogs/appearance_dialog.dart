@@ -117,6 +117,10 @@ class _AppearanceDialogState extends State<AppearanceDialog> {
     );
   }
 
+  void _resetColors() {
+    // TODO
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -157,12 +161,20 @@ class _AppearanceDialogState extends State<AppearanceDialog> {
 
           const SizedBox(height: 12),
 
-          const Text(
-            'Farben',
-            
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-            ),      
+          Row(
+            children: [
+              const Text(
+                'Farben',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const Spacer(),
+              TextButton(
+                onPressed: _resetColors,
+                child: const Text('Zurücksetzen'),
+              ),
+            ],
           ),
 
           _buildColorRow(

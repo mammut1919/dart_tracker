@@ -242,7 +242,7 @@ class _RootPageState extends State<RootPage> {
         return;
       }
 
-      await _storage.clear();
+      await _clearAllData();
 
       for (final entry in backup.entries) {
         await _storage.add(entry.type, entry.value, entry.timestamp);
@@ -271,7 +271,10 @@ class _RootPageState extends State<RootPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Backup erfolgreich importiert.')),
       );
-    } catch (_) {
+    } catch (e, stackTrace) {
+      debugPrint(e.toString());
+      debugPrint(stackTrace.toString());
+      
       if (!mounted) return;
 
       ScaffoldMessenger.of(

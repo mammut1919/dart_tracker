@@ -21,7 +21,7 @@ class BackupService {
     required List<NewFinishEntry> finishes,
   }) {
     final backup = BackupData(
-      version: 2,
+      version: 3,
       settings: settings,
       entries: entries,
       finishes: finishes,

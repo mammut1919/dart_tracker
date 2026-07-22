@@ -29,7 +29,7 @@ class BackupData {
   factory BackupData.fromJson(Map<String, dynamic> json, BackupMapper mapper) {
     final version = json['version'] as int;
 
-    if (version < 1 || version > 2) {
+    if (version < 1 || version > 3) {
       throw UnsupportedError('Unsupported backup version: $version');
     }
 

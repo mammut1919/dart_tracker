@@ -141,11 +141,16 @@ class AppSettings {
       baseline162: json['baseline162'] as int,
       baselineHighFinish: json['baselineHighFinish'] as int? ?? 0,
       baselineShortLeg: json['baselineShortLeg'] as int? ?? 0,
-      score180ColorValue: json['score180ColorValue'] as int,
-      score171ColorValue: json['score171ColorValue'] as int,
-      score162ColorValue: json['score162ColorValue'] as int,
-      highFinishColorValue: json['highFinishColorValue'] as int,
-      shortLegColorValue: json['shortLegColorValue'] as int,
+      score180ColorValue: json['score180ColorValue'] as int? ??
+          AppSettings.initial.score180ColorValue,
+      score171ColorValue: json['score171ColorValue'] as int? ??
+          AppSettings.initial.score171ColorValue,
+      score162ColorValue: json['score162ColorValue'] as int? ??
+          AppSettings.initial.score162ColorValue,
+      highFinishColorValue: json['highFinishColorValue'] as int? ??
+          AppSettings.initial.highFinishColorValue,
+      shortLegColorValue: json['shortLegColorValue'] as int? ??
+          AppSettings.initial.shortLegColorValue,
     );
   }
 }
