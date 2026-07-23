@@ -65,12 +65,20 @@ class _StatisticsDialogState extends State<StatisticsDialog> {
         key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text(
+              'Trage hier deine bereits erzielten Treffer vor der Nutzung von Dart Tracker ein.\n'
+              'Diese Werte werden als Startbestand für deine Statistiken verwendet.',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+
+            const SizedBox(height: 16),
+
             _buildField('180', _baseline180Controller),
             _buildField('171', _baseline171Controller),
             _buildField('162', _baseline162Controller),
             _buildField('High Finish', _baselineHighFinishController),
-
             _buildField('Short Leg', _baselineShortLegController),
           ],
         ),
