@@ -2,6 +2,7 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter/material.dart';
 
 import '../settings/app_settings.dart';
+import '../theme/app_colors.dart';
 
 class AppearanceDialog extends StatefulWidget {
   const AppearanceDialog({
@@ -117,7 +118,14 @@ class _AppearanceDialogState extends State<AppearanceDialog> {
   }
 
   void _resetColors() {
-    // TODO
+    setState(() {
+      _score180Color = AppColors.score180;
+      _score171Color = AppColors.score171;
+      _score162Color = AppColors.score162;
+
+      _highFinishColor = AppColors.highFinish;
+      _shortLegColor = AppColors.shortLeg;
+    });
   }
 
   ThemeMode _themeModeFromString(String value) {
