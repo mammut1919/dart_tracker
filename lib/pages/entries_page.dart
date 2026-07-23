@@ -129,7 +129,7 @@ class EntriesPage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 child: EntryButton(
                   label: 'High Finish',
-                  color: AppColors.highFinish,
+                  color: settings.highFinishColor,
                   onPressed: () =>
                       onShowAddDialog(initialOption: highFinishOption),
                 ),
@@ -141,7 +141,7 @@ class EntriesPage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 child: EntryButton(
                   label: 'Short Leg',
-                  color: AppColors.shortLeg,
+                  color: settings.shortLegColor,
                   onPressed: () =>
                       onShowAddDialog(initialOption: shortLegOption),
                 ),
@@ -158,7 +158,7 @@ class EntriesPage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 child: EntrySummaryCard(
                   count: countHighFinish + highFinishBaseline,
-                  color: AppColors.highFinish,
+                  color: settings.highFinishColor,
                   label: 'HF',
                 ),
               ),
@@ -168,7 +168,7 @@ class EntriesPage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 child: EntrySummaryCard(
                   count: countSL + shortLegBaseline,
-                  color: AppColors.shortLeg,
+                  color: settings.shortLegColor,
                   label: 'SL',
                 ),
               ),
