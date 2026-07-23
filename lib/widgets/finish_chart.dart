@@ -41,10 +41,6 @@ class FinishChart extends StatelessWidget {
     final counts = _buildCounts();
     final maxCount = _maxCount(counts);
 
-    final colorScheme = Theme.of(context).colorScheme;
-    final backgroundColor = colorScheme.surfaceContainerHighest;
-    //final barColor = color;
-
     final finishOrder = [
       ...finishFields.where(
         (field) =>

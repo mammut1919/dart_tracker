@@ -1,5 +1,31 @@
 # Changelog
 
+# [1.5.0] - 2026-07-23
+
+## New
+
+- Light and Dark Mode
+- Customizable colors
+- Appearance settings
+- Finish chart
+- Finish history
+- Backup format v3
+
+## Improved
+
+- Immediate theme updates
+- Improved backup compatibility
+- Material 3 improvements
+- Better dark mode contrast
+
+## Fixed
+
+- Import replaces finish history correctly
+- Import supports legacy backup formats
+- Theme and colors refresh immediately after import
+
+---
+
 ## [1.4.0] - 2026-07-22
 
 ### ✨ New
