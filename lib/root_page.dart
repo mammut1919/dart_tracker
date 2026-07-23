@@ -104,6 +104,7 @@ class _RootPageState extends State<RootPage> {
 
     widget.onSettingsChanged(settings);
   }
+
   Future<void> _addEntry(NewEntry entry) async {
     await _storage.add(entry.type, entry.value, entry.timestamp);
 
@@ -257,13 +258,9 @@ class _RootPageState extends State<RootPage> {
         );
       }
 
-      await _settingsRepository.save(backup.settings);
+      await _updateSettings(backup.settings);
 
       if (!mounted) return;
-
-      setState(() {
-        _settings = backup.settings;
-      });
 
       await _reloadData();
 
