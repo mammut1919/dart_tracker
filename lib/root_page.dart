@@ -8,7 +8,7 @@ import 'database/score_storage.dart';
 import 'database/finish_storage.dart';
 import 'dialogs/settings_dialog.dart';
 import 'models/app_page.dart';
-import 'models/entry_option.dart';
+import 'models/entry_type.dart';
 import 'models/date_filter.dart';
 import 'models/new_entry.dart';
 import 'models/new_finish_entry.dart';
@@ -137,10 +137,13 @@ class _RootPageState extends State<RootPage> {
     await _loadFinishes();
   }
 
-  Future<void> _showAddDialog({EntryOption? initialOption}) async {
+  Future<void> _showAddDialog({EntryType? initialType}) async {
     final entry = await showDialog<NewEntry>(
       context: context,
-      builder: (_) => EntryDialog(initialOption: initialOption),
+      builder: (_) => EntryDialog(
+        initialType: initialType,
+        shortLegLimit: _settings.shortLegLimit,
+      ),
     );
 
     if (entry == null) {

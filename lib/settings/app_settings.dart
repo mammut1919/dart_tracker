@@ -12,6 +12,8 @@ class AppSettings {
     baselineHighFinish: 0,
     baselineShortLeg: 0,
 
+    shortLegLimit: 24,
+
     score180ColorValue: 0xFF4CAF50,
     score171ColorValue: 0xFFFF9800,
     score162ColorValue: 0xFF0000FF,
@@ -27,6 +29,7 @@ class AppSettings {
     required this.baseline162,
     required this.baselineHighFinish,
     required this.baselineShortLeg,
+    required this.shortLegLimit,
     required this.score180ColorValue,
     required this.score171ColorValue,
     required this.score162ColorValue,
@@ -45,6 +48,7 @@ class AppSettings {
   final int baseline162;
   final int baselineHighFinish;
   final int baselineShortLeg;
+  final int shortLegLimit;
   final int score180ColorValue;
   final int score171ColorValue;
   final int score162ColorValue;
@@ -66,6 +70,9 @@ class AppSettings {
     int? baseline162,
     int? baselineHighFinish,
     int? baselineShortLeg,
+    
+    int? shortLegLimit,
+
     int? score180ColorValue,
     int? score171ColorValue,
     int? score162ColorValue,
@@ -80,6 +87,9 @@ class AppSettings {
       baseline162: baseline162 ?? this.baseline162,
       baselineHighFinish: baselineHighFinish ?? this.baselineHighFinish,
       baselineShortLeg: baselineShortLeg ?? this.baselineShortLeg,
+
+      shortLegLimit: shortLegLimit ?? this.shortLegLimit,
+
       score180ColorValue: score180ColorValue ?? this.score180ColorValue,
       score171ColorValue: score171ColorValue ?? this.score171ColorValue,
       score162ColorValue: score162ColorValue ?? this.score162ColorValue,
@@ -141,6 +151,7 @@ class AppSettings {
       'baseline162': baseline162,
       'baselineHighFinish': baselineHighFinish,
       'baselineShortLeg': baselineShortLeg,
+      'shortLegLimit': shortLegLimit,
       'score180ColorValue': score180ColorValue,
       'score171ColorValue': score171ColorValue,
       'score162ColorValue': score162ColorValue,
@@ -158,6 +169,8 @@ class AppSettings {
       baseline162: json['baseline162'] as int,
       baselineHighFinish: json['baselineHighFinish'] as int? ?? 0,
       baselineShortLeg: json['baselineShortLeg'] as int? ?? 0,
+      shortLegLimit: json['shortLegLimit'] as int? ??
+          AppSettings.initial.shortLegLimit,
       score180ColorValue: json['score180ColorValue'] as int? ??
           AppSettings.initial.score180ColorValue,
       score171ColorValue: json['score171ColorValue'] as int? ??

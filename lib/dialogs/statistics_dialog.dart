@@ -13,17 +13,21 @@ class StatisticsDialog extends StatefulWidget {
 }
 
 class _StatisticsDialogState extends State<StatisticsDialog> {
+  late int _shortLegLimit;
   late final TextEditingController _baseline180Controller;
   late final TextEditingController _baseline171Controller;
   late final TextEditingController _baseline162Controller;
   late final TextEditingController _baselineHighFinishController;
   late final TextEditingController _baselineShortLegController;
 
+
   final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
+
+    _shortLegLimit = widget.settings.shortLegLimit;
 
     _baseline180Controller = TextEditingController(
       text: widget.settings.baseline180.toString(),
@@ -60,13 +64,64 @@ class _StatisticsDialogState extends State<StatisticsDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Startwerte'),
+      title: const Text('Statistik-Einstellungen'),
       content: Form(
         key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const Text(
+              'Grenze für Short Leg',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            Text(
+              'Ein Short Leg wird bis einschließlich der ausgewählten Anzahl an Darts gezählt.',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+
+            const SizedBox(height: 12),
+
+            DropdownButtonFormField<int>(
+              initialValue: _shortLegLimit,
+              decoration: const InputDecoration(
+                labelText: 'Short Leg bis',
+                border: OutlineInputBorder(),
+              ),
+              items: const [
+                DropdownMenuItem(value: 18, child: Text('18 Darts')),
+                DropdownMenuItem(value: 21, child: Text('21 Darts')),
+                DropdownMenuItem(value: 24, child: Text('24 Darts')),
+                DropdownMenuItem(value: 27, child: Text('27 Darts')),
+                DropdownMenuItem(value: 30, child: Text('30 Darts')),
+              ],
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() {
+                    _shortLegLimit = value;
+                  });
+                }
+              },
+            ),
+
+            const SizedBox(height: 24),
+
+            const Text(
+              'Startwerte',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
             Text(
               'Trage hier deine bereits erzielten Treffer vor der Nutzung von Dart Tracker ein.\n'
               'Diese Werte werden als Startbestand für deine Statistiken verwendet.',
@@ -95,17 +150,20 @@ class _StatisticsDialogState extends State<StatisticsDialog> {
             if (!_formKey.currentState!.validate()) {
               return;
             }
+
             Navigator.pop(
               context,
               widget.settings.copyWith(
+                shortLegLimit: _shortLegLimit,
                 baseline180: int.parse(_baseline180Controller.text),
                 baseline171: int.parse(_baseline171Controller.text),
                 baseline162: int.parse(_baseline162Controller.text),
                 baselineHighFinish: int.parse(
                   _baselineHighFinishController.text,
                 ),
-
-                baselineShortLeg: int.parse(_baselineShortLegController.text),
+                baselineShortLeg: int.parse(
+                  _baselineShortLegController.text,
+                ),
               ),
             );
           },

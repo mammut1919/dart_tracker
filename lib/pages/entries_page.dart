@@ -3,8 +3,6 @@ import 'package:intl/intl.dart';
 
 import '../models/date_filter.dart';
 import '../models/default_scores.dart';
-import '../models/entry_option.dart';
-import '../models/entry_options.dart';
 import '../models/entry_type.dart';
 import '../models/new_entry.dart';
 import '../settings/app_settings.dart';
@@ -33,7 +31,7 @@ class EntriesPage extends StatelessWidget {
   final DateFilter selectedDateFilter;
   final ValueChanged<DateFilter> onDateFilterChanged;
   final ValueChanged<NewEntry> onAddEntry;
-  final Future<void> Function({EntryOption? initialOption}) onShowAddDialog;
+  final Future<void> Function({EntryType? initialType,}) onShowAddDialog;
   final Future<void> Function(NewEntry) onConfirmDelete;
 
   int _countEntries({required EntryType type, int? value}) {
@@ -131,7 +129,7 @@ class EntriesPage extends StatelessWidget {
                   label: 'High Finish',
                   color: settings.highFinishColor,
                   onPressed: () =>
-                      onShowAddDialog(initialOption: highFinishOption),
+                      onShowAddDialog(initialType: EntryType.highFinish,),
                 ),
               ),
             ),
@@ -142,8 +140,9 @@ class EntriesPage extends StatelessWidget {
                 child: EntryButton(
                   label: 'Short Leg',
                   color: settings.shortLegColor,
-                  onPressed: () =>
-                      onShowAddDialog(initialOption: shortLegOption),
+                  onPressed: () => onShowAddDialog(
+                    initialType: EntryType.shortLeg,
+                  ),
                 ),
               ),
             ),

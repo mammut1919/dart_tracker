@@ -37,15 +37,19 @@ class SettingsDialog extends StatelessWidget {
               leading: const Icon(Icons.bar_chart),
               title: const Text('Statistik'),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () {
+              onTap: () async {
                 Navigator.pop(context);
 
-                showDialog(
+                final updatedSettings = await showDialog<AppSettings>(
                   context: context,
                   builder: (_) => StatisticsDialog(
                     settings: settings,
                   ),
                 );
+
+                if (updatedSettings != null) {
+                  onSettingsChanged(updatedSettings);
+                }
               },
             ),
             // data

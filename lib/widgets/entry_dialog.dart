@@ -3,12 +3,18 @@ import 'package:flutter/services.dart';
 
 import '../models/entry_option.dart';
 import '../models/entry_options.dart';
+import '../models/entry_type.dart';
 import '../models/new_entry.dart';
 
 class EntryDialog extends StatefulWidget {
-  const EntryDialog({super.key, this.initialOption});
+  const EntryDialog({
+    super.key,
+    this.initialType,
+    required this.shortLegLimit,
+  });
 
-  final EntryOption? initialOption;
+  final EntryType? initialType;
+  final int shortLegLimit;
 
   @override
   State<EntryDialog> createState() => _EntryDialogState();
@@ -16,6 +22,7 @@ class EntryDialog extends StatefulWidget {
 
 class _EntryDialogState extends State<EntryDialog> {
   late EntryOption _selectedOption;
+  late List<EntryOption> _availableOptions;
 
   DateTime _selectedDate = DateTime.now();
 
@@ -25,7 +32,19 @@ class _EntryDialogState extends State<EntryDialog> {
   void initState() {
     super.initState();
 
-    _selectedOption = widget.initialOption ?? availableEntryOptions.first;
+    _availableOptions = availableEntryOptions(widget.shortLegLimit);
+
+    _selectedOption = widget.initialType == null
+        ? _availableOptions.first
+        : _availableOptions.firstWhere(
+            (option) => option.type == widget.initialType,
+          );
+
+    _selectedOption = widget.initialType == null
+        ? _availableOptions .first
+        : _availableOptions .firstWhere(
+            (option) => option.type == widget.initialType,
+          );
   }
 
   Future<void> _pickDate() async {
@@ -88,7 +107,7 @@ class _EntryDialogState extends State<EntryDialog> {
           DropdownButtonFormField<EntryOption>(
             initialValue: _selectedOption,
             decoration: const InputDecoration(labelText: 'Eintrag'),
-            items: availableEntryOptions
+            items: _availableOptions
                 .map(
                   (option) => DropdownMenuItem(
                     value: option,

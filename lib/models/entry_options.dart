@@ -27,18 +27,18 @@ const highFinishOption = EntryOption(
   maxValue: 180,
 );
 
-const shortLegOption = EntryOption(
-  label: 'Short Leg',
-  type: EntryType.shortLeg,
-  inputLabel: 'Darts',
-  minValue: 9,
-  maxValue: 24,
-);
-
-const availableEntryOptions = [
-  score180Option,
-  score171Option,
-  score162Option,
-  highFinishOption,
-  shortLegOption,
-];
+List<EntryOption> availableEntryOptions(int shortLegLimit) {
+  return [
+    score180Option,
+    score171Option,
+    score162Option,
+    highFinishOption,
+    EntryOption(
+      label: 'Short Leg',
+      type: EntryType.shortLeg,
+      inputLabel: 'Darts',
+      minValue: 9,
+      maxValue: shortLegLimit,
+    ),
+  ];
+}
