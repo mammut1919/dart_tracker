@@ -1,9 +1,11 @@
 enum DateFilter {
-  allTime,
   today,
   last7Days,
   last30Days,
+  last90Days,
+  last180Days,
   last365Days,
+  allTime,
 }
 
 extension DateFilterExtension on DateFilter {
@@ -17,8 +19,12 @@ extension DateFilterExtension on DateFilter {
         return '7 Tage';
       case DateFilter.last30Days:
         return '30 Tage';
+      case DateFilter.last90Days:
+        return '3 Monate';
+      case DateFilter.last180Days:
+        return '6 Monate';
       case DateFilter.last365Days:
-        return '365 Tage';
+        return '1 Jahr';
     }
   }
 
@@ -36,6 +42,10 @@ extension DateFilterExtension on DateFilter {
         return now.subtract(const Duration(days: 7));
       case DateFilter.last30Days:
         return now.subtract(const Duration(days: 30));
+      case DateFilter.last90Days:
+        return now.subtract(const Duration(days: 90));
+      case DateFilter.last180Days:
+        return now.subtract(const Duration(days: 180));
       case DateFilter.last365Days:
         return now.subtract(const Duration(days: 365));
     }
