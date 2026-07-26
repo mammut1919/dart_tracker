@@ -34,13 +34,27 @@ class EntriesPage extends StatelessWidget {
   final Future<void> Function({EntryType? initialType,}) onShowAddDialog;
   final Future<void> Function(NewEntry) onConfirmDelete;
 
-  int _countEntries({required EntryType type, int? value}) {
+  int _countEntries({
+    required EntryType type,
+    int? value,
+    bool onlyValidShortLegs = false,
+  }) {
     return entries.where((entry) {
       if (entry.type != type) {
         return false;
       }
 
-      return value == null || entry.value == value;
+      if (value != null && entry.value != value) {
+        return false;
+      }
+
+      if (onlyValidShortLegs &&
+          type == EntryType.shortLeg &&
+          entry.value > settings.shortLegLimit) {
+        return false;
+      }
+
+      return true;
     }).length;
   }
 
@@ -50,8 +64,10 @@ class EntriesPage extends StatelessWidget {
     final count171 = _countEntries(type: EntryType.score, value: 171);
     final count162 = _countEntries(type: EntryType.score, value: 162);
     final countHighFinish = _countEntries(type: EntryType.highFinish);
-    final countSL = _countEntries(type: EntryType.shortLeg);
-    
+    final countSL = _countEntries(
+      type: EntryType.shortLeg,
+      onlyValidShortLegs: true,
+    );
     final highFinishBaseline = selectedDateFilter.includesBaseline
       ? settings.baselineHighFinish
       : 0;
