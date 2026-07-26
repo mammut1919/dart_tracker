@@ -8,9 +8,9 @@ import '../models/new_entry.dart';
 import '../settings/app_settings.dart';
 import '../theme/app_colors.dart';
 import '../widgets/date_filter_selector.dart';
+import '../widgets/entries_chart.dart';
 import '../widgets/entry_button.dart';
 import '../widgets/entry_summary_card.dart';
-import '../widgets/score_chart.dart';
 
 class EntriesPage extends StatelessWidget {
   const EntriesPage({
@@ -177,7 +177,7 @@ class EntriesPage extends StatelessWidget {
         const SizedBox(height: 8),
         // score chart
         if (entries.isNotEmpty) ...[
-          ScoreChart(
+          EntriesChart(
             entries: entries, 
             settings: settings,
             includeBaseline: selectedDateFilter.includesBaseline,
