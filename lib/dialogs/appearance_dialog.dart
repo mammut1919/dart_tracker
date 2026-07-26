@@ -24,6 +24,7 @@ class _AppearanceDialogState extends State<AppearanceDialog> {
   late Color _score162Color;
   late Color _highFinishColor;
   late Color _shortLegColor;
+  late Color? _finishColor;
 
   @override
   void initState() {
@@ -34,7 +35,7 @@ class _AppearanceDialogState extends State<AppearanceDialog> {
     _score162Color = widget.settings.score162Color;
     _highFinishColor = widget.settings.highFinishColor;
     _shortLegColor = widget.settings.shortLegColor;
-
+    _finishColor = widget.settings.finishColor;
     _themeMode = _themeModeFromString(widget.settings.themeMode);
   }
 
@@ -125,6 +126,8 @@ class _AppearanceDialogState extends State<AppearanceDialog> {
 
       _highFinishColor = AppColors.highFinish;
       _shortLegColor = AppColors.shortLeg;
+
+      _finishColor = null;
     });
   }
 
@@ -245,6 +248,16 @@ class _AppearanceDialogState extends State<AppearanceDialog> {
             },
           ),
 
+          _buildColorRow(
+            label: 'Finishes',
+            color: _finishColor ?? Theme.of(context).colorScheme.primary,
+            onChanged: (color) {
+              setState(() {
+                _finishColor = color;
+              });
+            },
+          ),
+
           const SizedBox(height: 12),
         ],
       ),
@@ -266,6 +279,7 @@ class _AppearanceDialogState extends State<AppearanceDialog> {
                 score162ColorValue: _score162Color.toARGB32(),
                 highFinishColorValue: _highFinishColor.toARGB32(),
                 shortLegColorValue: _shortLegColor.toARGB32(),
+                finishColorValue: _finishColor?.toARGB32(),
               ),
             );
           },

@@ -2,16 +2,19 @@ import 'package:flutter/material.dart';
 
 import '../models/finish_multiplier.dart';
 import '../models/finish_fields.dart';
+import '../settings/app_settings.dart';
 
 class FinishGrid extends StatelessWidget {
   const FinishGrid({
     super.key,
     required this.onSelected,
     required this.multiplier,
+    required this.settings,
   });
 
   final FinishMultiplier multiplier;
   final ValueChanged<int> onSelected;
+  final AppSettings settings;
 
   static const _buttonHeight = 32.0;
 
@@ -38,6 +41,9 @@ class FinishGrid extends StatelessWidget {
 
             return FilledButton(
               style: FilledButton.styleFrom(
+                backgroundColor:
+                    settings.finishColor ??
+                    Theme.of(context).colorScheme.primary,
                 padding: EdgeInsets.zero,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),

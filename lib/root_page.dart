@@ -440,6 +440,7 @@ class _RootPageState extends State<RootPage> {
           ),
           FinishesPage(
             finishes: _filteredFinishes,
+            settings: _settings,
             selectedDateFilter: _selectedDateFilter,
             onDateFilterChanged: _setDateFilter,
             onSaveFinish: _saveFinish,

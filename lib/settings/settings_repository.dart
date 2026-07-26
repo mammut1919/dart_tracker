@@ -13,6 +13,7 @@ class SettingsRepository {
   static const _score162ColorKey = 'score162Color';
   static const _highFinishColorKey = 'highFinishColor';
   static const _shortLegColorKey = 'shortLegColor';
+  static const _finishColorKey = 'finishColorValue';
   static const _themeModeKey = 'themeMode';
 
   Future<AppSettings> load() async {
@@ -34,28 +35,25 @@ class SettingsRepository {
       score180ColorValue:
           prefs.getInt(_score180ColorKey) ??
           AppSettings.initial.score180ColorValue,
-
       score171ColorValue:
           prefs.getInt(_score171ColorKey) ??
           AppSettings.initial.score171ColorValue,
-
       score162ColorValue:
           prefs.getInt(_score162ColorKey) ??
           AppSettings.initial.score162ColorValue,
-
       highFinishColorValue:
           prefs.getInt(_highFinishColorKey) ??
           AppSettings.initial.highFinishColorValue,
-
       shortLegColorValue:
           prefs.getInt(_shortLegColorKey) ??
           AppSettings.initial.shortLegColorValue,
-
+      finishColorValue:
+        prefs.getInt(_finishColorKey) ??
+        AppSettings.initial.finishColorValue,
       themeMode:
           prefs.getString(_themeModeKey) ??
           AppSettings.initial.themeMode,
     );
-
   }
 
   Future<void> save(AppSettings settings) async {
@@ -71,6 +69,16 @@ class SettingsRepository {
     await prefs.setInt(_score162ColorKey, settings.score162ColorValue);
     await prefs.setInt(_highFinishColorKey, settings.highFinishColorValue);
     await prefs.setInt(_shortLegColorKey, settings.shortLegColorValue);
+
+    if (settings.finishColorValue == null) {
+      await prefs.remove(_finishColorKey);
+    } else {
+      await prefs.setInt(
+        _finishColorKey,
+        settings.finishColorValue!,
+      );
+    }
+    
     await prefs.setString(_themeModeKey, settings.themeMode);
   }
 }
