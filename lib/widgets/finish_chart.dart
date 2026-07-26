@@ -3,16 +3,19 @@ import 'package:flutter/material.dart';
 import '../models/finish_multiplier.dart';
 import '../models/finish_fields.dart';
 import '../models/new_finish_entry.dart';
+import "../settings/app_settings.dart";
 
 class FinishChart extends StatelessWidget {
   const FinishChart({
     super.key,
     required this.finishes,
     required this.multiplier,  
+    required this.settings,
   });
 
   final List<NewFinishEntry> finishes;
   final FinishMultiplier multiplier;
+  final AppSettings settings;
 
   Map<int, int> _buildCounts() {
     final counts = <int, int>{};
@@ -84,7 +87,7 @@ class FinishChart extends StatelessWidget {
                               alignment: Alignment.centerLeft,
                               widthFactor: factor,
                               child: Container(
-                                color: Theme.of(context).colorScheme.primary,
+                                color: settings.finishColor ?? Theme.of(context).colorScheme.primary,
                               ),
                             ),
                           ],

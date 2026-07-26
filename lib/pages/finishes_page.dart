@@ -9,6 +9,7 @@ import '../widgets/date_filter_selector.dart';
 import '../widgets/finish_chart.dart';
 import '../widgets/finish_grid.dart';
 import '../widgets/finish_multiplier_selector.dart';
+import '../settings/app_settings.dart';
 
 class FinishesPage extends StatefulWidget {
   const FinishesPage({
@@ -18,6 +19,7 @@ class FinishesPage extends StatefulWidget {
     required this.onDateFilterChanged,
     required this.onSaveFinish,
     required this.onDeleteFinish,
+    required this.settings,
   });
 
   final List<NewFinishEntry> finishes;
@@ -25,6 +27,7 @@ class FinishesPage extends StatefulWidget {
   final ValueChanged<DateFilter> onDateFilterChanged;
   final Future<void> Function(NewFinishEntry) onSaveFinish;
   final Future<void> Function(NewFinishEntry) onDeleteFinish;
+  final AppSettings settings;
 
   @override
   State<FinishesPage> createState() => _FinishesPageState();
@@ -88,6 +91,7 @@ class _FinishesPageState extends State<FinishesPage> {
                   ),
                   const Spacer(),
                   FinishMultiplierSelector(
+                    settings: widget.settings,
                     selectedMultiplier: _selectedMultiplier,
                     onSelectionChanged: (multiplier) {
                       setState(() {
@@ -99,6 +103,7 @@ class _FinishesPageState extends State<FinishesPage> {
               ),
               const SizedBox(height: 12),
               FinishGrid(
+                settings: widget.settings,
                 multiplier: _selectedMultiplier,
                 onSelected: (field) {
                   widget.onSaveFinish(
@@ -113,7 +118,8 @@ class _FinishesPageState extends State<FinishesPage> {
               const SizedBox(height: 16),
               FinishChart(
                 finishes: visibleFinishes,
-                multiplier: _selectedMultiplier
+                multiplier: _selectedMultiplier,
+                settings: widget.settings,
               ),
               const SizedBox(height: 24),
               const Text(

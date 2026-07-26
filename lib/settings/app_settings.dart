@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../models/entry_type.dart';
 
 class AppSettings {
+  static const Object _noChange = Object();
+
   static const initial = AppSettings(
     baseline180: 0,
     baseline171: 0,
@@ -15,7 +17,7 @@ class AppSettings {
     score162ColorValue: 0xFF0000FF,
     highFinishColorValue: 0xFF673AB7,
     shortLegColorValue: 0xFFF44336,
-
+    finishColorValue: null,
     themeMode: 'light',
   );
 
@@ -30,6 +32,7 @@ class AppSettings {
     required this.score162ColorValue,
     required this.highFinishColorValue,
     required this.shortLegColorValue,
+    required this.finishColorValue,
     required this.themeMode,
   }) : assert(baseline180 >= 0),
        assert(baseline171 >= 0),
@@ -47,6 +50,7 @@ class AppSettings {
   final int score162ColorValue;
   final int highFinishColorValue;
   final int shortLegColorValue;
+  final int? finishColorValue;
   final String themeMode;
 
   Color get score180Color => Color(score180ColorValue);
@@ -54,6 +58,7 @@ class AppSettings {
   Color get score162Color => Color(score162ColorValue);
   Color get highFinishColor => Color(highFinishColorValue);
   Color get shortLegColor => Color(shortLegColorValue);
+  Color? get finishColor => finishColorValue == null ? null : Color(finishColorValue!);
 
   AppSettings copyWith({
     int? baseline180,
@@ -66,6 +71,7 @@ class AppSettings {
     int? score162ColorValue,
     int? highFinishColorValue,
     int? shortLegColorValue,
+    Object? finishColorValue = _noChange,
     String? themeMode,
   }) {
     return AppSettings(
@@ -79,6 +85,9 @@ class AppSettings {
       score162ColorValue: score162ColorValue ?? this.score162ColorValue,
       highFinishColorValue: highFinishColorValue ?? this.highFinishColorValue,
       shortLegColorValue: shortLegColorValue ?? this.shortLegColorValue,
+      finishColorValue: identical(finishColorValue, _noChange)
+          ? this.finishColorValue
+          : finishColorValue as int?,
       themeMode: themeMode ?? this.themeMode,
     );
   }
@@ -137,6 +146,7 @@ class AppSettings {
       'score162ColorValue': score162ColorValue,
       'highFinishColorValue': highFinishColorValue,
       'shortLegColorValue': shortLegColorValue,
+      'finishColorValue': finishColorValue,
       'themeMode': themeMode,
     };
   }
@@ -158,6 +168,8 @@ class AppSettings {
           AppSettings.initial.highFinishColorValue,
       shortLegColorValue: json['shortLegColorValue'] as int? ??
           AppSettings.initial.shortLegColorValue,
+      finishColorValue: json['finishColorValue'] as int? ??
+          AppSettings.initial.finishColorValue,
       themeMode: json['themeMode'] as String? ?? 'light',
     );
   }
