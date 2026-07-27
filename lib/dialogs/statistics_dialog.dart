@@ -3,6 +3,12 @@ import 'package:flutter/services.dart';
 
 import '../settings/app_settings.dart';
 
+enum StatisticsSection {
+  none,
+  shortLeg,
+  baselines,
+}
+
 class StatisticsDialog extends StatefulWidget {
   const StatisticsDialog({super.key, required this.settings});
 
@@ -61,6 +67,8 @@ class _StatisticsDialogState extends State<StatisticsDialog> {
     super.dispose();
   }
 
+  StatisticsSection _expandedSection = StatisticsSection.none;
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -71,70 +79,116 @@ class _StatisticsDialogState extends State<StatisticsDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Grenze für Short Leg',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+            InkWell(
+              onTap: () {
+                setState(() {
+                  _expandedSection =
+                    _expandedSection == StatisticsSection.shortLeg
+                        ? StatisticsSection.none
+                        : StatisticsSection.shortLeg;
+                });
+              },
+              child: Row(
+                children: [
+                  Icon(
+                    _expandedSection == StatisticsSection.shortLeg
+                        ? Icons.expand_less
+                        : Icons.expand_more,
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Grenze für Short Leg',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
             ),
 
             const SizedBox(height: 8),
 
-            Text(
-              'Ein Short Leg wird bis einschließlich der ausgewählten Anzahl an Darts gezählt.',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
+            if (_expandedSection == StatisticsSection.shortLeg) ...[
+              Text(
+                'Ein Short Leg wird bis einschließlich der ausgewählten Anzahl an Darts gezählt.\n'
+                'Bereits erfasste Short Legs mit mehr Darts werden nicht in der Grafik berücksichtigt '
+                'aber nicht gelöscht.',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+
+              const SizedBox(height: 12),
+
+              DropdownButtonFormField<int>(
+                initialValue: _shortLegLimit,
+                decoration: const InputDecoration(
+                  labelText: 'Short Leg bis',
+                  border: OutlineInputBorder(),
+                ),
+                items: const [
+                  DropdownMenuItem(value: 18, child: Text('18 Darts')),
+                  DropdownMenuItem(value: 21, child: Text('21 Darts')),
+                  DropdownMenuItem(value: 24, child: Text('24 Darts')),
+                  DropdownMenuItem(value: 27, child: Text('27 Darts')),
+                  DropdownMenuItem(value: 30, child: Text('30 Darts')),
+                ],
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      _shortLegLimit = value;
+                    });
+                  }
+                },
+              ),
+            ],
 
             const SizedBox(height: 12),
 
-            DropdownButtonFormField<int>(
-              initialValue: _shortLegLimit,
-              decoration: const InputDecoration(
-                labelText: 'Short Leg bis',
-                border: OutlineInputBorder(),
-              ),
-              items: const [
-                DropdownMenuItem(value: 18, child: Text('18 Darts')),
-                DropdownMenuItem(value: 21, child: Text('21 Darts')),
-                DropdownMenuItem(value: 24, child: Text('24 Darts')),
-                DropdownMenuItem(value: 27, child: Text('27 Darts')),
-                DropdownMenuItem(value: 30, child: Text('30 Darts')),
-              ],
-              onChanged: (value) {
-                if (value != null) {
-                  setState(() {
-                    _shortLegLimit = value;
-                  });
-                }
+            InkWell(
+              onTap: () {
+                setState(() {
+                  _expandedSection =
+                      _expandedSection == StatisticsSection.baselines
+                          ? StatisticsSection.none
+                          : StatisticsSection.baselines;
+                });
               },
-            ),
-
-            const SizedBox(height: 24),
-
-            const Text(
-              'Startwerte',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+              child: Row(
+                children: [
+                  Icon(
+                    _expandedSection == StatisticsSection.baselines
+                        ? Icons.expand_less
+                        : Icons.expand_more,
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Startwerte',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
             ),
 
             const SizedBox(height: 8),
 
-            Text(
-              'Trage hier deine bereits erzielten Treffer vor der Nutzung von Dart Tracker ein.\n'
-              'Diese Werte werden als Startbestand für deine Statistiken verwendet.',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
+            if (_expandedSection == StatisticsSection.baselines) ...[
+              Text(
+                'Trage hier deine bereits erzielten Treffer vor der Nutzung von Dart Tracker ein. '
+                'Diese Werte werden als Startbestand für deine Statistiken verwendet.',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
 
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-            _buildField('180', _baseline180Controller),
-            _buildField('171', _baseline171Controller),
-            _buildField('162', _baseline162Controller),
-            _buildField('High Finish', _baselineHighFinishController),
-            _buildField('Short Leg', _baselineShortLegController),
+              _buildField('180', _baseline180Controller),
+              _buildField('171', _baseline171Controller),
+              _buildField('162', _baseline162Controller),
+              _buildField('High Finish', _baselineHighFinishController),
+              _buildField('Short Leg', _baselineShortLegController),
+            ],
           ],
         ),
       ),

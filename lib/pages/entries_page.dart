@@ -218,6 +218,9 @@ class EntriesPage extends StatelessWidget {
           )
         else
           ...entries.map<Widget>((entry) {
+              final ignored =
+                entry.type == EntryType.shortLeg &&
+                entry.value > settings.shortLegLimit;
             return Dismissible(
               key: ValueKey(entry.id),
               direction: DismissDirection.endToStart,
@@ -236,7 +239,23 @@ class EntriesPage extends StatelessWidget {
                   onLongPress: () => onConfirmDelete(entry),
                   leading: Icon(entry.type.icon),
                   title: Text(entry.type.format(entry.value)),
-                  subtitle: Text(dateFormat.format(entry.timestamp)),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(dateFormat.format(entry.timestamp)),
+                      if (ignored)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Text(
+                            'Nicht in der Statistik berücksichtigt\n'
+                            '(Statistik-Einstellungen: Grenze für Short Leg ${settings.shortLegLimit} Darts)',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context).colorScheme.outline,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
             );
