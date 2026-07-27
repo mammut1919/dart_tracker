@@ -7,8 +7,9 @@ A lightweight Flutter app for tracking personal dart training statistics.
 ### Score Tracking
 - Track 180, 171 and 162 scores
 - Track High Finishes
-- Track Short Legs
+- Track configurable Short Legs
 - Interactive statistics chart
+- Configurable Short Leg definition (18–30 darts)
 - Configurable baseline values
 - Configurable colors
 - Date range filters
@@ -19,6 +20,7 @@ A lightweight Flutter app for tracking personal dart training statistics.
 - Dedicated Finishes page
 - Double and Triple finish tracking
 - Finish distribution chart
+- Configurable finish button color
 - Date range filters
 - Finish history
 - Swipe to delete
@@ -45,13 +47,17 @@ A lightweight Flutter app for tracking personal dart training statistics.
 
 ## Roadmap
 
-### v1.6
-- Improved cloud backup compatibility
+### v1.7
+- Native iOS support
+- Improved backup handling
+- Additional statistics
 
 ### Future ideas
 - Personal bests
 - Extended statistics
 - Cloud synchronization
+- Player profiles
+- Checkout statistics
 
 ## Development
 
@@ -59,3 +65,4 @@ A lightweight Flutter app for tracking personal dart training statistics.
 flutter pub get
 dart analyze
 flutter run
+```

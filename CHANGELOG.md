@@ -1,5 +1,36 @@
 # Changelog
 
+## [1.6.0] - 2025-07-28
+
+### Added
+
+- Configurable Short Leg definition (18–30 darts)
+- New statistics setting for the Short Leg definition
+- Additional date filters:
+  - Last 90 days
+  - Last 3 months
+  - Last 6 months
+- Configurable finish button color
+- Collapsible sections in the statistics settings dialog
+
+### Changed
+
+- Short Leg charts now respect the configured Short Leg definition
+- Short Leg summary cards now respect the configured Short Leg definition
+- Short Leg history now indicates entries that are excluded from statistics based on the configured definition
+- Improved finish page color handling
+- Improved finish button styling
+
+### Refactored
+
+- Renamed `ScoreChart` to `EntriesChart`
+
+### Fixed
+
+- Restored default finish colors after resetting the settings
+- Various UI improvements and minor bug fixes
+
+
 # [1.5.0] - 2026-07-23
 
 ## New
