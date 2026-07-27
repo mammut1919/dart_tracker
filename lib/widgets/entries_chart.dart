@@ -11,8 +11,8 @@ import '../models/entry_type.dart';
 import '../models/new_entry.dart';
 import '../theme/app_colors.dart';
 
-class ScoreChart extends StatelessWidget {
-  const ScoreChart({
+class EntriesChart extends StatelessWidget {
+  const EntriesChart({
     super.key,
     required this.entries, 
     required this.settings,
@@ -249,8 +249,16 @@ class ScoreChart extends StatelessWidget {
       ),
     );
 
+    final chartEntries = entries.where((entry) {
+      if (entry.type != EntryType.shortLeg) {
+        return true;
+      }
+
+      return entry.value <= settings.shortLegLimit;
+    }).toList();
+
     final shortLegChart = builder.buildStepChart(
-      entries: entries,
+      entries: chartEntries,
       type: EntryType.shortLeg,
       baseline: includeBaseline
         ? settings.baselineShortLeg

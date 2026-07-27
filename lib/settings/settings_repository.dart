@@ -8,6 +8,7 @@ class SettingsRepository {
   static const _baseline162Key = 'baseline162';
   static const _baselineHighFinishKey = 'baselineHighFinish';
   static const _baselineShortLegKey = 'baselineShortLeg';
+  static const _shortLegLimitKey = 'shortLegLimit';
   static const _score180ColorKey = 'score180Color';
   static const _score171ColorKey = 'score171Color';
   static const _score162ColorKey = 'score162Color';
@@ -32,6 +33,9 @@ class SettingsRepository {
       baselineShortLeg:
           prefs.getInt(_baselineShortLegKey) ??
           AppSettings.initial.baselineShortLeg,
+      shortLegLimit:
+          prefs.getInt(_shortLegLimitKey) ??
+          AppSettings.initial.shortLegLimit,
       score180ColorValue:
           prefs.getInt(_score180ColorKey) ??
           AppSettings.initial.score180ColorValue,
@@ -64,6 +68,7 @@ class SettingsRepository {
     await prefs.setInt(_baseline162Key, settings.baseline162);
     await prefs.setInt(_baselineHighFinishKey, settings.baselineHighFinish);
     await prefs.setInt(_baselineShortLegKey, settings.baselineShortLeg);
+    await prefs.setInt(_shortLegLimitKey, settings.shortLegLimit);
     await prefs.setInt(_score180ColorKey, settings.score180ColorValue);
     await prefs.setInt(_score171ColorKey, settings.score171ColorValue);
     await prefs.setInt(_score162ColorKey, settings.score162ColorValue);
