@@ -3,6 +3,12 @@ import 'package:flutter/services.dart';
 
 import '../settings/app_settings.dart';
 
+enum StatisticsSection {
+  none,
+  shortLeg,
+  baselines,
+}
+
 class StatisticsDialog extends StatefulWidget {
   const StatisticsDialog({super.key, required this.settings});
 
@@ -13,17 +19,21 @@ class StatisticsDialog extends StatefulWidget {
 }
 
 class _StatisticsDialogState extends State<StatisticsDialog> {
+  late int _shortLegLimit;
   late final TextEditingController _baseline180Controller;
   late final TextEditingController _baseline171Controller;
   late final TextEditingController _baseline162Controller;
   late final TextEditingController _baselineHighFinishController;
   late final TextEditingController _baselineShortLegController;
 
+
   final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
+
+    _shortLegLimit = widget.settings.shortLegLimit;
 
     _baseline180Controller = TextEditingController(
       text: widget.settings.baseline180.toString(),
@@ -57,29 +67,146 @@ class _StatisticsDialogState extends State<StatisticsDialog> {
     super.dispose();
   }
 
+  StatisticsSection _expandedSection = StatisticsSection.none;
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Startwerte'),
+      title: const Text('Statistik-Einstellungen'),
       content: Form(
         key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Trage hier deine bereits erzielten Treffer vor der Nutzung von Dart Tracker ein.\n'
-              'Diese Werte werden als Startbestand für deine Statistiken verwendet.',
-              style: Theme.of(context).textTheme.bodySmall,
+            InkWell(
+              onTap: () {
+                setState(() {
+                  _expandedSection =
+                    _expandedSection == StatisticsSection.shortLeg
+                        ? StatisticsSection.none
+                        : StatisticsSection.shortLeg;
+                });
+              },
+              child: Row(
+                children: [
+                  Icon(
+                    _expandedSection == StatisticsSection.shortLeg
+                        ? Icons.expand_less
+                        : Icons.expand_more,
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Grenze für Short Leg',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
 
-            _buildField('180', _baseline180Controller),
-            _buildField('171', _baseline171Controller),
-            _buildField('162', _baseline162Controller),
-            _buildField('High Finish', _baselineHighFinishController),
-            _buildField('Short Leg', _baselineShortLegController),
+            AnimatedSize(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInOut,
+              child: _expandedSection == StatisticsSection.shortLeg
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                          Text(
+                            'Ein Short Leg wird bis einschließlich der ausgewählten Anzahl an Darts gezählt.\n'
+                            'Bereits erfasste Short Legs mit mehr Darts werden nicht in der Grafik berücksichtigt '
+                            'aber nicht gelöscht.',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+
+                          const SizedBox(height: 12),
+
+                          DropdownButtonFormField<int>(
+                            initialValue: _shortLegLimit,
+                            decoration: const InputDecoration(
+                              labelText: 'Short Leg bis',
+                              border: OutlineInputBorder(),
+                            ),
+                            items: const [
+                              DropdownMenuItem(value: 18, child: Text('18 Darts')),
+                              DropdownMenuItem(value: 21, child: Text('21 Darts')),
+                              DropdownMenuItem(value: 24, child: Text('24 Darts')),
+                              DropdownMenuItem(value: 27, child: Text('27 Darts')),
+                              DropdownMenuItem(value: 30, child: Text('30 Darts')),
+                            ],
+                            onChanged: (value) {
+                              if (value != null) {
+                                setState(() {
+                                  _shortLegLimit = value;
+                                });
+                              }
+                            },
+                          ),
+                      ],
+                    )
+                  : const SizedBox.shrink(),
+            ),
+
+            const SizedBox(height: 12),
+
+            InkWell(
+              onTap: () {
+                setState(() {
+                  _expandedSection =
+                      _expandedSection == StatisticsSection.baselines
+                          ? StatisticsSection.none
+                          : StatisticsSection.baselines;
+                });
+              },
+              child: Row(
+                children: [
+                  Icon(
+                    _expandedSection == StatisticsSection.baselines
+                        ? Icons.expand_less
+                        : Icons.expand_more,
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Startwerte',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            AnimatedSize(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInOut,
+              child: _expandedSection == StatisticsSection.baselines
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                            'Trage hier deine bereits erzielten Treffer vor der Nutzung von Dart Tracker ein. '
+                            'Diese Werte werden als Startbestand für deine Statistiken verwendet.',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          _buildField('180', _baseline180Controller),
+                          _buildField('171', _baseline171Controller),
+                          _buildField('162', _baseline162Controller),
+                          _buildField('High Finish', _baselineHighFinishController),
+                          _buildField('Short Leg', _baselineShortLegController),
+                      ],
+                    )
+                  : const SizedBox.shrink(),
+            ),
           ],
         ),
       ),
@@ -95,17 +222,20 @@ class _StatisticsDialogState extends State<StatisticsDialog> {
             if (!_formKey.currentState!.validate()) {
               return;
             }
+
             Navigator.pop(
               context,
               widget.settings.copyWith(
+                shortLegLimit: _shortLegLimit,
                 baseline180: int.parse(_baseline180Controller.text),
                 baseline171: int.parse(_baseline171Controller.text),
                 baseline162: int.parse(_baseline162Controller.text),
                 baselineHighFinish: int.parse(
                   _baselineHighFinishController.text,
                 ),
-
-                baselineShortLeg: int.parse(_baselineShortLegController.text),
+                baselineShortLeg: int.parse(
+                  _baselineShortLegController.text,
+                ),
               ),
             );
           },

@@ -3,16 +3,14 @@ import 'package:intl/intl.dart';
 
 import '../models/date_filter.dart';
 import '../models/default_scores.dart';
-import '../models/entry_option.dart';
-import '../models/entry_options.dart';
 import '../models/entry_type.dart';
 import '../models/new_entry.dart';
 import '../settings/app_settings.dart';
 import '../theme/app_colors.dart';
 import '../widgets/date_filter_selector.dart';
+import '../widgets/entries_chart.dart';
 import '../widgets/entry_button.dart';
 import '../widgets/entry_summary_card.dart';
-import '../widgets/score_chart.dart';
 
 class EntriesPage extends StatelessWidget {
   const EntriesPage({
@@ -33,16 +31,30 @@ class EntriesPage extends StatelessWidget {
   final DateFilter selectedDateFilter;
   final ValueChanged<DateFilter> onDateFilterChanged;
   final ValueChanged<NewEntry> onAddEntry;
-  final Future<void> Function({EntryOption? initialOption}) onShowAddDialog;
+  final Future<void> Function({EntryType? initialType,}) onShowAddDialog;
   final Future<void> Function(NewEntry) onConfirmDelete;
 
-  int _countEntries({required EntryType type, int? value}) {
+  int _countEntries({
+    required EntryType type,
+    int? value,
+    bool onlyValidShortLegs = false,
+  }) {
     return entries.where((entry) {
       if (entry.type != type) {
         return false;
       }
 
-      return value == null || entry.value == value;
+      if (value != null && entry.value != value) {
+        return false;
+      }
+
+      if (onlyValidShortLegs &&
+          type == EntryType.shortLeg &&
+          entry.value > settings.shortLegLimit) {
+        return false;
+      }
+
+      return true;
     }).length;
   }
 
@@ -52,8 +64,10 @@ class EntriesPage extends StatelessWidget {
     final count171 = _countEntries(type: EntryType.score, value: 171);
     final count162 = _countEntries(type: EntryType.score, value: 162);
     final countHighFinish = _countEntries(type: EntryType.highFinish);
-    final countSL = _countEntries(type: EntryType.shortLeg);
-    
+    final countSL = _countEntries(
+      type: EntryType.shortLeg,
+      onlyValidShortLegs: true,
+    );
     final highFinishBaseline = selectedDateFilter.includesBaseline
       ? settings.baselineHighFinish
       : 0;
@@ -131,7 +145,7 @@ class EntriesPage extends StatelessWidget {
                   label: 'High Finish',
                   color: settings.highFinishColor,
                   onPressed: () =>
-                      onShowAddDialog(initialOption: highFinishOption),
+                      onShowAddDialog(initialType: EntryType.highFinish,),
                 ),
               ),
             ),
@@ -142,8 +156,9 @@ class EntriesPage extends StatelessWidget {
                 child: EntryButton(
                   label: 'Short Leg',
                   color: settings.shortLegColor,
-                  onPressed: () =>
-                      onShowAddDialog(initialOption: shortLegOption),
+                  onPressed: () => onShowAddDialog(
+                    initialType: EntryType.shortLeg,
+                  ),
                 ),
               ),
             ),
@@ -178,7 +193,7 @@ class EntriesPage extends StatelessWidget {
         const SizedBox(height: 8),
         // score chart
         if (entries.isNotEmpty) ...[
-          ScoreChart(
+          EntriesChart(
             entries: entries, 
             settings: settings,
             includeBaseline: selectedDateFilter.includesBaseline,
@@ -203,6 +218,9 @@ class EntriesPage extends StatelessWidget {
           )
         else
           ...entries.map<Widget>((entry) {
+              final ignored =
+                entry.type == EntryType.shortLeg &&
+                entry.value > settings.shortLegLimit;
             return Dismissible(
               key: ValueKey(entry.id),
               direction: DismissDirection.endToStart,
@@ -221,7 +239,23 @@ class EntriesPage extends StatelessWidget {
                   onLongPress: () => onConfirmDelete(entry),
                   leading: Icon(entry.type.icon),
                   title: Text(entry.type.format(entry.value)),
-                  subtitle: Text(dateFormat.format(entry.timestamp)),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(dateFormat.format(entry.timestamp)),
+                      if (ignored)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Text(
+                            'Nicht in der Statistik berücksichtigt\n'
+                            '(Statistik-Einstellungen: Grenze für Short Leg ${settings.shortLegLimit} Darts)',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context).colorScheme.outline,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
             );
