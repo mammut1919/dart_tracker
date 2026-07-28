@@ -14,6 +14,8 @@ class PageSelector extends StatelessWidget {
         return 'Dart Tracker';
       case AppPage.finishes:
         return 'Finishes';
+      case AppPage.analytics:
+        return 'Statistiken';
     }
   }
 
@@ -46,6 +48,19 @@ class PageSelector extends StatelessWidget {
                 const SizedBox(width: 18),
               const SizedBox(width: 8),
               const Text('Finishes'),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          value: AppPage.analytics,
+          child: Row(
+            children: [
+              if (page == AppPage.analytics)
+                const Icon(Icons.check, size: 18)
+              else
+                const SizedBox(width: 18),
+              const SizedBox(width: 8),
+              const Text('Statistiken'),
             ],
           ),
         ),

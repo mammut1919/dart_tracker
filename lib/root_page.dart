@@ -12,6 +12,7 @@ import 'models/entry_type.dart';
 import 'models/date_filter.dart';
 import 'models/new_entry.dart';
 import 'models/new_finish_entry.dart';
+import 'pages/analytics_page.dart';
 import 'pages/entries_page.dart';
 import 'pages/finishes_page.dart';
 import 'settings/app_settings.dart';
@@ -44,7 +45,8 @@ class _RootPageState extends State<RootPage> {
   final DateFormat _dateFormat = DateFormat('dd.MM.yyyy');
   DateFilter _selectedDateFilter = DateFilter.allTime;
 
-  AppPage _currentPage = AppPage.entries;
+  AppPage _currentPage = AppPage.analytics; 
+  // ToDo:Reset
 
   List<NewEntry> _entries = [];
   List<NewFinishEntry> _finishes = [];
@@ -448,6 +450,12 @@ class _RootPageState extends State<RootPage> {
             onDateFilterChanged: _setDateFilter,
             onSaveFinish: _saveFinish,
             onDeleteFinish: _deleteFinish,
+          ),
+          AnalyticsPage(
+            finishes: _filteredFinishes,
+            settings: _settings,
+            selectedDateFilter: _selectedDateFilter,
+            onDateFilterChanged: _setDateFilter,
           ),
         ],
       ),
