@@ -4,6 +4,7 @@ import '../models/analytics_type.dart';
 import '../models/date_filter.dart';
 import '../models/new_finish_entry.dart';
 import '../settings/app_settings.dart';
+import '../widgets/activity_statistics.dart';
 import '../widgets/analytics_selector.dart';
 import '../widgets/average_finish_chart.dart';
 import '../widgets/date_filter_selector.dart';
@@ -67,10 +68,16 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
             ),
           )
         else
-          AverageFinishChart(
-            finishes: widget.finishes,
-            settings: widget.settings,
-          ),
+          if (_selectedAnalytics == AnalyticsType.averageFinishDart)
+            AverageFinishChart(
+              finishes: widget.finishes,
+              settings: widget.settings,
+            ),
+
+          if (_selectedAnalytics == AnalyticsType.activity)
+            ActivityStatistics(
+              finishes: widget.finishes,
+            ),
       ],
     );
   }

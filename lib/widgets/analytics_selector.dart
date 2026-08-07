@@ -31,6 +31,19 @@ class AnalyticsSelector extends StatelessWidget {
             ],
           ),
         ),
+        PopupMenuItem(
+          value: AnalyticsType.activity,
+          child: Row(
+            children: [
+              if (selectedAnalytics == AnalyticsType.activity)
+                const Icon(Icons.check, size: 18)
+              else
+                const SizedBox(width: 18),
+              const SizedBox(width: 8),
+              const Text('Aktivität'),
+            ],
+          ),
+        ),
       ],
       child: Row(
         mainAxisSize: MainAxisSize.min,
