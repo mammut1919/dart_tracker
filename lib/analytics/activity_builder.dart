@@ -31,10 +31,14 @@ class ActivityBuilder {
       (a, b) => a.isBefore(b) ? a : b,
     );
 
-    final lastDay = grouped.keys.reduce(
-      (a, b) => a.isAfter(b) ? a : b,
-    );
+    final now = DateTime.now();
 
+    final lastDay = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    );
+    
     final result = <ActivityPoint>[];
 
     for (

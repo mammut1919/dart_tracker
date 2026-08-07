@@ -2,13 +2,14 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../analytics/analytics_builder.dart';
-import '../models/new_finish_entry.dart';
+import '../analytics/activity_builder.dart';
+import '../charts/chart_constants.dart';
 import '../charts/chart_scale.dart';
+import '../models/new_finish_entry.dart';
 import '../settings/app_settings.dart';
 
-class AverageFinishChart extends StatelessWidget {
-  const AverageFinishChart({
+class ActivityChart extends StatelessWidget {
+  const ActivityChart({
     super.key,
     required this.finishes,
     required this.settings,
@@ -26,9 +27,9 @@ class AverageFinishChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final builder = const AnalyticsBuilder();
+    final builder = const ActivityBuilder();
 
-    final points = builder.buildAverageFinishData(
+    final points = builder.buildActivityData(
       finishes: finishes,
     );
 
@@ -39,13 +40,30 @@ class AverageFinishChart extends StatelessWidget {
     final spots = <FlSpot>[];
 
     for (var i = 0; i < points.length; i++) {
+      final point = points[i];
+
       spots.add(
         FlSpot(
           i.toDouble(),
-          points[i].average,
+          point.finishes.toDouble(),
         ),
       );
     }
+
+    final maxDataY = points
+        .map((point) => point.finishes)
+        .reduce((a, b) => a > b ? a : b)
+        .toDouble();
+
+    final yInterval = ChartScale.calculateYInterval(
+      0,
+      maxDataY,
+    );
+
+    final chartMaxY = ChartScale.calculateChartMaxY(
+      maxDataY,
+      yInterval,
+    );
 
     return Card(
       child: SizedBox(
@@ -57,7 +75,7 @@ class AverageFinishChart extends StatelessWidget {
               minX: 0,
               maxX: (points.length - 1).toDouble(),
               minY: 0,
-              maxY: 60,
+              maxY: chartMaxY,
 
               borderData: FlBorderData(show: true),
 
@@ -95,14 +113,13 @@ class AverageFinishChart extends StatelessWidget {
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
-                    reservedSize: _axisReservedSize,
-                    interval: 10,
+                    reservedSize: ChartConstants.axisReservedSize,
+                    interval: yInterval,
                     getTitlesWidget: (value, meta) {
                       return SideTitleWidget(
                         meta: meta,
                         child: Text(
                           value.toInt().toString(),
-                          style: const TextStyle(fontSize: 10),
                         ),
                       );
                     },
@@ -120,8 +137,7 @@ class AverageFinishChart extends StatelessWidget {
 
                       return LineTooltipItem(
                         '${DateFormat('dd.MM.yyyy').format(point.date)}\n'
-                        'Ø letzter Dart:\n'
-                        '${point.average.toStringAsFixed(2)} Punkte',
+                        '${point.finishes} Finishes',
                         TextStyle(
                           color: settings.finishColor,
                           fontWeight: FontWeight.bold,
