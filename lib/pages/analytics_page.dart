@@ -45,6 +45,13 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
 
         const SizedBox(height: 8),
 
+        Text(
+          _selectedAnalytics.description,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+
+        const SizedBox(height: 16),
+
         DateFilterSelector(
           selectedFilter: widget.selectedDateFilter,
           onSelectionChanged: widget.onDateFilterChanged,

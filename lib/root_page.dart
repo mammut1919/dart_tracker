@@ -45,8 +45,7 @@ class _RootPageState extends State<RootPage> {
   final DateFormat _dateFormat = DateFormat('dd.MM.yyyy');
   DateFilter _selectedDateFilter = DateFilter.allTime;
 
-  AppPage _currentPage = AppPage.analytics; 
-  // ToDo:Reset
+  AppPage _currentPage = AppPage.entries; 
 
   List<NewEntry> _entries = [];
   List<NewFinishEntry> _finishes = [];

@@ -12,13 +12,6 @@ class AnalyticsSelector extends StatelessWidget {
   final AnalyticsType selectedAnalytics;
   final ValueChanged<AnalyticsType> onSelectionChanged;
 
-  String get _title {
-    switch (selectedAnalytics) {
-      case AnalyticsType.averageFinishDart:
-        return 'Ø letzter Dart';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<AnalyticsType>(
@@ -34,7 +27,7 @@ class AnalyticsSelector extends StatelessWidget {
               else
                 const SizedBox(width: 18),
               const SizedBox(width: 8),
-              const Text('Durchschnitt Punkte letzter Dart'),
+              Text(AnalyticsType.averageFinishDart.title),
             ],
           ),
         ),
@@ -43,7 +36,7 @@ class AnalyticsSelector extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            _title,
+            selectedAnalytics.title,
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const Icon(Icons.arrow_drop_down),
