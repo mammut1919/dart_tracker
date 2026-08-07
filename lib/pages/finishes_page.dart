@@ -15,6 +15,7 @@ class FinishesPage extends StatefulWidget {
   const FinishesPage({
     super.key,
     required this.finishes,
+    required this.allFinishes,
     required this.selectedDateFilter,
     required this.onDateFilterChanged,
     required this.onSaveFinish,
@@ -23,6 +24,7 @@ class FinishesPage extends StatefulWidget {
   });
 
   final List<NewFinishEntry> finishes;
+  final List<NewFinishEntry> allFinishes;
   final DateFilter selectedDateFilter;
   final ValueChanged<DateFilter> onDateFilterChanged;
   final Future<void> Function(NewFinishEntry) onSaveFinish;
@@ -71,6 +73,18 @@ class _FinishesPageState extends State<FinishesPage> {
     }
   }
 
+  int _countForFilter(DateFilter filter) {
+    final startDate = filter.startDate;
+
+    if (startDate == null) {
+      return widget.allFinishes.length;
+    }
+
+    return widget.allFinishes.where((finish) {
+      return !finish.timestamp.isBefore(startDate);
+    }).length;
+  }
+
   @override
   Widget build(BuildContext context) {
     final visibleFinishes = widget.finishes
@@ -88,6 +102,7 @@ class _FinishesPageState extends State<FinishesPage> {
                   DateFilterSelector(
                     selectedFilter: widget.selectedDateFilter,
                     onSelectionChanged: widget.onDateFilterChanged,
+                    countForFilter: _countForFilter,
                   ),
                   const Spacer(),
                   FinishMultiplierSelector(
