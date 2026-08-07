@@ -6,6 +6,7 @@ class ActivityBuilder {
 
   List<ActivityPoint> buildActivityData({
     required List<NewFinishEntry> finishes,
+    DateTime? startDate,
   }) {
     if (finishes.isEmpty) {
       return [];
@@ -27,9 +28,15 @@ class ActivityBuilder {
       );
     }
 
-    final firstDay = grouped.keys.reduce(
-      (a, b) => a.isBefore(b) ? a : b,
-    );
+    final firstDay = startDate != null
+        ? DateTime(
+            startDate.year,
+            startDate.month,
+            startDate.day,
+          )
+        : grouped.keys.reduce(
+            (a, b) => a.isBefore(b) ? a : b,
+          );
 
     final now = DateTime.now();
 
@@ -38,7 +45,7 @@ class ActivityBuilder {
       now.month,
       now.day,
     );
-    
+
     final result = <ActivityPoint>[];
 
     for (

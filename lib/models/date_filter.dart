@@ -33,21 +33,45 @@ extension DateFilterExtension on DateFilter {
   DateTime? get startDate {
     final now = DateTime.now();
 
+    DateTime normalize(DateTime date) {
+      return DateTime(
+        date.year,
+        date.month,
+        date.day,
+      );
+    }
+
     switch (this) {
       case DateFilter.allTime:
         return null;
+
       case DateFilter.today:
-        return DateTime(now.year, now.month, now.day);
+        return normalize(now);
+
       case DateFilter.last7Days:
-        return now.subtract(const Duration(days: 7));
+        return normalize(
+          now.subtract(const Duration(days: 7)),
+        );
+
       case DateFilter.last30Days:
-        return now.subtract(const Duration(days: 30));
+        return normalize(
+          now.subtract(const Duration(days: 30)),
+        );
+
       case DateFilter.last90Days:
-        return now.subtract(const Duration(days: 90));
+        return normalize(
+          now.subtract(const Duration(days: 90)),
+        );
+
       case DateFilter.last180Days:
-        return now.subtract(const Duration(days: 180));
+        return normalize(
+          now.subtract(const Duration(days: 180)),
+        );
+
       case DateFilter.last365Days:
-        return now.subtract(const Duration(days: 365));
+        return normalize(
+          now.subtract(const Duration(days: 365)),
+        );
     }
   }
 }

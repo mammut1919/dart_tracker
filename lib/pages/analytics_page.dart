@@ -79,6 +79,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
             ActivityChart(
               finishes: widget.finishes,
               settings: widget.settings,
+              selectedDateFilter: widget.selectedDateFilter,
             ),
 
             const SizedBox(height: 16),

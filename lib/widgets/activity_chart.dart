@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../analytics/activity_builder.dart';
+import '../charts/chart_axis.dart';
 import '../charts/chart_constants.dart';
 import '../charts/chart_scale.dart';
+import '../models/date_filter.dart';
 import '../models/new_finish_entry.dart';
 import '../settings/app_settings.dart';
 
@@ -13,10 +15,12 @@ class ActivityChart extends StatelessWidget {
     super.key,
     required this.finishes,
     required this.settings,
+    required this.selectedDateFilter,
   });
 
   final List<NewFinishEntry> finishes;
   final AppSettings settings;
+  final DateFilter selectedDateFilter;
 
   static const _chartHeight = 250.0;
   static const _padding = 16.0;
@@ -31,6 +35,7 @@ class ActivityChart extends StatelessWidget {
 
     final points = builder.buildActivityData(
       finishes: finishes,
+      startDate: selectedDateFilter.startDate,
     );
 
     if (points.isEmpty) {
@@ -92,7 +97,7 @@ class ActivityChart extends StatelessWidget {
                   sideTitles: SideTitles(
                     showTitles: true,
                     reservedSize: _axisReservedSize,
-                    interval: ChartScale.calculateXInterval(points.length),
+                    interval: 1,
                     getTitlesWidget: (value, meta) {
                       final index = value.round();
 
@@ -100,10 +105,24 @@ class ActivityChart extends StatelessWidget {
                         return const SizedBox.shrink();
                       }
 
+                      final current = points[index].date;
+
+/* vorübergehend deaktiviert
+                      if (!ChartAxis.shouldShowLabel(
+                        index: index,
+                        date: points[index].date,
+                        filter: selectedDateFilter,
+                      )) {
+                        return const SizedBox.shrink();
+                      }
+*/
                       return SideTitleWidget(
                         meta: meta,
                         child: Text(
-                          DateFormat('dd.MM').format(points[index].date),
+                          ChartAxis.formatDate(
+                            current,
+                            selectedDateFilter,
+                          ),
                           style: const TextStyle(fontSize: 10),
                         ),
                       );
