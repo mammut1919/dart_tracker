@@ -76,7 +76,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
             ),
           )
         else
-          if (_selectedAnalytics == AnalyticsType.averageFinishDart)
+          if (_selectedAnalytics == AnalyticsType.averageFinishDart) ...[
             AverageFinishChart(
               finishes: widget.finishes,
               settings: widget.settings,
@@ -87,6 +87,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
             AverageFinishStatistics(
               finishes: widget.finishes,
             ),
+          ],
 
           if (_selectedAnalytics == AnalyticsType.activity) ...[
             ActivityChart(
