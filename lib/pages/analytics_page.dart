@@ -8,6 +8,7 @@ import '../widgets/activity_chart.dart';
 import '../widgets/activity_statistics.dart';
 import '../widgets/analytics_selector.dart';
 import '../widgets/average_finish_chart.dart';
+import '../widgets/average_finish_statistics.dart';
 import '../widgets/date_filter_selector.dart';
 
 class AnalyticsPage extends StatefulWidget {
@@ -79,6 +80,12 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
             AverageFinishChart(
               finishes: widget.finishes,
               settings: widget.settings,
+            ),
+
+            const SizedBox(height: 16),
+
+            AverageFinishStatistics(
+              finishes: widget.finishes,
             ),
 
           if (_selectedAnalytics == AnalyticsType.activity) ...[
