@@ -39,6 +39,11 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
         AnalyticsSelector(
           selectedAnalytics: _selectedAnalytics,
           onSelectionChanged: (analytics) {
+            if (analytics == AnalyticsType.activity &&
+                widget.selectedDateFilter == DateFilter.today) {
+              widget.onDateFilterChanged(DateFilter.last7Days);
+            }
+
             setState(() {
               _selectedAnalytics = analytics;
             });
@@ -57,6 +62,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
         DateFilterSelector(
           selectedFilter: widget.selectedDateFilter,
           onSelectionChanged: widget.onDateFilterChanged,
+          showToday: _selectedAnalytics != AnalyticsType.activity,
         ),
 
         const SizedBox(height: 24),

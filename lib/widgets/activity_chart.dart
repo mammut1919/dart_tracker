@@ -107,21 +107,22 @@ class ActivityChart extends StatelessWidget {
 
                       final current = points[index].date;
 
-/* vorübergehend deaktiviert
                       if (!ChartAxis.shouldShowLabel(
                         index: index,
-                        date: points[index].date,
+                        pointCount: points.length,
                         filter: selectedDateFilter,
                       )) {
                         return const SizedBox.shrink();
                       }
-*/
+
                       return SideTitleWidget(
                         meta: meta,
                         child: Text(
                           ChartAxis.formatDate(
                             current,
                             selectedDateFilter,
+                            firstDate: points.first.date,
+                            lastDate: points.last.date,
                           ),
                           style: const TextStyle(fontSize: 10),
                         ),

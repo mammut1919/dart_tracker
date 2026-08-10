@@ -7,7 +7,10 @@ class ChartAxis {
 
   static String formatDate(
     DateTime date,
-    DateFilter filter,
+    DateFilter filter, {
+    required DateTime firstDate,
+    required DateTime lastDate,
+  }
   ) {
     switch (filter) {
       case DateFilter.today:
@@ -23,36 +26,41 @@ class ChartAxis {
         return DateFormat('MMM').format(date);
 
       case DateFilter.allTime:
+        final twoYearsAfterFirstDate = DateTime(
+          firstDate.year + 2,
+          firstDate.month,
+          firstDate.day,
+        );
+
+        if (lastDate.isBefore(twoYearsAfterFirstDate)) {
+          return DateFormat('MMM.yy').format(date);
+        }
+
         return DateFormat('yyyy').format(date);
     }
   }
 
   static bool shouldShowLabel({
     required int index,
-    required DateTime date,
+    required int pointCount,
     required DateFilter filter,
   }) {
-    switch (filter) {
-      case DateFilter.today:
-        return true;
-
-      case DateFilter.last7Days:
-        return index % 2 == 0;
-
-      case DateFilter.last30Days:
-        return index % 15 == 0;
-
-      case DateFilter.last90Days:
-        return index % 15 == 0;
-
-      case DateFilter.last180Days:
-        return index % 30 == 0;
-
-      case DateFilter.last365Days:
-        return index % 30 == 0;
-
-      case DateFilter.allTime:
-        return index % 30 == 0;
+    if (pointCount <= 1) {
+      return true;
     }
+
+    final targetCount = switch (filter) {
+      DateFilter.today => pointCount,
+      DateFilter.last7Days => 5,
+      DateFilter.last30Days => 7,
+      DateFilter.last90Days => 7,
+      DateFilter.last180Days => 7,
+      DateFilter.last365Days => 7,
+      DateFilter.allTime => pointCount <= 31 ? 5 : 7,
+    };
+
+    final interval = ((pointCount - 1) / (targetCount - 1)).ceil();
+
+    return index == 0 || index == pointCount - 1 || index % interval == 0;
   }
 }
