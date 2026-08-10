@@ -37,6 +37,7 @@ class FinishesPage extends StatefulWidget {
 
 class _FinishesPageState extends State<FinishesPage> {
   FinishMultiplier _selectedMultiplier = FinishMultiplier.double;
+    bool _showAllHistory = false;
 
   Future<void> _confirmDeleteFinish(
     BuildContext context,
@@ -88,8 +89,12 @@ class _FinishesPageState extends State<FinishesPage> {
   @override
   Widget build(BuildContext context) {
     final visibleFinishes = widget.finishes
-      .where((finish) => finish.multiplier == _selectedMultiplier)
-      .toList();
+        .where((finish) => finish.multiplier == _selectedMultiplier)
+        .toList();
+    final historyFinishes = _showAllHistory
+        ? visibleFinishes
+        : visibleFinishes.take(3).toList();
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -148,7 +153,7 @@ class _FinishesPageState extends State<FinishesPage> {
                   child: Center(child: Text('Noch keine Finishes erfasst.')),
                 )
               else
-                ...visibleFinishes.map<Widget>((finish) {
+                ...historyFinishes.map<Widget>((finish) {
                   return Dismissible(
                     key: ValueKey(finish.id),
                     direction: DismissDirection.endToStart,
@@ -179,6 +184,17 @@ class _FinishesPageState extends State<FinishesPage> {
                     ),
                   );
                 }),
+                if (visibleFinishes.length > 3)
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        _showAllHistory = !_showAllHistory;
+                      });
+                    },
+                    child: Text(
+                      _showAllHistory ? 'Weniger anzeigen' : 'Mehr anzeigen',
+                    ),
+                  ),
             ],
           ),
         ),
