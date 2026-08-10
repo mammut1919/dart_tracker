@@ -20,12 +20,16 @@ class ChartAxis {
 
       case DateFilter.last90Days:
       case DateFilter.last180Days:
-        return DateFormat('MM.yy').format(date);
-
       case DateFilter.last365Days:
-        return DateFormat('MMM').format(date);
+        return DateFormat('MMM.yy').format(date);
 
       case DateFilter.allTime:
+        final rangeInDays = lastDate.difference(firstDate).inDays;
+
+        if (rangeInDays <= 60) {
+          return DateFormat('dd.MM').format(date);
+        }
+
         final twoYearsAfterFirstDate = DateTime(
           firstDate.year + 2,
           firstDate.month,
