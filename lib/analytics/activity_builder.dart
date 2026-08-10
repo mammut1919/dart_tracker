@@ -51,7 +51,7 @@ class ActivityBuilder {
     for (
       var day = firstDay;
       !day.isAfter(lastDay);
-      day = day.add(const Duration(days: 1))
+      day = DateTime(day.year, day.month, day.day + 1)
     ) {
       result.add(
         ActivityPoint(
