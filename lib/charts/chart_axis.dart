@@ -1,6 +1,7 @@
 import 'package:intl/intl.dart';
 
 import '../models/date_filter.dart';
+import '../models/statistics_aggregation.dart';
 
 class ChartAxis {
   const ChartAxis._();
@@ -21,7 +22,7 @@ class ChartAxis {
       case DateFilter.last90Days:
       case DateFilter.last180Days:
       case DateFilter.last365Days:
-        return DateFormat('MMM.yy').format(date);
+        return DateFormat('MMM yy', 'de_DE').format(date);
 
       case DateFilter.allTime:
         final rangeInDays = lastDate.difference(firstDate).inDays;
@@ -37,7 +38,7 @@ class ChartAxis {
         );
 
         if (lastDate.isBefore(twoYearsAfterFirstDate)) {
-          return DateFormat('MMM.yy').format(date);
+          return DateFormat('MMM yy', 'de_DE').format(date);
         }
 
         return DateFormat('yyyy').format(date);
@@ -66,5 +67,28 @@ class ChartAxis {
     final interval = ((pointCount - 1) / (targetCount - 1)).ceil();
 
     return index == 0 || index == pointCount - 1 || index % interval == 0;
+  }
+
+  static String formatTooltipDate(
+    DateTime date,
+    StatisticsAggregation aggregation,
+  ) {
+    switch (aggregation) {
+      case StatisticsAggregation.day:
+        return DateFormat('dd.MM.yyyy').format(date);
+
+      case StatisticsAggregation.week:
+        final endDate = date.add(const Duration(days: 6));
+
+        return '${DateFormat('dd.MM.yyyy').format(date)}'
+            ' – '
+            '${DateFormat('dd.MM.yyyy').format(endDate)}';
+
+      case StatisticsAggregation.month:
+        return DateFormat('MMMM yyyy', 'de_DE').format(date);
+
+      case StatisticsAggregation.year:
+        return DateFormat('yyyy').format(date);
+    }
   }
 }

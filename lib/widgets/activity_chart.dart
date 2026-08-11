@@ -135,7 +135,7 @@ class ActivityChart extends StatelessWidget {
           final point = points[pointIndex];
 
           return LineTooltipItem(
-            '${DateFormat('dd.MM.yyyy').format(point.date)}\n'
+            '${ChartAxis.formatTooltipDate(point.date, aggregation)}\n'
             '${point.finishes} Finishes',
             TextStyle(
               color: settings.finishColor,
