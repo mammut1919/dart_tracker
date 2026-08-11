@@ -113,6 +113,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
               finishes: widget.finishes,
               settings: widget.settings,
               selectedDateFilter: widget.selectedDateFilter,
+              aggregation: _selectedAggregation,
             ),
 
             const SizedBox(height: 16),

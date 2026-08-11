@@ -8,6 +8,7 @@ import '../charts/chart_constants.dart';
 import '../charts/chart_scale.dart';
 import '../models/date_filter.dart';
 import '../models/new_finish_entry.dart';
+import '../models/statistics_aggregation.dart';
 import '../settings/app_settings.dart';
 
 class ActivityChart extends StatelessWidget {
@@ -16,11 +17,13 @@ class ActivityChart extends StatelessWidget {
     required this.finishes,
     required this.settings,
     required this.selectedDateFilter,
+    required this.aggregation,
   });
 
   final List<NewFinishEntry> finishes;
   final AppSettings settings;
   final DateFilter selectedDateFilter;
+  final StatisticsAggregation aggregation;
 
   static const _chartHeight = 250.0;
   static const _padding = 16.0;
@@ -36,6 +39,7 @@ class ActivityChart extends StatelessWidget {
     final points = builder.buildActivityData(
       finishes: finishes,
       startDate: selectedDateFilter.startDate,
+      aggregation: aggregation,
     );
 
     if (points.isEmpty) {
@@ -153,6 +157,11 @@ class ActivityChart extends StatelessWidget {
                   getTooltipColor: (_) => Colors.black87,
                   getTooltipItems: (touchedSpots) {
                     return touchedSpots.map((spot) {
+                      if (spot.spotIndex < 0 ||
+                          spot.spotIndex >= points.length) {
+                        return null;
+                      }
+
                       final point = points[spot.spotIndex];
 
                       return LineTooltipItem(

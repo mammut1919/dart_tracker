@@ -23,10 +23,10 @@ enum AnalyticsType {
   String get description {
     switch (this) {
       case AnalyticsType.averageFinishDart:
-        return 'Der Chart zeigt den durchschnittlichen Punktwert des letzten Finish-Darts pro Trainingstag. Höhere Werte bedeuten im Durchschnitt anspruchsvollere Checkouts.';
+        return 'Der Chart zeigt den durchschnittlichen Punktwert aller Finish-Darts pro Trainingszeitraum. Höhere Werte bedeuten im Durchschnitt höhere Checkouts.';
 
       case AnalyticsType.activity:
-        return 'Diese Auswertung zeigt deine Trainingsaktivität. Der Chart stellt die Anzahl erfolgreicher Finishes pro Trainingstag dar. Darunter findest du Kennzahlen zu deinen Trainingsserien.';
+        return 'Diese Auswertung zeigt deine Trainingsaktivität. Der Chart stellt die Anzahl erfolgreicher Finishes pro Trainingszeitraum dar. Darunter findest du Kennzahlen zu deinen Trainingsserien.';
     }
   }
 }
