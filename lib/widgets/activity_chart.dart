@@ -1,6 +1,5 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../analytics/activity_builder.dart';
 import '../charts/chart_axis.dart';
@@ -39,6 +38,34 @@ class ActivityChart extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
+    final firstDate = points.first.date;
+    final lastDate = points.last.date;
+
+    final xInterval = ChartScale.calculateXInterval(
+      lastDate.difference(firstDate).inDays + 1,
+    );
+
+    final xTickDates = ChartScale.buildXTickDates(
+      firstDate: firstDate,
+      lastDate: lastDate,
+      interval: xInterval,
+    );
+
+    final xTickOffsets = xTickDates
+        .map(
+          (date) => date
+              .difference(firstDate)
+              .inDays
+              .toDouble(),
+        )
+        .toSet();
+        
+debugPrint('firstDate: $firstDate');
+debugPrint('lastDate: $lastDate');
+debugPrint('xTickDates: $xTickDates');
+debugPrint('xTickOffsets: $xTickOffsets');
+
+
     final spots = <FlSpot>[];
 
     if (points.length == 1 && aggregation != StatisticsAggregation.day) {
@@ -49,12 +76,15 @@ class ActivityChart extends StatelessWidget {
         FlSpot(1, points.first.finishes.toDouble()),
       );
     } else {
-      for (var i = 0; i < points.length; i++) {
-        final point = points[i];
+      for (final point in points) {
+        final x = point.date
+            .difference(firstDate)
+            .inDays
+            .toDouble();
 
         spots.add(
           FlSpot(
-            i.toDouble(),
+            x,
             point.finishes.toDouble(),
           ),
         );
@@ -81,34 +111,26 @@ class ActivityChart extends StatelessWidget {
       maxX: points.length == 1 &&
               aggregation != StatisticsAggregation.day
           ? 1
-          : (points.length - 1).toDouble(),
+          : lastDate
+              .difference(firstDate)
+              .inDays
+              .toDouble(),
       maxY: chartMaxY,
+      xTickOffsets: xTickOffsets,
       yInterval: yInterval,
       bottomTitles: (value, meta) {
-        final index = value.round();
-
-        if (index < 0 || index >= points.length) {
-          return const SizedBox.shrink();
-        }
-
-        final current = points[index].date;
-
-        if (!ChartAxis.shouldShowLabel(
-          index: index,
-          pointCount: points.length,
-          filter: selectedDateFilter,
-        )) {
-          return const SizedBox.shrink();
-        }
+        final date = firstDate.add(
+          Duration(days: value.round()),
+        );
 
         return SideTitleWidget(
           meta: meta,
           child: Text(
             ChartAxis.formatDate(
-              current,
+              date,
               selectedDateFilter,
-              firstDate: points.first.date,
-              lastDate: points.last.date,
+              firstDate: firstDate,
+              lastDate: lastDate,
             ),
             style: const TextStyle(fontSize: 10),
           ),

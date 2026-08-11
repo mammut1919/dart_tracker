@@ -9,6 +9,7 @@ class StatisticsLineChart extends StatelessWidget {
     required this.spots,
     required this.maxX,
     required this.maxY,
+    required this.xTickOffsets,
     required this.yInterval,
     required this.bottomTitles,
     required this.leftTitles,
@@ -19,6 +20,7 @@ class StatisticsLineChart extends StatelessWidget {
   final List<FlSpot> spots;
   final double maxX;
   final double maxY;
+  final Set<double> xTickOffsets;
   final double yInterval;
 
   final Widget Function(double value, TitleMeta meta) bottomTitles;
@@ -32,9 +34,10 @@ class StatisticsLineChart extends StatelessWidget {
 
   static const _chartHeight = 250.0;
   static const _padding = 16.0;
+  static const _axisReservedSize = 34.0;
+  static const _lineWidth = 3.0;
   static const _animationDuration =
       Duration(milliseconds: 350);
-  static const _lineWidth = 3.0;
 
   @override
   Widget build(BuildContext context) {
@@ -49,11 +52,8 @@ class StatisticsLineChart extends StatelessWidget {
               maxX: maxX,
               minY: 0,
               maxY: maxY,
-
               borderData: FlBorderData(show: true),
-
               gridData: FlGridData(show: true),
-
               titlesData: FlTitlesData(
                 topTitles: AxisTitles(
                   sideTitles: SideTitles(showTitles: false),
@@ -64,21 +64,28 @@ class StatisticsLineChart extends StatelessWidget {
                 bottomTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
-                    reservedSize: 34,
+                    reservedSize: _axisReservedSize,
                     interval: 1,
-                    getTitlesWidget: bottomTitles,
+                    getTitlesWidget: (value, meta) {
+                      final x = value.round().toDouble();
+
+                      if (!xTickOffsets.contains(x)) {
+                        return const SizedBox.shrink();
+                      }
+
+                      return bottomTitles(value, meta);
+                    },
                   ),
                 ),
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
-                    reservedSize: 34,
+                    reservedSize: _axisReservedSize,
                     interval: yInterval,
                     getTitlesWidget: leftTitles,
                   ),
                 ),
               ),
-
               lineTouchData: LineTouchData(
                 enabled: true,
                 touchTooltipData: LineTouchTooltipData(
@@ -86,7 +93,6 @@ class StatisticsLineChart extends StatelessWidget {
                   getTooltipItems: tooltipItems,
                 ),
               ),
-
               lineBarsData: [
                 LineChartBarData(
                   spots: spots,
