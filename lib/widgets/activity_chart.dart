@@ -4,12 +4,12 @@ import 'package:intl/intl.dart';
 
 import '../analytics/activity_builder.dart';
 import '../charts/chart_axis.dart';
-import '../charts/chart_constants.dart';
 import '../charts/chart_scale.dart';
 import '../models/date_filter.dart';
 import '../models/new_finish_entry.dart';
 import '../models/statistics_aggregation.dart';
 import '../settings/app_settings.dart';
+import '../widgets/statistics_line_chart.dart';
 
 class ActivityChart extends StatelessWidget {
   const ActivityChart({
@@ -24,13 +24,6 @@ class ActivityChart extends StatelessWidget {
   final AppSettings settings;
   final DateFilter selectedDateFilter;
   final StatisticsAggregation aggregation;
-
-  static const _chartHeight = 250.0;
-  static const _padding = 16.0;
-  static const _axisReservedSize = 34.0;
-  static const _lineWidth = 3.0;
-  static const _animationDuration =
-      Duration(milliseconds: 350);
 
   @override
   Widget build(BuildContext context) {
@@ -83,129 +76,75 @@ class ActivityChart extends StatelessWidget {
       yInterval,
     );
 
-    return Card(
-      child: SizedBox(
-        height: _chartHeight,
-        child: Padding(
-          padding: const EdgeInsets.all(_padding),
-          child: LineChart(
-            LineChartData(
-              minX: 0,
-              maxX: points.length == 1 && aggregation != StatisticsAggregation.day
-                  ? 1
-                  : (points.length - 1).toDouble(),
-              minY: 0,
-              maxY: chartMaxY,
+    return StatisticsLineChart(
+      spots: spots,
+      maxX: points.length == 1 &&
+              aggregation != StatisticsAggregation.day
+          ? 1
+          : (points.length - 1).toDouble(),
+      maxY: chartMaxY,
+      yInterval: yInterval,
+      bottomTitles: (value, meta) {
+        final index = value.round();
 
-              borderData: FlBorderData(show: true),
+        if (index < 0 || index >= points.length) {
+          return const SizedBox.shrink();
+        }
 
-              gridData: FlGridData(show: true),
+        final current = points[index].date;
 
-              titlesData: FlTitlesData(
-                topTitles: AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
-                rightTitles: AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
-                bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    reservedSize: _axisReservedSize,
-                    interval: 1,
-                    getTitlesWidget: (value, meta) {
-                      final index = value.round();
+        if (!ChartAxis.shouldShowLabel(
+          index: index,
+          pointCount: points.length,
+          filter: selectedDateFilter,
+        )) {
+          return const SizedBox.shrink();
+        }
 
-                      if (index < 0 || index >= points.length) {
-                        return const SizedBox.shrink();
-                      }
-
-                      final current = points[index].date;
-
-                      if (!ChartAxis.shouldShowLabel(
-                        index: index,
-                        pointCount: points.length,
-                        filter: selectedDateFilter,
-                      )) {
-                        return const SizedBox.shrink();
-                      }
-
-                      return SideTitleWidget(
-                        meta: meta,
-                        child: Text(
-                          ChartAxis.formatDate(
-                            current,
-                            selectedDateFilter,
-                            firstDate: points.first.date,
-                            lastDate: points.last.date,
-                          ),
-                          style: const TextStyle(fontSize: 10),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                leftTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    reservedSize: ChartConstants.axisReservedSize,
-                    interval: yInterval,
-                    getTitlesWidget: (value, meta) {
-                      return SideTitleWidget(
-                        meta: meta,
-                        child: Text(
-                          value.toInt().toString(),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-
-              lineTouchData: LineTouchData(
-                enabled: true,
-                touchTooltipData: LineTouchTooltipData(
-                  getTooltipColor: (_) => Colors.black87,
-                  getTooltipItems: (touchedSpots) {
-                    return touchedSpots.map((spot) {
-                      final pointIndex = points.length == 1
-                          ? 0
-                          : spot.spotIndex;
-
-                      if (pointIndex < 0 || pointIndex >= points.length) {
-                        return null;
-                      }
-
-                      final point = points[pointIndex];
-
-                      return LineTooltipItem(
-                        '${DateFormat('dd.MM.yyyy').format(point.date)}\n'
-                        '${point.finishes} Finishes',
-                        TextStyle(
-                          color: settings.finishColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      );
-                    }).toList();
-                  },
-                ),
-              ),
-
-              lineBarsData: [
-                LineChartBarData(
-                  spots: spots,
-                  isCurved: false,
-                  color: settings.finishColor,
-                  barWidth: _lineWidth,
-                  dotData: const FlDotData(show: false),
-                ),
-              ],
+        return SideTitleWidget(
+          meta: meta,
+          child: Text(
+            ChartAxis.formatDate(
+              current,
+              selectedDateFilter,
+              firstDate: points.first.date,
+              lastDate: points.last.date,
             ),
-            duration: _animationDuration,
-            curve: Curves.easeOutCubic,
+            style: const TextStyle(fontSize: 10),
           ),
-        ),
-      ),
+        );
+      },
+      leftTitles: (value, meta) {
+        return SideTitleWidget(
+          meta: meta,
+          child: Text(
+            value.toInt().toString(),
+          ),
+        );
+      },
+      tooltipItems: (touchedSpots) {
+        return touchedSpots.map((spot) {
+          final pointIndex = points.length == 1
+              ? 0
+              : spot.spotIndex;
+
+          if (pointIndex < 0 || pointIndex >= points.length) {
+            return null;
+          }
+
+          final point = points[pointIndex];
+
+          return LineTooltipItem(
+            '${DateFormat('dd.MM.yyyy').format(point.date)}\n'
+            '${point.finishes} Finishes',
+            TextStyle(
+              color: settings.finishColor,
+              fontWeight: FontWeight.bold,
+            ),
+          );
+        }).toList();
+      },
+      settings: settings,
     );
   }
 }
