@@ -175,7 +175,8 @@ class _FinishesPageState extends State<FinishesPage> {
                         title: Text(
                           finish.field == 50
                             ? 'Bull'
-                            : '${finish.multiplier == FinishMultiplier.double ? 'D' : 'T'}${finish.field}',
+                            : '${finish.multiplier == FinishMultiplier.double ? 'D' : 'T'}${finish.field}'
+                            '${finish.score != null ? '  (Finish: ${finish.score})' : ''}',
                         ),
                         subtitle: Text(
                           DateFormat('dd.MM.yyyy').format(finish.timestamp),

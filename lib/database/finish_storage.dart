@@ -21,6 +21,7 @@ class FinishStorage {
             field: row.field,
             multiplier: FinishMultiplier.values.byName(row.multiplier),
             timestamp: row.timestamp,
+            score: row.score,
           ),
         )
         .toList();
@@ -29,8 +30,9 @@ class FinishStorage {
   Future<void> add(
     int field,
     FinishMultiplier multiplier,
-    DateTime timestamp,
-  ) async {
+    DateTime timestamp, {
+    int? score,
+  }) async {
     await _database
         .into(_database.finishEntries)
         .insert(
@@ -38,6 +40,7 @@ class FinishStorage {
             field: field,
             multiplier: Value(multiplier.name),
             timestamp: timestamp,
+            score: Value(score),
           ),
         );
   }
