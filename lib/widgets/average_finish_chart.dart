@@ -42,13 +42,22 @@ class AverageFinishChart extends StatelessWidget {
 
     final spots = <FlSpot>[];
 
-    for (var i = 0; i < points.length; i++) {
+    if (points.length == 1 && aggregation != StatisticsAggregation.day) {
       spots.add(
-        FlSpot(
-          i.toDouble(),
-          points[i].average,
-        ),
+        FlSpot(0, points.first.average),
       );
+      spots.add(
+        FlSpot(1, points.first.average),
+      );
+    } else {
+      for (var i = 0; i < points.length; i++) {
+        spots.add(
+          FlSpot(
+            i.toDouble(),
+            points[i].average,
+          ),
+        );
+      }
     }
 
     return Card(
@@ -59,7 +68,9 @@ class AverageFinishChart extends StatelessWidget {
           child: LineChart(
             LineChartData(
               minX: 0,
-              maxX: (points.length - 1).toDouble(),
+              maxX: spots.length == 2 && points.length == 1
+                  ? 1
+                  : (points.length - 1).toDouble(),
               minY: 0,
               maxY: 60,
 
@@ -120,7 +131,15 @@ class AverageFinishChart extends StatelessWidget {
                   getTooltipColor: (_) => Colors.black87,
                   getTooltipItems: (touchedSpots) {
                     return touchedSpots.map((spot) {
-                      final point = points[spot.spotIndex];
+                      final pointIndex = points.length == 1
+                          ? 0
+                          : spot.spotIndex;
+
+                      if (pointIndex < 0 || pointIndex >= points.length) {
+                        return null;
+                      }
+
+                      final point = points[pointIndex];
 
                       return LineTooltipItem(
                         '${DateFormat('dd.MM.yyyy').format(point.date)}\n'

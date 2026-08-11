@@ -48,15 +48,24 @@ class ActivityChart extends StatelessWidget {
 
     final spots = <FlSpot>[];
 
-    for (var i = 0; i < points.length; i++) {
-      final point = points[i];
-
+    if (points.length == 1 && aggregation != StatisticsAggregation.day) {
       spots.add(
-        FlSpot(
-          i.toDouble(),
-          point.finishes.toDouble(),
-        ),
+        FlSpot(0, points.first.finishes.toDouble()),
       );
+      spots.add(
+        FlSpot(1, points.first.finishes.toDouble()),
+      );
+    } else {
+      for (var i = 0; i < points.length; i++) {
+        final point = points[i];
+
+        spots.add(
+          FlSpot(
+            i.toDouble(),
+            point.finishes.toDouble(),
+          ),
+        );
+      }
     }
 
     final maxDataY = points
@@ -82,7 +91,9 @@ class ActivityChart extends StatelessWidget {
           child: LineChart(
             LineChartData(
               minX: 0,
-              maxX: (points.length - 1).toDouble(),
+              maxX: points.length == 1 && aggregation != StatisticsAggregation.day
+                  ? 1
+                  : (points.length - 1).toDouble(),
               minY: 0,
               maxY: chartMaxY,
 
@@ -157,12 +168,15 @@ class ActivityChart extends StatelessWidget {
                   getTooltipColor: (_) => Colors.black87,
                   getTooltipItems: (touchedSpots) {
                     return touchedSpots.map((spot) {
-                      if (spot.spotIndex < 0 ||
-                          spot.spotIndex >= points.length) {
+                      final pointIndex = points.length == 1
+                          ? 0
+                          : spot.spotIndex;
+
+                      if (pointIndex < 0 || pointIndex >= points.length) {
                         return null;
                       }
 
-                      final point = points[spot.spotIndex];
+                      final point = points[pointIndex];
 
                       return LineTooltipItem(
                         '${DateFormat('dd.MM.yyyy').format(point.date)}\n'
