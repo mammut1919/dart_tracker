@@ -3,14 +3,17 @@ import 'package:flutter/material.dart';
 import '../analytics/analytics_builder.dart';
 import '../models/finish_multiplier.dart';
 import '../models/new_finish_entry.dart';
+import '../models/statistics_aggregation.dart';
 
 class AverageFinishStatistics extends StatelessWidget {
   const AverageFinishStatistics({
     super.key,
     required this.finishes,
+    required this.aggregation,
   });
 
   final List<NewFinishEntry> finishes;
+  final StatisticsAggregation aggregation;
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +25,7 @@ class AverageFinishStatistics extends StatelessWidget {
 
     final points = builder.buildAverageFinishData(
       finishes: finishes,
+      aggregation: aggregation,
     );
 
     if (points.isEmpty) {

@@ -106,6 +106,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
 
             AverageFinishStatistics(
               finishes: widget.finishes,
+              aggregation: _selectedAggregation,
             ),
           ],
 
