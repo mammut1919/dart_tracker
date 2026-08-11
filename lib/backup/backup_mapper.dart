@@ -19,6 +19,7 @@ class BackupMapper {
       'field': finish.field,
       'multiplier': finish.multiplier.name,
       'timestamp': finish.timestamp.toIso8601String(),
+      if (finish.score != null) 'score': finish.score,
     };
   }
 
@@ -49,6 +50,7 @@ class BackupMapper {
       timestamp: DateTime.parse(
         json['timestamp'] as String,
       ),
+      score: json['score'] as int?,
     );
   }
 }

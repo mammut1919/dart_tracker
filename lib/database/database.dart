@@ -26,6 +26,8 @@ class FinishEntries extends Table {
     text().withDefault(const Constant('double'))();
 
   DateTimeColumn get timestamp => dateTime()();
+
+  IntColumn get score => integer().nullable()();
 }
 
 @DriftDatabase(tables: [ScoreEntries, FinishEntries])
@@ -33,7 +35,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -53,6 +55,13 @@ class AppDatabase extends _$AppDatabase {
         await m.addColumn(
           finishEntries,
           finishEntries.multiplier,
+        );
+      }
+
+      if (from < 5) {
+        await m.addColumn(
+          finishEntries,
+          finishEntries.score,
         );
       }
     },

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/entry_type.dart';
+import '../models/finish_tracking_mode.dart';
 
 class AppSettings {
   static const Object _noChange = Object();
@@ -13,6 +14,7 @@ class AppSettings {
     baselineShortLeg: 0,
 
     shortLegLimit: 24,
+    finishTrackingMode: FinishTrackingMode.lastDart,
 
     score180ColorValue: 0xFF4CAF50,
     score171ColorValue: 0xFFFF9800,
@@ -30,6 +32,7 @@ class AppSettings {
     required this.baselineHighFinish,
     required this.baselineShortLeg,
     required this.shortLegLimit,
+    required this.finishTrackingMode,
     required this.score180ColorValue,
     required this.score171ColorValue,
     required this.score162ColorValue,
@@ -49,6 +52,7 @@ class AppSettings {
   final int baselineHighFinish;
   final int baselineShortLeg;
   final int shortLegLimit;
+  final FinishTrackingMode finishTrackingMode;
   final int score180ColorValue;
   final int score171ColorValue;
   final int score162ColorValue;
@@ -72,6 +76,7 @@ class AppSettings {
     int? baselineShortLeg,
     
     int? shortLegLimit,
+    FinishTrackingMode? finishTrackingMode,
 
     int? score180ColorValue,
     int? score171ColorValue,
@@ -89,6 +94,7 @@ class AppSettings {
       baselineShortLeg: baselineShortLeg ?? this.baselineShortLeg,
 
       shortLegLimit: shortLegLimit ?? this.shortLegLimit,
+      finishTrackingMode: finishTrackingMode ?? this.finishTrackingMode,
 
       score180ColorValue: score180ColorValue ?? this.score180ColorValue,
       score171ColorValue: score171ColorValue ?? this.score171ColorValue,
@@ -152,6 +158,7 @@ class AppSettings {
       'baselineHighFinish': baselineHighFinish,
       'baselineShortLeg': baselineShortLeg,
       'shortLegLimit': shortLegLimit,
+      'finishTrackingMode': finishTrackingMode.name,
       'score180ColorValue': score180ColorValue,
       'score171ColorValue': score171ColorValue,
       'score162ColorValue': score162ColorValue,
@@ -171,6 +178,10 @@ class AppSettings {
       baselineShortLeg: json['baselineShortLeg'] as int? ?? 0,
       shortLegLimit: json['shortLegLimit'] as int? ??
           AppSettings.initial.shortLegLimit,
+      finishTrackingMode: FinishTrackingMode.values.byName(
+        json['finishTrackingMode'] as String? ??
+            FinishTrackingMode.lastDart.name,
+      ),
       score180ColorValue: json['score180ColorValue'] as int? ??
           AppSettings.initial.score180ColorValue,
       score171ColorValue: json['score171ColorValue'] as int? ??

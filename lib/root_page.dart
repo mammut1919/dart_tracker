@@ -123,6 +123,7 @@ class _RootPageState extends State<RootPage> {
       finish.field,
       finish.multiplier,
       finish.timestamp,
+      score: finish.score,
     );
 
     await _loadFinishes();
@@ -258,7 +259,8 @@ class _RootPageState extends State<RootPage> {
         await _finishStorage.add(
           finish.field,
           finish.multiplier,
-          finish.timestamp
+          finish.timestamp,
+          score: finish.score,
         );
       }
 

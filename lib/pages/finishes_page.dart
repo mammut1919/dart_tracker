@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import '../models/date_filter.dart';
 import '../models/finish_multiplier.dart';
+import '../models/finish_tracking_mode.dart';
 import '../models/new_finish_entry.dart';
 import '../theme/app_colors.dart';
 import '../widgets/date_filter_selector.dart';
@@ -86,6 +88,93 @@ class _FinishesPageState extends State<FinishesPage> {
     }).length;
   }
 
+  Future<int?> _showFinishScoreDialog(
+    BuildContext context,
+    int field,
+    FinishMultiplier multiplier,
+  ) async {
+    final defaultScore = field * multiplier.factor;
+
+    final controller = TextEditingController();
+
+    final score = await showDialog<int>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Finish Score'),
+          content: TextFormField(
+            controller: controller,
+            autofocus: true,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              labelText: 'Final Score',
+              hintText: defaultScore.toString(),
+            ),
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Abbrechen'),
+            ),
+            FilledButton(
+              onPressed: () {
+                final score = controller.text.isEmpty
+                    ? defaultScore
+                    : int.tryParse(controller.text);
+
+                if (score == null || score <= 0) {
+                  return;
+                }
+
+                Navigator.pop(context, score);
+              },
+              child: const Text('Speichern'),
+            ),
+          ],
+        );
+      },
+    );
+
+    controller.dispose();
+
+    return score;
+  }
+
+  Future<void> _handleFinishSelected(int field) async {
+    final timestamp = DateTime.now();
+
+    if (widget.settings.finishTrackingMode ==
+        FinishTrackingMode.lastDart) {
+      widget.onSaveFinish(
+        NewFinishEntry(
+          field: field,
+          multiplier: _selectedMultiplier,
+          timestamp: timestamp,
+        ),
+      );
+
+      return;
+    }
+
+    final score = await _showFinishScoreDialog(context, field, _selectedMultiplier);
+
+    if (score == null) {
+      return;
+    }
+
+    widget.onSaveFinish(
+      NewFinishEntry(
+        field: field,
+        multiplier: _selectedMultiplier,
+        timestamp: timestamp,
+        score: score,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final visibleFinishes = widget.finishes
@@ -125,15 +214,7 @@ class _FinishesPageState extends State<FinishesPage> {
               FinishGrid(
                 settings: widget.settings,
                 multiplier: _selectedMultiplier,
-                onSelected: (field) {
-                  widget.onSaveFinish(
-                    NewFinishEntry(
-                      field: field,
-                      multiplier: _selectedMultiplier,
-                      timestamp: DateTime.now()
-                    ),
-                  );
-                },
+                onSelected: _handleFinishSelected,
               ),
               const SizedBox(height: 16),
               FinishChart(
@@ -175,7 +256,8 @@ class _FinishesPageState extends State<FinishesPage> {
                         title: Text(
                           finish.field == 50
                             ? 'Bull'
-                            : '${finish.multiplier == FinishMultiplier.double ? 'D' : 'T'}${finish.field}',
+                            : '${finish.multiplier == FinishMultiplier.double ? 'D' : 'T'}${finish.field}'
+                            '${finish.score != null ? ' (Finish: ${finish.score})' : ''}',
                         ),
                         subtitle: Text(
                           DateFormat('dd.MM.yyyy').format(finish.timestamp),
