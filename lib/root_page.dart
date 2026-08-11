@@ -123,6 +123,7 @@ class _RootPageState extends State<RootPage> {
       finish.field,
       finish.multiplier,
       finish.timestamp,
+      score: finish.score,
     );
 
     await _loadFinishes();
