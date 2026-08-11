@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/analytics_type.dart';
 import '../models/date_filter.dart';
 import '../models/new_finish_entry.dart';
+import '../models/statistics_aggregation.dart';
 import '../settings/app_settings.dart';
 import '../widgets/activity_chart.dart';
 import '../widgets/activity_statistics.dart';
@@ -10,6 +11,7 @@ import '../widgets/analytics_selector.dart';
 import '../widgets/average_finish_chart.dart';
 import '../widgets/average_finish_statistics.dart';
 import '../widgets/date_filter_selector.dart';
+import '../widgets/statistics_aggregation_selector.dart';
 
 class AnalyticsPage extends StatefulWidget {
   const AnalyticsPage({
@@ -31,6 +33,8 @@ class AnalyticsPage extends StatefulWidget {
 
 class _AnalyticsPageState extends State<AnalyticsPage> {
   AnalyticsType _selectedAnalytics = AnalyticsType.averageFinishDart;
+
+  StatisticsAggregation _selectedAggregation = StatisticsAggregation.day;
 
   @override
   Widget build(BuildContext context) {
@@ -60,10 +64,25 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
 
         const SizedBox(height: 16),
 
-        DateFilterSelector(
-          selectedFilter: widget.selectedDateFilter,
-          onSelectionChanged: widget.onDateFilterChanged,
-          showToday: _selectedAnalytics != AnalyticsType.activity,
+        Row(
+          children: [
+            DateFilterSelector(
+              selectedFilter: widget.selectedDateFilter,
+              onSelectionChanged: widget.onDateFilterChanged,
+              showToday: _selectedAnalytics != AnalyticsType.activity,
+            ),
+
+            const Spacer(),
+
+            StatisticsAggregationSelector(
+              selectedAggregation: _selectedAggregation,
+              onSelectionChanged: (aggregation) {
+                setState(() {
+                  _selectedAggregation = aggregation;
+                });
+              },
+            ),
+          ],
         ),
 
         const SizedBox(height: 24),
