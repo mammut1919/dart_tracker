@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app_settings.dart';
+import '../models/finish_tracking_mode.dart';
 
 class SettingsRepository {
   static const _baseline180Key = 'baseline180';
@@ -9,6 +10,7 @@ class SettingsRepository {
   static const _baselineHighFinishKey = 'baselineHighFinish';
   static const _baselineShortLegKey = 'baselineShortLeg';
   static const _shortLegLimitKey = 'shortLegLimit';
+  static const _finishTrackingModeKey = 'finishTrackingMode';
   static const _score180ColorKey = 'score180Color';
   static const _score171ColorKey = 'score171Color';
   static const _score162ColorKey = 'score162Color';
@@ -36,6 +38,11 @@ class SettingsRepository {
       shortLegLimit:
           prefs.getInt(_shortLegLimitKey) ??
           AppSettings.initial.shortLegLimit,
+      finishTrackingMode: FinishTrackingMode.values.byName(
+        prefs.getString(_finishTrackingModeKey) ??
+            AppSettings.initial.finishTrackingMode.name,
+      ),
+
       score180ColorValue:
           prefs.getInt(_score180ColorKey) ??
           AppSettings.initial.score180ColorValue,
@@ -85,5 +92,10 @@ class SettingsRepository {
     }
     
     await prefs.setString(_themeModeKey, settings.themeMode);
+
+    await prefs.setString(
+      _finishTrackingModeKey,
+      settings.finishTrackingMode.name,
+    );
   }
 }
