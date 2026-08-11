@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../analytics/analytics_builder.dart';
 import '../models/new_finish_entry.dart';
+import '../models/statistics_aggregation.dart';
 import '../charts/chart_scale.dart';
 import '../settings/app_settings.dart';
 
@@ -12,10 +13,12 @@ class AverageFinishChart extends StatelessWidget {
     super.key,
     required this.finishes,
     required this.settings,
+    required this.aggregation,
   });
 
   final List<NewFinishEntry> finishes;
   final AppSettings settings;
+  final StatisticsAggregation aggregation;
 
   static const _chartHeight = 250.0;
   static const _padding = 16.0;
@@ -30,6 +33,7 @@ class AverageFinishChart extends StatelessWidget {
 
     final points = builder.buildAverageFinishData(
       finishes: finishes,
+      aggregation: aggregation,
     );
 
     if (points.isEmpty) {

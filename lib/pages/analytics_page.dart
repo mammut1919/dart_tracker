@@ -99,6 +99,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
             AverageFinishChart(
               finishes: widget.finishes,
               settings: widget.settings,
+              aggregation: _selectedAggregation,
             ),
 
             const SizedBox(height: 16),
