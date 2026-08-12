@@ -8,7 +8,7 @@ class NewFinishEntry {
     required this.timestamp,
     this.score,
   })
-    : assert((field >= 1 && field <= 20) || field == 50);
+    : assert(field >= 1 && field <= 25);
 
   final int? id;
   final int field;

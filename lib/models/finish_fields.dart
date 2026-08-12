@@ -21,15 +21,25 @@ const finishFields = [
   18,
   19,
   20,
-  50,
+  25,
 ];
 
-String finishButtonLabel(int field) {
-  return field == 50 ? 'Bull' : '$field';
+String finishButtonLabel(
+  int field,
+  FinishMultiplier multiplier,
+) {
+  if (field == 25) {
+    return 'Bull';
+  }
+
+  return '$field';
 }
 
-String finishChartLabel(int field, FinishMultiplier multiplier) {
-  if (field == 50) {
+String finishChartLabel(
+  int field,
+  FinishMultiplier multiplier,
+) {
+  if (field == 25 && multiplier == FinishMultiplier.double) {
     return 'Bull';
   }
 

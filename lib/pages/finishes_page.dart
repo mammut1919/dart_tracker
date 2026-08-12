@@ -52,7 +52,7 @@ class _FinishesPageState extends State<FinishesPage> {
           title: const Text('Finish löschen?'),
           content: Text(
             'Soll ${
-              finish.field == 50
+              finish.field == 25 && finish.multiplier == FinishMultiplier.double
                 ? "Bull"
                 : "${finish.multiplier == FinishMultiplier.double ? 'D' : 'T'}${finish.field}"
             } wirklich gelöscht werden?',
@@ -215,10 +215,11 @@ class _FinishesPageState extends State<FinishesPage> {
                             _confirmDeleteFinish(context, finish),
                         leading: const Icon(Icons.gps_fixed),
                         title: Text(
-                          finish.field == 50
-                            ? 'Bull'
-                            : '${finish.multiplier == FinishMultiplier.double ? 'D' : 'T'}${finish.field}'
-                            '${finish.score != null ? ' (Finish: ${finish.score})' : ''}',
+                          '${finish.field == 25 &&
+                                  finish.multiplier == FinishMultiplier.double
+                              ? 'Bull'
+                              : '${finish.multiplier == FinishMultiplier.double ? 'D' : 'T'}${finish.field}'}'
+                          '${finish.score != null ? ' (Finish: ${finish.score})' : ''}',
                         ),
                         subtitle: Text(
                           DateFormat('dd.MM.yyyy').format(finish.timestamp),
