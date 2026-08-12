@@ -92,55 +92,16 @@ class _FinishesPageState extends State<FinishesPage> {
     BuildContext context,
     int field,
     FinishMultiplier multiplier,
-  ) async {
-    final defaultScore = field * multiplier.factor;
-
-    final controller = TextEditingController();
-
-    final score = await showDialog<int>(
+  ) {
+    return showDialog<int>(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text('Finish Score'),
-          content: TextFormField(
-            controller: controller,
-            autofocus: true,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              labelText: 'Final Score',
-              hintText: defaultScore.toString(),
-            ),
-            inputFormatters: [
-              FilteringTextInputFormatter.digitsOnly,
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Abbrechen'),
-            ),
-            FilledButton(
-              onPressed: () {
-                final score = controller.text.isEmpty
-                    ? defaultScore
-                    : int.tryParse(controller.text);
-
-                if (score == null || score <= 0) {
-                  return;
-                }
-
-                Navigator.pop(context, score);
-              },
-              child: const Text('Speichern'),
-            ),
-          ],
+        return _FinishScoreDialog(
+          field: field,
+          multiplier: multiplier,
         );
       },
     );
-
-    controller.dispose();
-
-    return score;
   }
 
   Future<void> _handleFinishSelected(int field) async {
@@ -281,6 +242,80 @@ class _FinishesPageState extends State<FinishesPage> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _FinishScoreDialog extends StatefulWidget {
+  const _FinishScoreDialog({
+    required this.field,
+    required this.multiplier,
+  });
+
+  final int field;
+  final FinishMultiplier multiplier;
+
+  @override
+  State<_FinishScoreDialog> createState() => _FinishScoreDialogState();
+}
+
+class _FinishScoreDialogState extends State<_FinishScoreDialog> {
+  late final TextEditingController _controller;
+
+  late final int _defaultScore;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _defaultScore =
+        widget.field * widget.multiplier.factor;
+
+    _controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Finish Score'),
+      content: TextFormField(
+        controller: _controller,
+        autofocus: true,
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(
+          labelText: 'Final Score',
+          hintText: _defaultScore.toString(),
+        ),
+        inputFormatters: [
+          FilteringTextInputFormatter.digitsOnly,
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Abbrechen'),
+        ),
+        FilledButton(
+          onPressed: () {
+            final score = _controller.text.isEmpty
+                ? _defaultScore
+                : int.tryParse(_controller.text);
+
+            if (score == null || score <= 0) {
+              return;
+            }
+
+            Navigator.pop(context, score);
+          },
+          child: const Text('Speichern'),
+        ),
+      ],
     );
   }
 }
