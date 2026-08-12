@@ -112,9 +112,22 @@ class _RootPageState extends State<RootPage> {
     await _loadEntries();
   }
 
-  Future<void> _deleteEntry(int id) async {
-    await _storage.delete(id);
+  Future<void> _deleteEntry(NewEntry entry) async {
+    if (entry.type == EntryType.highFinish) {
+      final relatedFinish = _finishes.cast<NewFinishEntry?>().firstWhere(
+        (finish) =>
+            finish?.timestamp == entry.timestamp &&
+            finish?.score == entry.value,
+        orElse: () => null,
+      );
 
+      if (relatedFinish != null) {
+        await _finishStorage.delete(relatedFinish.id!);
+        await _loadFinishes();
+      }
+    }
+
+    await _storage.delete(entry.id!);
     await _loadEntries();
   }
 
@@ -139,12 +152,22 @@ class _RootPageState extends State<RootPage> {
   }
 
   Future<void> _deleteFinish(NewFinishEntry finish) async {
-    if (finish.id == null) {
-      return;
+    if (finish.score != null && finish.score! >= 100) {
+      final relatedEntry = _entries.cast<NewEntry?>().firstWhere(
+        (entry) =>
+            entry?.type == EntryType.highFinish &&
+            entry?.timestamp == finish.timestamp &&
+            entry?.value == finish.score,
+        orElse: () => null,
+      );
+
+      if (relatedEntry != null) {
+        await _storage.delete(relatedEntry.id!);
+        await _loadEntries();
+      }
     }
 
     await _finishStorage.delete(finish.id!);
-
     await _loadFinishes();
   }
 
@@ -189,7 +212,7 @@ class _RootPageState extends State<RootPage> {
     );
 
     if (delete == true) {
-      await _deleteEntry(entry.id!);
+      await _deleteEntry(entry);
     }
   }
 
