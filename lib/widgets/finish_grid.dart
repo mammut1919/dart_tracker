@@ -37,7 +37,7 @@ class FinishGrid extends StatelessWidget {
           itemBuilder: (context, index) {
             final field = finishFields[index];
 
-            final enabled = field != 50 || bullEnabled;
+            final enabled = field != 25 || bullEnabled;
 
             return FilledButton(
               style: FilledButton.styleFrom(
@@ -53,7 +53,7 @@ class FinishGrid extends StatelessWidget {
                   ? () => onSelected(field)
                   : null,
               child: Text(
-                finishButtonLabel(field),
+                finishButtonLabel(field, multiplier),
                 maxLines: 1,
                 softWrap: false,
                 overflow: TextOverflow.visible,

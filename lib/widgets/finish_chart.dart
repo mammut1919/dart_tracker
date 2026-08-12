@@ -47,7 +47,7 @@ class FinishChart extends StatelessWidget {
     final finishOrder = [
       ...finishFields.where(
         (field) =>
-            multiplier == FinishMultiplier.double || field != 50,
+            multiplier == FinishMultiplier.double || field != 25,
       ),
     ]..sort((a, b) => b.compareTo(a));
 

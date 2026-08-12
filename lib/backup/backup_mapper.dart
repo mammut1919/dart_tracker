@@ -42,8 +42,10 @@ class BackupMapper {
   }
 
   NewFinishEntry finishFromJson(Map<String, dynamic> json) {
+    final field = json['field'] as int;
+
     return NewFinishEntry(
-      field: json['field'] as int,
+      field: field == 50 ? 25 : field,
       multiplier: FinishMultiplier.values.byName(
         json['multiplier'] as String? ?? 'double',
       ),
