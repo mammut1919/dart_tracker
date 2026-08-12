@@ -5,8 +5,8 @@ import '../models/finish_multiplier.dart';
 import '../models/new_finish_entry.dart';
 import '../models/statistics_aggregation.dart';
 
-class AverageFinishStatistics extends StatelessWidget {
-  const AverageFinishStatistics({
+class AverageLastDartStatistics extends StatelessWidget {
+  const AverageLastDartStatistics({
     super.key,
     required this.finishes,
     required this.aggregation,

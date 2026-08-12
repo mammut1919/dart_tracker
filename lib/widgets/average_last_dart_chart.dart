@@ -9,8 +9,8 @@ import '../charts/chart_scale.dart';
 import '../settings/app_settings.dart';
 import '../widgets/statistics_line_chart.dart';
 
-class AverageFinishChart extends StatelessWidget {
-  const AverageFinishChart({
+class AverageLastDartChart extends StatelessWidget {
+  const AverageLastDartChart({
     super.key,
     required this.finishes,
     required this.settings,
