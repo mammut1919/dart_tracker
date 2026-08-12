@@ -126,6 +126,15 @@ class _RootPageState extends State<RootPage> {
       score: finish.score,
     );
 
+    if (finish.score != null && finish.score! >= 100) {
+      await _storage.add(
+        EntryType.highFinish,
+        finish.score!,
+        finish.timestamp,
+      );
+      await _loadEntries();
+    }
+
     await _loadFinishes();
   }
 
