@@ -80,6 +80,9 @@ class ChartScale {
       return result;
     }
 
+    // Ersten tatsächlichen Datenpunkt als Tick verwenden.
+    result.add(firstDate);
+
     var date = DateTime(
       firstDate.year,
       firstDate.month,
@@ -94,23 +97,17 @@ class ChartScale {
     }
 
     while (!date.isAfter(lastDate)) {
-      result.add(date);
+      final distance = date.difference(result.last).inDays;
+
+      // Nur hinzufügen, wenn der neue Tick nicht zu dicht
+      // am vorherigen Tick liegt.
+      if (distance >= 14) {
+        result.add(date);
+      }
 
       date = DateTime(
         date.year,
         date.month + interval.amount,
-      );
-    }
-
-    if (result.isEmpty ||
-        result.last.year != lastDate.year ||
-        result.last.month != lastDate.month) {
-      result.add(
-        DateTime(
-          lastDate.year,
-          lastDate.month,
-          1,
-        ),
       );
     }
 
