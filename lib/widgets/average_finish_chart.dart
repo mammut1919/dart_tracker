@@ -1,12 +1,13 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../analytics/analytics_builder.dart';
+import '../charts/chart_axis.dart';
 import '../models/new_finish_entry.dart';
 import '../models/statistics_aggregation.dart';
 import '../charts/chart_scale.dart';
 import '../settings/app_settings.dart';
+import '../widgets/statistics_line_chart.dart';
 
 class AverageFinishChart extends StatelessWidget {
   const AverageFinishChart({
@@ -19,13 +20,6 @@ class AverageFinishChart extends StatelessWidget {
   final List<NewFinishEntry> finishes;
   final AppSettings settings;
   final StatisticsAggregation aggregation;
-
-  static const _chartHeight = 250.0;
-  static const _padding = 16.0;
-  static const _axisReservedSize = 34.0;
-  static const _lineWidth = 3.0;
-  static const _animationDuration =
-      Duration(milliseconds: 350);
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +34,28 @@ class AverageFinishChart extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
+    final firstDate = points.first.date;
+    final lastDate = points.last.date;
+
+    final xInterval = ChartScale.calculateXInterval(
+      lastDate.difference(firstDate).inDays,
+    );
+
+    final xTickDates = ChartScale.buildXTickDates(
+      firstDate: firstDate,
+      lastDate: lastDate,
+      interval: xInterval,
+    );
+
+    final xTickOffsets = xTickDates
+        .map(
+          (date) => date
+              .difference(firstDate)
+              .inDays
+              .toDouble(),
+        )
+        .toSet();
+
     final spots = <FlSpot>[];
 
     if (points.length == 1 && aggregation != StatisticsAggregation.day) {
@@ -50,126 +66,103 @@ class AverageFinishChart extends StatelessWidget {
         FlSpot(1, points.first.average),
       );
     } else {
-      for (var i = 0; i < points.length; i++) {
+      for (final point in points) {
+        final x = point.date
+            .difference(firstDate)
+            .inDays
+            .toDouble();
+
         spots.add(
           FlSpot(
-            i.toDouble(),
-            points[i].average,
+            x,
+            point.average,
           ),
         );
       }
     }
 
-    return Card(
-      child: SizedBox(
-        height: _chartHeight,
-        child: Padding(
-          padding: const EdgeInsets.all(_padding),
-          child: LineChart(
-            LineChartData(
-              minX: 0,
-              maxX: spots.length == 2 && points.length == 1
-                  ? 1
-                  : (points.length - 1).toDouble(),
-              minY: 0,
-              maxY: 60,
+    final maxDataY = points
+        .map((point) => point.average)
+        .reduce((a, b) => a > b ? a : b);
 
-              borderData: FlBorderData(show: true),
+    final yInterval = ChartScale.calculateYInterval(
+      0,
+      maxDataY,
+    );
 
-              gridData: FlGridData(show: true),
+    final chartMaxY = ChartScale.calculateChartMaxY(
+      maxDataY,
+      yInterval,
+    );
 
-              titlesData: FlTitlesData(
-                topTitles: AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
-                rightTitles: AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
-                bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    reservedSize: _axisReservedSize,
-                    interval: ChartScale.calculateXInterval(points.length),
-                    getTitlesWidget: (value, meta) {
-                      final index = value.round();
+    return StatisticsLineChart(
+      spots: spots,
+      maxX: points.length == 1 &&
+              aggregation != StatisticsAggregation.day
+          ? 1
+          : points.last.date
+              .difference(points.first.date)
+              .inDays
+              .toDouble(),
+      maxY: chartMaxY,
+      xTickOffsets: xTickOffsets,
+      yInterval: yInterval,
 
-                      if (index < 0 || index >= points.length) {
-                        return const SizedBox.shrink();
-                      }
+      bottomTitles: (value, meta) {
+        final date = firstDate.add(
+          Duration(days: value.round()),
+        );
 
-                      return SideTitleWidget(
-                        meta: meta,
-                        child: Text(
-                          DateFormat('dd.MM').format(points[index].date),
-                          style: const TextStyle(fontSize: 10),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                leftTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    reservedSize: _axisReservedSize,
-                    interval: 10,
-                    getTitlesWidget: (value, meta) {
-                      return SideTitleWidget(
-                        meta: meta,
-                        child: Text(
-                          value.toInt().toString(),
-                          style: const TextStyle(fontSize: 10),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-
-              lineTouchData: LineTouchData(
-                enabled: true,
-                touchTooltipData: LineTouchTooltipData(
-                  getTooltipColor: (_) => Colors.black87,
-                  getTooltipItems: (touchedSpots) {
-                    return touchedSpots.map((spot) {
-                      final pointIndex = points.length == 1
-                          ? 0
-                          : spot.spotIndex;
-
-                      if (pointIndex < 0 || pointIndex >= points.length) {
-                        return null;
-                      }
-
-                      final point = points[pointIndex];
-
-                      return LineTooltipItem(
-                        '${DateFormat('dd.MM.yyyy').format(point.date)}\n'
-                        'Ø letzter Dart:\n'
-                        '${point.average.toStringAsFixed(2)} Punkte',
-                        TextStyle(
-                          color: settings.finishColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      );
-                    }).toList();
-                  },
-                ),
-              ),
-
-              lineBarsData: [
-                LineChartBarData(
-                  spots: spots,
-                  isCurved: false,
-                  color: settings.finishColor,
-                  barWidth: _lineWidth,
-                  dotData: const FlDotData(show: false),
-                ),
-              ],
+        return SideTitleWidget(
+          meta: meta,
+          child: Text(
+            ChartAxis.formatAggregationDate(
+              date,
+              aggregation,
             ),
-            duration: _animationDuration,
-            curve: Curves.easeOutCubic,
+            style: const TextStyle(fontSize: 10),
           ),
-        ),
-      ),
+        );
+      },
+
+      leftTitles: (value, meta) {
+        return SideTitleWidget(
+          meta: meta,
+          child: Text(
+            value.toInt().toString(),
+            style: const TextStyle(fontSize: 10),
+          ),
+        );
+      },
+
+      tooltipItems: (touchedSpots) {
+        return touchedSpots.map((spot) {
+          final pointIndex =
+              points.length == 1 ? 0 : spot.spotIndex;
+
+          if (pointIndex < 0 ||
+              pointIndex >= points.length) {
+            return null;
+          }
+
+          final point = points[pointIndex];
+
+          return LineTooltipItem(
+            '${ChartAxis.formatTooltipDate(
+              point.date,
+              aggregation,
+            )}\n'
+            'Ø letzter Dart:\n'
+            '${point.average.toStringAsFixed(2)} Punkte',
+            TextStyle(
+              color: settings.finishColor,
+              fontWeight: FontWeight.bold,
+            ),
+          );
+        }).toList();
+      },
+
+      settings: settings,
     );
   }
 }
