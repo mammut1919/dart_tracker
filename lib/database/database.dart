@@ -75,6 +75,7 @@ class AppDatabase extends _$AppDatabase {
 }
 
 LazyDatabase _openConnection() {
+  
   return LazyDatabase(() async {
     final directory = await getApplicationDocumentsDirectory();
 
