@@ -12,6 +12,7 @@ import '../widgets/finish_chart.dart';
 import '../widgets/finish_grid.dart';
 import '../widgets/finish_multiplier_selector.dart';
 import '../settings/app_settings.dart';
+import '../validation/finish_score_validator.dart';
 
 class FinishesPage extends StatefulWidget {
   const FinishesPage({
@@ -262,16 +263,17 @@ class _FinishScoreDialog extends StatefulWidget {
 
 class _FinishScoreDialogState extends State<_FinishScoreDialog> {
   late final TextEditingController _controller;
-
   late final int _defaultScore;
+
+  static const _validator = FinishScoreValidator();
+
+  bool _isValid = true;
 
   @override
   void initState() {
     super.initState();
 
-    _defaultScore =
-        widget.field * widget.multiplier.factor;
-
+    _defaultScore = widget.field * widget.multiplier.factor;
     _controller = TextEditingController();
   }
 
@@ -279,6 +281,48 @@ class _FinishScoreDialogState extends State<_FinishScoreDialog> {
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  void _validate() {
+    final text = _controller.text;
+
+    if (text.isEmpty) {
+      setState(() {
+        _isValid = true;
+      });
+      return;
+    }
+
+    final score = int.tryParse(text);
+
+    if (score == null) {
+      setState(() {
+        _isValid = false;
+      });
+      return;
+    }
+
+    final validation = _validator.validate(
+      score: score,
+      field: widget.field,
+      multiplier: widget.multiplier,
+    );
+
+    setState(() {
+      _isValid = validation.isValid;
+    });
+  }
+
+  void _save() {
+    if (!_isValid) {
+      return;
+    }
+
+    final score = _controller.text.isEmpty
+        ? _defaultScore
+        : int.parse(_controller.text);
+
+    Navigator.pop(context, score);
   }
 
   @override
@@ -296,6 +340,7 @@ class _FinishScoreDialogState extends State<_FinishScoreDialog> {
         inputFormatters: [
           FilteringTextInputFormatter.digitsOnly,
         ],
+        onChanged: (_) => _validate(),
       ),
       actions: [
         TextButton(
@@ -303,17 +348,7 @@ class _FinishScoreDialogState extends State<_FinishScoreDialog> {
           child: const Text('Abbrechen'),
         ),
         FilledButton(
-          onPressed: () {
-            final score = _controller.text.isEmpty
-                ? _defaultScore
-                : int.tryParse(_controller.text);
-
-            if (score == null || score <= 0) {
-              return;
-            }
-
-            Navigator.pop(context, score);
-          },
+          onPressed: _isValid ? _save : null,
           child: const Text('Speichern'),
         ),
       ],
