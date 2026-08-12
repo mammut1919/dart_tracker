@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../analytics/analytics_builder.dart';
 import '../models/new_finish_entry.dart';
 import '../models/statistics_aggregation.dart';
 
@@ -19,6 +20,34 @@ class AverageFinishStatistics extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
+    final builder = const AnalyticsBuilder();
+
+    final points = builder.buildAverageFinishData(
+      finishes: finishes,
+      aggregation: aggregation,
+    );
+
+    if (points.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final currentAverage = points.last.average;
+
+    final bestAverage = points
+        .map((point) => point.average)
+        .reduce((a, b) => a > b ? a : b);
+
+    final scoredFinishes = finishes
+        .where((finish) => finish.score != null)
+        .toList();
+
+    final totalScore = scoredFinishes.fold<double>(
+      0,
+      (sum, finish) => sum + finish.score!,
+    );
+
+    final periodAverage = totalScore / scoredFinishes.length;
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -26,17 +55,17 @@ class AverageFinishStatistics extends StatelessWidget {
           children: [
             _StatisticRow(
               label: 'Aktueller Durchschnitt',
-              value: '—',
+              value: currentAverage.toStringAsFixed(2),
             ),
             const Divider(),
             _StatisticRow(
               label: 'Höchster Durchschnitt',
-              value: '—',
+              value: bestAverage.toStringAsFixed(2),
             ),
             const Divider(),
             _StatisticRow(
               label: 'Durchschnitt Zeitraum',
-              value: '—',
+              value: periodAverage.toStringAsFixed(2),
             ),
           ],
         ),

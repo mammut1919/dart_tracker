@@ -23,7 +23,7 @@ class AverageLastDartStatistics extends StatelessWidget {
 
     final builder = const AnalyticsBuilder();
 
-    final points = builder.buildAverageFinishData(
+    final points = builder.buildAverageLastDartData(
       finishes: finishes,
       aggregation: aggregation,
     );
