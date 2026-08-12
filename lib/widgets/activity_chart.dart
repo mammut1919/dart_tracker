@@ -42,7 +42,7 @@ class ActivityChart extends StatelessWidget {
     final lastDate = points.last.date;
 
     final xInterval = ChartScale.calculateXInterval(
-      lastDate.difference(firstDate).inDays + 1,
+      lastDate.difference(firstDate).inDays,
     );
 
     final xTickDates = ChartScale.buildXTickDates(
@@ -59,12 +59,6 @@ class ActivityChart extends StatelessWidget {
               .toDouble(),
         )
         .toSet();
-        
-debugPrint('firstDate: $firstDate');
-debugPrint('lastDate: $lastDate');
-debugPrint('xTickDates: $xTickDates');
-debugPrint('xTickOffsets: $xTickOffsets');
-
 
     final spots = <FlSpot>[];
 

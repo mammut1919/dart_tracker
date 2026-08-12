@@ -71,7 +71,9 @@ class ChartScale {
         );
       }
 
-      if (result.isEmpty || result.last != lastDate) {
+      if (result.isEmpty ||
+          result.last != lastDate &&
+          lastDate.difference(result.last).inDays >= interval.amount) {
         result.add(lastDate);
       }
 

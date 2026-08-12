@@ -38,7 +38,7 @@ class AverageFinishChart extends StatelessWidget {
     final lastDate = points.last.date;
 
     final xInterval = ChartScale.calculateXInterval(
-      lastDate.difference(firstDate).inDays + 1,
+      lastDate.difference(firstDate).inDays,
     );
 
     final xTickDates = ChartScale.buildXTickDates(
@@ -109,12 +109,6 @@ class AverageFinishChart extends StatelessWidget {
       yInterval: yInterval,
 
       bottomTitles: (value, meta) {
-        final x = value.round().toDouble();
-
-        if (!xTickOffsets.contains(x)) {
-          return const SizedBox.shrink();
-        }
-
         final date = firstDate.add(
           Duration(days: value.round()),
         );
