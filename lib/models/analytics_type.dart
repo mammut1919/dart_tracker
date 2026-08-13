@@ -32,7 +32,7 @@ enum AnalyticsType {
   String get description {
     switch (this) {
       case AnalyticsType.averageFinish:
-        return 'Diese Auswertung zeigt den durchschnittlichen Punktwert deiner vollständigen Finishes.';
+        return 'Diese Auswertung zeigt den durchschnittlichen Punktwert deiner vollständigen Finishes. Finish-Erfassung kann in den Einstellungen eingeschaltet werden.';
 
       case AnalyticsType.averageFinishDart:
         return 'Der Chart zeigt den durchschnittlichen Punktwert aller Finish-Darts pro Trainingszeitraum. Höhere Werte bedeuten im Durchschnitt höhere Checkouts.';

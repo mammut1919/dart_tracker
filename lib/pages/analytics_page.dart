@@ -99,8 +99,8 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
         else
           if (_selectedAnalytics == AnalyticsType.averageFinish) ...[
             AverageFinishChart(
+              finishes: widget.finishes,
               settings: widget.settings,
-              selectedDateFilter: widget.selectedDateFilter,
               aggregation: _selectedAggregation,
             ),
 
