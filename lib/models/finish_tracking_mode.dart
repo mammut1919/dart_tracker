@@ -1,0 +1,4 @@
+enum FinishTrackingMode {
+  lastDart,
+  fullFinish,
+}

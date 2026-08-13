@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../models/finish_tracking_mode.dart';
 import '../settings/app_settings.dart';
 
 enum StatisticsSection {
   none,
   shortLeg,
   baselines,
+  finishTracking,
 }
 
 class StatisticsDialog extends StatefulWidget {
@@ -20,6 +22,7 @@ class StatisticsDialog extends StatefulWidget {
 
 class _StatisticsDialogState extends State<StatisticsDialog> {
   late int _shortLegLimit;
+  late FinishTrackingMode _finishTrackingMode;
   late final TextEditingController _baseline180Controller;
   late final TextEditingController _baseline171Controller;
   late final TextEditingController _baseline162Controller;
@@ -34,6 +37,7 @@ class _StatisticsDialogState extends State<StatisticsDialog> {
     super.initState();
 
     _shortLegLimit = widget.settings.shortLegLimit;
+    _finishTrackingMode = widget.settings.finishTrackingMode;
 
     _baseline180Controller = TextEditingController(
       text: widget.settings.baseline180.toString(),
@@ -157,6 +161,82 @@ class _StatisticsDialogState extends State<StatisticsDialog> {
               onTap: () {
                 setState(() {
                   _expandedSection =
+                      _expandedSection == StatisticsSection.finishTracking
+                          ? StatisticsSection.none
+                          : StatisticsSection.finishTracking;
+                });
+              },
+              child: Row(
+                children: [
+                  Icon(
+                    _expandedSection == StatisticsSection.finishTracking
+                        ? Icons.expand_less
+                        : Icons.expand_more,
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Finish-Tracking',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            AnimatedSize(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInOut,
+              child: _expandedSection == StatisticsSection.finishTracking
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Lege fest, welche Informationen bei einem Finish '
+                          'gespeichert werden.',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        DropdownButtonFormField<FinishTrackingMode>(
+                          initialValue: _finishTrackingMode,
+                          decoration: const InputDecoration(
+                            labelText: 'Tracking-Modus',
+                            border: OutlineInputBorder(),
+                          ),
+                          items: const [
+                            DropdownMenuItem(
+                              value: FinishTrackingMode.lastDart,
+                              child: Text('Nur letzter Dart'),
+                            ),
+                            DropdownMenuItem(
+                              value: FinishTrackingMode.fullFinish,
+                              child: Text('Gesamtes Finish'),
+                            ),
+                          ],
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() {
+                                _finishTrackingMode = value;
+                              });
+                            }
+                          },
+                        ),
+                      ],
+                    )
+                  : const SizedBox.shrink(),
+            ),
+
+            const SizedBox(height: 12),
+
+            InkWell(
+              onTap: () {
+                setState(() {
+                  _expandedSection =
                       _expandedSection == StatisticsSection.baselines
                           ? StatisticsSection.none
                           : StatisticsSection.baselines;
@@ -227,6 +307,7 @@ class _StatisticsDialogState extends State<StatisticsDialog> {
               context,
               widget.settings.copyWith(
                 shortLegLimit: _shortLegLimit,
+                finishTrackingMode: _finishTrackingMode,
                 baseline180: int.parse(_baseline180Controller.text),
                 baseline171: int.parse(_baseline171Controller.text),
                 baseline162: int.parse(_baseline162Controller.text),

@@ -26,6 +26,8 @@ class FinishEntries extends Table {
     text().withDefault(const Constant('double'))();
 
   DateTimeColumn get timestamp => dateTime()();
+
+  IntColumn get score => integer().nullable()();
 }
 
 @DriftDatabase(tables: [ScoreEntries, FinishEntries])
@@ -33,7 +35,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -55,11 +57,25 @@ class AppDatabase extends _$AppDatabase {
           finishEntries.multiplier,
         );
       }
+
+      if (from < 5) {
+        await m.addColumn(
+          finishEntries,
+          finishEntries.score,
+        );
+      }
+
+      if (from < 6) {
+        await customStatement(
+          'UPDATE finish_entries SET field = 25 WHERE field = 50',
+        );
+      }
     },
   );
 }
 
 LazyDatabase _openConnection() {
+  
   return LazyDatabase(() async {
     final directory = await getApplicationDocumentsDirectory();
 

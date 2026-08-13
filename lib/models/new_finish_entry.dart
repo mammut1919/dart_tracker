@@ -5,12 +5,14 @@ class NewFinishEntry {
     this.id,
     required this.field, 
     required this.multiplier,
-    required this.timestamp
+    required this.timestamp,
+    this.score,
   })
-    : assert((field >= 1 && field <= 20) || field == 50);
+    : assert(field >= 1 && field <= 25);
 
   final int? id;
   final int field;
   final FinishMultiplier multiplier;
   final DateTime timestamp;
+  final int? score;
 }

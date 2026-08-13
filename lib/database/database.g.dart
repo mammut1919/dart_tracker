@@ -344,8 +344,23 @@ class $FinishEntriesTable extends FinishEntries
     type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _scoreMeta = const VerificationMeta('score');
   @override
-  List<GeneratedColumn> get $columns => [id, field, multiplier, timestamp];
+  late final GeneratedColumn<int> score = GeneratedColumn<int>(
+    'score',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    field,
+    multiplier,
+    timestamp,
+    score,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -383,6 +398,12 @@ class $FinishEntriesTable extends FinishEntries
     } else if (isInserting) {
       context.missing(_timestampMeta);
     }
+    if (data.containsKey('score')) {
+      context.handle(
+        _scoreMeta,
+        score.isAcceptableOrUnknown(data['score']!, _scoreMeta),
+      );
+    }
     return context;
   }
 
@@ -408,6 +429,10 @@ class $FinishEntriesTable extends FinishEntries
         DriftSqlType.dateTime,
         data['${effectivePrefix}timestamp'],
       )!,
+      score: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}score'],
+      ),
     );
   }
 
@@ -422,11 +447,13 @@ class FinishEntry extends DataClass implements Insertable<FinishEntry> {
   final int field;
   final String multiplier;
   final DateTime timestamp;
+  final int? score;
   const FinishEntry({
     required this.id,
     required this.field,
     required this.multiplier,
     required this.timestamp,
+    this.score,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -435,6 +462,9 @@ class FinishEntry extends DataClass implements Insertable<FinishEntry> {
     map['field'] = Variable<int>(field);
     map['multiplier'] = Variable<String>(multiplier);
     map['timestamp'] = Variable<DateTime>(timestamp);
+    if (!nullToAbsent || score != null) {
+      map['score'] = Variable<int>(score);
+    }
     return map;
   }
 
@@ -444,6 +474,9 @@ class FinishEntry extends DataClass implements Insertable<FinishEntry> {
       field: Value(field),
       multiplier: Value(multiplier),
       timestamp: Value(timestamp),
+      score: score == null && nullToAbsent
+          ? const Value.absent()
+          : Value(score),
     );
   }
 
@@ -457,6 +490,7 @@ class FinishEntry extends DataClass implements Insertable<FinishEntry> {
       field: serializer.fromJson<int>(json['field']),
       multiplier: serializer.fromJson<String>(json['multiplier']),
       timestamp: serializer.fromJson<DateTime>(json['timestamp']),
+      score: serializer.fromJson<int?>(json['score']),
     );
   }
   @override
@@ -467,6 +501,7 @@ class FinishEntry extends DataClass implements Insertable<FinishEntry> {
       'field': serializer.toJson<int>(field),
       'multiplier': serializer.toJson<String>(multiplier),
       'timestamp': serializer.toJson<DateTime>(timestamp),
+      'score': serializer.toJson<int?>(score),
     };
   }
 
@@ -475,11 +510,13 @@ class FinishEntry extends DataClass implements Insertable<FinishEntry> {
     int? field,
     String? multiplier,
     DateTime? timestamp,
+    Value<int?> score = const Value.absent(),
   }) => FinishEntry(
     id: id ?? this.id,
     field: field ?? this.field,
     multiplier: multiplier ?? this.multiplier,
     timestamp: timestamp ?? this.timestamp,
+    score: score.present ? score.value : this.score,
   );
   FinishEntry copyWithCompanion(FinishEntriesCompanion data) {
     return FinishEntry(
@@ -489,6 +526,7 @@ class FinishEntry extends DataClass implements Insertable<FinishEntry> {
           ? data.multiplier.value
           : this.multiplier,
       timestamp: data.timestamp.present ? data.timestamp.value : this.timestamp,
+      score: data.score.present ? data.score.value : this.score,
     );
   }
 
@@ -498,13 +536,14 @@ class FinishEntry extends DataClass implements Insertable<FinishEntry> {
           ..write('id: $id, ')
           ..write('field: $field, ')
           ..write('multiplier: $multiplier, ')
-          ..write('timestamp: $timestamp')
+          ..write('timestamp: $timestamp, ')
+          ..write('score: $score')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, field, multiplier, timestamp);
+  int get hashCode => Object.hash(id, field, multiplier, timestamp, score);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -512,7 +551,8 @@ class FinishEntry extends DataClass implements Insertable<FinishEntry> {
           other.id == this.id &&
           other.field == this.field &&
           other.multiplier == this.multiplier &&
-          other.timestamp == this.timestamp);
+          other.timestamp == this.timestamp &&
+          other.score == this.score);
 }
 
 class FinishEntriesCompanion extends UpdateCompanion<FinishEntry> {
@@ -520,17 +560,20 @@ class FinishEntriesCompanion extends UpdateCompanion<FinishEntry> {
   final Value<int> field;
   final Value<String> multiplier;
   final Value<DateTime> timestamp;
+  final Value<int?> score;
   const FinishEntriesCompanion({
     this.id = const Value.absent(),
     this.field = const Value.absent(),
     this.multiplier = const Value.absent(),
     this.timestamp = const Value.absent(),
+    this.score = const Value.absent(),
   });
   FinishEntriesCompanion.insert({
     this.id = const Value.absent(),
     required int field,
     this.multiplier = const Value.absent(),
     required DateTime timestamp,
+    this.score = const Value.absent(),
   }) : field = Value(field),
        timestamp = Value(timestamp);
   static Insertable<FinishEntry> custom({
@@ -538,12 +581,14 @@ class FinishEntriesCompanion extends UpdateCompanion<FinishEntry> {
     Expression<int>? field,
     Expression<String>? multiplier,
     Expression<DateTime>? timestamp,
+    Expression<int>? score,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (field != null) 'field': field,
       if (multiplier != null) 'multiplier': multiplier,
       if (timestamp != null) 'timestamp': timestamp,
+      if (score != null) 'score': score,
     });
   }
 
@@ -552,12 +597,14 @@ class FinishEntriesCompanion extends UpdateCompanion<FinishEntry> {
     Value<int>? field,
     Value<String>? multiplier,
     Value<DateTime>? timestamp,
+    Value<int?>? score,
   }) {
     return FinishEntriesCompanion(
       id: id ?? this.id,
       field: field ?? this.field,
       multiplier: multiplier ?? this.multiplier,
       timestamp: timestamp ?? this.timestamp,
+      score: score ?? this.score,
     );
   }
 
@@ -576,6 +623,9 @@ class FinishEntriesCompanion extends UpdateCompanion<FinishEntry> {
     if (timestamp.present) {
       map['timestamp'] = Variable<DateTime>(timestamp.value);
     }
+    if (score.present) {
+      map['score'] = Variable<int>(score.value);
+    }
     return map;
   }
 
@@ -585,7 +635,8 @@ class FinishEntriesCompanion extends UpdateCompanion<FinishEntry> {
           ..write('id: $id, ')
           ..write('field: $field, ')
           ..write('multiplier: $multiplier, ')
-          ..write('timestamp: $timestamp')
+          ..write('timestamp: $timestamp, ')
+          ..write('score: $score')
           ..write(')'))
         .toString();
   }
@@ -787,6 +838,7 @@ typedef $$FinishEntriesTableCreateCompanionBuilder =
       required int field,
       Value<String> multiplier,
       required DateTime timestamp,
+      Value<int?> score,
     });
 typedef $$FinishEntriesTableUpdateCompanionBuilder =
     FinishEntriesCompanion Function({
@@ -794,6 +846,7 @@ typedef $$FinishEntriesTableUpdateCompanionBuilder =
       Value<int> field,
       Value<String> multiplier,
       Value<DateTime> timestamp,
+      Value<int?> score,
     });
 
 class $$FinishEntriesTableFilterComposer
@@ -822,6 +875,11 @@ class $$FinishEntriesTableFilterComposer
 
   ColumnFilters<DateTime> get timestamp => $composableBuilder(
     column: $table.timestamp,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get score => $composableBuilder(
+    column: $table.score,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -854,6 +912,11 @@ class $$FinishEntriesTableOrderingComposer
     column: $table.timestamp,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get score => $composableBuilder(
+    column: $table.score,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$FinishEntriesTableAnnotationComposer
@@ -878,6 +941,9 @@ class $$FinishEntriesTableAnnotationComposer
 
   GeneratedColumn<DateTime> get timestamp =>
       $composableBuilder(column: $table.timestamp, builder: (column) => column);
+
+  GeneratedColumn<int> get score =>
+      $composableBuilder(column: $table.score, builder: (column) => column);
 }
 
 class $$FinishEntriesTableTableManager
@@ -915,11 +981,13 @@ class $$FinishEntriesTableTableManager
                 Value<int> field = const Value.absent(),
                 Value<String> multiplier = const Value.absent(),
                 Value<DateTime> timestamp = const Value.absent(),
+                Value<int?> score = const Value.absent(),
               }) => FinishEntriesCompanion(
                 id: id,
                 field: field,
                 multiplier: multiplier,
                 timestamp: timestamp,
+                score: score,
               ),
           createCompanionCallback:
               ({
@@ -927,11 +995,13 @@ class $$FinishEntriesTableTableManager
                 required int field,
                 Value<String> multiplier = const Value.absent(),
                 required DateTime timestamp,
+                Value<int?> score = const Value.absent(),
               }) => FinishEntriesCompanion.insert(
                 id: id,
                 field: field,
                 multiplier: multiplier,
                 timestamp: timestamp,
+                score: score,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

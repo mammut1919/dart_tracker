@@ -5,6 +5,7 @@ import '../settings/app_settings.dart';
 import '../charts/chart_builder.dart';
 import '../charts/chart_data.dart';
 import '../charts/chart_range.dart';
+import '../charts/chart_scale.dart';
 import '../charts/chart_series.dart';
 import '../models/default_scores.dart';
 import '../models/entry_type.dart';
@@ -45,7 +46,10 @@ class EntriesChart extends StatelessWidget {
 
     final minY = _calculateMinY(settings);
 
-    final yInterval = _calculateYInterval(minY, maxDataY);
+    final yInterval = ChartScale.calculateYInterval(
+      minY,
+      maxDataY,
+    );
 
     final chartMaxY = _calculateChartMaxY(maxDataY, yInterval);
 
@@ -308,18 +312,6 @@ class EntriesChart extends StatelessWidget {
     return lowestBaseline == 0
         ? 0.0
         : (lowestBaseline - 1).toDouble();
-  }
-
-  double _calculateYInterval(double minY, double maxY) {
-    final range = maxY - minY;
-
-    if (range <= 10) return 1;
-    if (range <= 20) return 2;
-    if (range <= 50) return 5;
-    if (range <= 100) return 10;
-    if (range <= 200) return 20;
-
-    return 50;
   }
 
   double _calculateChartMaxY(double maxValue, double interval) {

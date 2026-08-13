@@ -7,10 +7,24 @@ class DateFilterSelector extends StatelessWidget {
     super.key,
     required this.selectedFilter,
     required this.onSelectionChanged,
+    this.countForFilter,
+    this.showToday = true,
   });
 
   final DateFilter selectedFilter;
   final ValueChanged<DateFilter> onSelectionChanged;
+  final int Function(DateFilter filter)? countForFilter;
+  final bool showToday;
+
+  String _label(DateFilter filter) {
+    final count = countForFilter?.call(filter);
+
+    if (count == null) {
+      return filter.label;
+    }
+
+    return '${filter.label} ($count)';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,10 +34,11 @@ class DateFilterSelector extends StatelessWidget {
           initialValue: selectedFilter,
           onSelected: onSelectionChanged,
           itemBuilder: (context) => DateFilter.values
+              .where((filter) => showToday || filter != DateFilter.today)
               .map(
                 (filter) => PopupMenuItem<DateFilter>(
                   value: filter,
-                  child: Text(filter.label),
+                  child: Text(_label(filter)),
                 ),
               )
               .toList(),
@@ -31,7 +46,7 @@ class DateFilterSelector extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                selectedFilter.label,
+                _label(selectedFilter),
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const Icon(Icons.arrow_drop_down),

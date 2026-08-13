@@ -12,6 +12,7 @@ import 'models/entry_type.dart';
 import 'models/date_filter.dart';
 import 'models/new_entry.dart';
 import 'models/new_finish_entry.dart';
+import 'pages/analytics_page.dart';
 import 'pages/entries_page.dart';
 import 'pages/finishes_page.dart';
 import 'settings/app_settings.dart';
@@ -44,7 +45,7 @@ class _RootPageState extends State<RootPage> {
   final DateFormat _dateFormat = DateFormat('dd.MM.yyyy');
   DateFilter _selectedDateFilter = DateFilter.allTime;
 
-  AppPage _currentPage = AppPage.entries;
+  AppPage _currentPage = AppPage.entries; 
 
   List<NewEntry> _entries = [];
   List<NewFinishEntry> _finishes = [];
@@ -111,9 +112,22 @@ class _RootPageState extends State<RootPage> {
     await _loadEntries();
   }
 
-  Future<void> _deleteEntry(int id) async {
-    await _storage.delete(id);
+  Future<void> _deleteEntry(NewEntry entry) async {
+    if (entry.type == EntryType.highFinish) {
+      final relatedFinish = _finishes.cast<NewFinishEntry?>().firstWhere(
+        (finish) =>
+            finish?.timestamp == entry.timestamp &&
+            finish?.score == entry.value,
+        orElse: () => null,
+      );
 
+      if (relatedFinish != null) {
+        await _finishStorage.delete(relatedFinish.id!);
+        await _loadFinishes();
+      }
+    }
+
+    await _storage.delete(entry.id!);
     await _loadEntries();
   }
 
@@ -122,18 +136,38 @@ class _RootPageState extends State<RootPage> {
       finish.field,
       finish.multiplier,
       finish.timestamp,
+      score: finish.score,
     );
+
+    if (finish.score != null && finish.score! >= 100) {
+      await _storage.add(
+        EntryType.highFinish,
+        finish.score!,
+        finish.timestamp,
+      );
+      await _loadEntries();
+    }
 
     await _loadFinishes();
   }
 
   Future<void> _deleteFinish(NewFinishEntry finish) async {
-    if (finish.id == null) {
-      return;
+    if (finish.score != null && finish.score! >= 100) {
+      final relatedEntry = _entries.cast<NewEntry?>().firstWhere(
+        (entry) =>
+            entry?.type == EntryType.highFinish &&
+            entry?.timestamp == finish.timestamp &&
+            entry?.value == finish.score,
+        orElse: () => null,
+      );
+
+      if (relatedEntry != null) {
+        await _storage.delete(relatedEntry.id!);
+        await _loadEntries();
+      }
     }
 
     await _finishStorage.delete(finish.id!);
-
     await _loadFinishes();
   }
 
@@ -178,7 +212,7 @@ class _RootPageState extends State<RootPage> {
     );
 
     if (delete == true) {
-      await _deleteEntry(entry.id!);
+      await _deleteEntry(entry);
     }
   }
 
@@ -257,7 +291,8 @@ class _RootPageState extends State<RootPage> {
         await _finishStorage.add(
           finish.field,
           finish.multiplier,
-          finish.timestamp
+          finish.timestamp,
+          score: finish.score,
         );
       }
 
@@ -443,11 +478,18 @@ class _RootPageState extends State<RootPage> {
           ),
           FinishesPage(
             finishes: _filteredFinishes,
+            allFinishes: _finishes,
             settings: _settings,
             selectedDateFilter: _selectedDateFilter,
             onDateFilterChanged: _setDateFilter,
             onSaveFinish: _saveFinish,
             onDeleteFinish: _deleteFinish,
+          ),
+          AnalyticsPage(
+            finishes: _filteredFinishes,
+            settings: _settings,
+            selectedDateFilter: _selectedDateFilter,
+            onDateFilterChanged: _setDateFilter,
           ),
         ],
       ),

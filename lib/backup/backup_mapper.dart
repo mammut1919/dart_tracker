@@ -19,6 +19,7 @@ class BackupMapper {
       'field': finish.field,
       'multiplier': finish.multiplier.name,
       'timestamp': finish.timestamp.toIso8601String(),
+      if (finish.score != null) 'score': finish.score,
     };
   }
 
@@ -41,14 +42,17 @@ class BackupMapper {
   }
 
   NewFinishEntry finishFromJson(Map<String, dynamic> json) {
+    final field = json['field'] as int;
+
     return NewFinishEntry(
-      field: json['field'] as int,
+      field: field == 50 ? 25 : field,
       multiplier: FinishMultiplier.values.byName(
         json['multiplier'] as String? ?? 'double',
       ),
       timestamp: DateTime.parse(
         json['timestamp'] as String,
       ),
+      score: json['score'] as int?,
     );
   }
 }
