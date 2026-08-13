@@ -58,7 +58,7 @@ class AverageLastDartChart extends StatelessWidget {
 
     final spots = <FlSpot>[];
 
-    if (points.length == 1 && aggregation != StatisticsAggregation.day) {
+    if (points.length == 1) {
       spots.add(
         FlSpot(0, points.first.average),
       );
@@ -97,8 +97,7 @@ class AverageLastDartChart extends StatelessWidget {
 
     return StatisticsLineChart(
       spots: spots,
-      maxX: points.length == 1 &&
-              aggregation != StatisticsAggregation.day
+      maxX: points.length == 1 
           ? 1
           : points.last.date
               .difference(points.first.date)
