@@ -10,6 +10,8 @@ import '../widgets/activity_statistics.dart';
 import '../widgets/analytics_selector.dart';
 import '../widgets/average_finish_chart.dart';
 import '../widgets/average_finish_statistics.dart';
+import '../widgets/average_last_dart_chart.dart';
+import '../widgets/average_last_dart_statistics.dart';
 import '../widgets/date_filter_selector.dart';
 import '../widgets/statistics_aggregation_selector.dart';
 
@@ -95,7 +97,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
             ),
           )
         else
-          if (_selectedAnalytics == AnalyticsType.averageFinishDart) ...[
+          if (_selectedAnalytics == AnalyticsType.averageFinish) ...[
             AverageFinishChart(
               finishes: widget.finishes,
               settings: widget.settings,
@@ -105,6 +107,21 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
             const SizedBox(height: 16),
 
             AverageFinishStatistics(
+              finishes: widget.finishes,
+              aggregation: _selectedAggregation,
+            ),
+          ],
+
+          if (_selectedAnalytics == AnalyticsType.averageFinishDart) ...[
+            AverageLastDartChart(
+              finishes: widget.finishes,
+              settings: widget.settings,
+              aggregation: _selectedAggregation,
+            ),
+
+            const SizedBox(height: 16),
+
+            AverageLastDartStatistics(
               finishes: widget.finishes,
               aggregation: _selectedAggregation,
             ),

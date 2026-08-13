@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../analytics/analytics_builder.dart';
+import '../models/finish_multiplier.dart';
 import '../models/new_finish_entry.dart';
 import '../models/statistics_aggregation.dart';
 
-class AverageFinishStatistics extends StatelessWidget {
-  const AverageFinishStatistics({
+class AverageLastDartStatistics extends StatelessWidget {
+  const AverageLastDartStatistics({
     super.key,
     required this.finishes,
     required this.aggregation,
@@ -22,7 +23,7 @@ class AverageFinishStatistics extends StatelessWidget {
 
     final builder = const AnalyticsBuilder();
 
-    final points = builder.buildAverageFinishData(
+    final points = builder.buildAverageLastDartData(
       finishes: finishes,
       aggregation: aggregation,
     );
@@ -37,16 +38,13 @@ class AverageFinishStatistics extends StatelessWidget {
         .map((point) => point.average)
         .reduce((a, b) => a > b ? a : b);
 
-    final scoredFinishes = finishes
-        .where((finish) => finish.score != null)
-        .toList();
-
-    final totalScore = scoredFinishes.fold<double>(
+    final totalScore = finishes.fold<double>(
       0,
-      (sum, finish) => sum + finish.score!,
+      (sum, finish) =>
+          sum + finish.field * finish.multiplier.factor,
     );
 
-    final periodAverage = totalScore / scoredFinishes.length;
+    final periodAverage = totalScore / finishes.length;
 
     return Card(
       child: Padding(

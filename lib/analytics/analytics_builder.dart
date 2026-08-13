@@ -6,9 +6,10 @@ import '../models/statistics_aggregation.dart';
 class AnalyticsBuilder {
   const AnalyticsBuilder();
 
-  List<AverageFinishPoint> buildAverageFinishData({
+  List<AverageFinishPoint> _buildAverageData({
     required List<NewFinishEntry> finishes,
-    StatisticsAggregation aggregation = StatisticsAggregation.day,
+    required StatisticsAggregation aggregation,
+    required double? Function(NewFinishEntry finish) scoreProvider,
   }) {
     if (finishes.isEmpty) {
       return [];
@@ -17,6 +18,12 @@ class AnalyticsBuilder {
     final grouped = <DateTime, List<double>>{};
 
     for (final finish in finishes) {
+      final score = scoreProvider(finish);
+
+      if (score == null) {
+        continue;
+      }
+
       final date = DateTime(
         finish.timestamp.year,
         finish.timestamp.month,
@@ -24,8 +31,6 @@ class AnalyticsBuilder {
       );
 
       final key = _periodStart(date, aggregation);
-
-      final score = (finish.field * finish.multiplier.factor).toDouble();
 
       grouped.putIfAbsent(key, () => []).add(score);
     }
@@ -45,6 +50,29 @@ class AnalyticsBuilder {
     points.sort((a, b) => a.date.compareTo(b.date));
 
     return points;
+  }
+
+  List<AverageFinishPoint> buildAverageLastDartData({
+    required List<NewFinishEntry> finishes,
+    StatisticsAggregation aggregation = StatisticsAggregation.day,
+  }) {
+    return _buildAverageData(
+      finishes: finishes,
+      aggregation: aggregation,
+      scoreProvider: (finish) =>
+          (finish.field * finish.multiplier.factor).toDouble(),
+    );
+  }
+
+  List<AverageFinishPoint> buildAverageFinishData({
+    required List<NewFinishEntry> finishes,
+    StatisticsAggregation aggregation = StatisticsAggregation.day,
+  }) {
+    return _buildAverageData(
+      finishes: finishes,
+      aggregation: aggregation,
+      scoreProvider: (finish) => finish.score?.toDouble(),
+    );
   }
 
   DateTime _periodStart(

@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 
 import '../analytics/analytics_builder.dart';
 import '../charts/chart_axis.dart';
-import '../charts/chart_scale.dart';
 import '../models/new_finish_entry.dart';
 import '../models/statistics_aggregation.dart';
+import '../charts/chart_scale.dart';
 import '../settings/app_settings.dart';
 import '../widgets/statistics_line_chart.dart';
 
-class AverageFinishChart extends StatelessWidget {
-  const AverageFinishChart({
+class AverageLastDartChart extends StatelessWidget {
+  const AverageLastDartChart({
     super.key,
     required this.finishes,
     required this.settings,
@@ -25,7 +25,7 @@ class AverageFinishChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final builder = const AnalyticsBuilder();
 
-    final points = builder.buildAverageFinishData(
+    final points = builder.buildAverageLastDartData(
       finishes: finishes,
       aggregation: aggregation,
     );
@@ -151,7 +151,7 @@ class AverageFinishChart extends StatelessWidget {
               point.date,
               aggregation,
             )}\n'
-            'Ø Finish:\n'
+            'Ø letzter Dart:\n'
             '${point.average.toStringAsFixed(2)} Punkte',
             TextStyle(
               color: settings.finishColor,
