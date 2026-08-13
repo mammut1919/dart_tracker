@@ -1,6 +1,40 @@
 # Changelog
 
-## [1.6.0] - 2025-07-28
+## [1.7.0] - 2026-08-13
+
+### Added
+
+- Finish tracking with optional finish score
+- Finish score validation for valid checkouts
+- Support for tracking the last dart or the complete finish
+- Automatic High Finish entries for finishes of 100 points or more
+- New statistics views:
+  - Finishes
+  - Average Finish
+  - Average Last Dart
+  - Activity
+- New finish analytics chart with the three highest finishes
+- Statistics aggregation by day, week, month, and year
+- Finish scores in history, import, and export
+
+### Changed
+
+- Improved statistics charts and time axis handling
+- Improved chart handling for single data points
+- Bull is now consistently represented as 25 points
+
+### Refactored
+
+- Extracted shared line chart infrastructure
+- Renamed Average Finish statistics to Average Last Dart
+
+### Fixed
+
+- Improved finish input validation
+- Various UI improvements and minor bug fixes
+
+
+## [1.6.0] - 2026-07-28
 
 ### Added
 
