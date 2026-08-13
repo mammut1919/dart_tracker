@@ -19,6 +19,19 @@ class AnalyticsSelector extends StatelessWidget {
       onSelected: onSelectionChanged,
       itemBuilder: (context) => [
         PopupMenuItem(
+          value: AnalyticsType.finishes,
+          child: Row(
+            children: [
+              if (selectedAnalytics == AnalyticsType.finishes)
+                const Icon(Icons.check, size: 18)
+              else
+                const SizedBox(width: 18),
+              const SizedBox(width: 8),
+              Text(AnalyticsType.finishes.title),
+            ],
+          ),
+        ),
+        PopupMenuItem(
           value: AnalyticsType.averageFinish,
           child: Row(
             children: [
