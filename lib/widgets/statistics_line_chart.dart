@@ -7,6 +7,7 @@ class StatisticsLineChart extends StatelessWidget {
   const StatisticsLineChart({
     super.key,
     required this.spots,
+    this.minX = 0,
     required this.maxX,
     required this.maxY,
     required this.xTickOffsets,
@@ -18,6 +19,7 @@ class StatisticsLineChart extends StatelessWidget {
   });
 
   final List<FlSpot> spots;
+  final double minX;
   final double maxX;
   final double maxY;
   final Set<double> xTickOffsets;
@@ -48,7 +50,7 @@ class StatisticsLineChart extends StatelessWidget {
           padding: const EdgeInsets.all(_padding),
           child: LineChart(
             LineChartData(
-              minX: 0,
+              minX: minX,
               maxX: maxX,
               minY: 0,
               maxY: maxY,

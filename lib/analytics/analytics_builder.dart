@@ -1,5 +1,6 @@
 import '../models/average_finish_point.dart';
 import '../models/finish_multiplier.dart';
+import '../models/finish_point.dart';
 import '../models/new_finish_entry.dart';
 import '../models/statistics_aggregation.dart';
 
@@ -109,5 +110,29 @@ class AnalyticsBuilder {
           date.year,
         );
     }
+  }
+
+  List<FinishPoint> buildFinishData({
+    required List<NewFinishEntry> finishes,
+  }) {
+    final points = <FinishPoint>[];
+
+    for (final finish in finishes) {
+      final score = finish.score;
+
+      if (score == null) {
+        continue;
+      }
+
+      points.add(
+        FinishPoint(
+          index: points.length + 1,
+          date: finish.timestamp,
+          score: score.toDouble(),
+        ),
+      );
+    }
+
+    return points;
   }
 }
