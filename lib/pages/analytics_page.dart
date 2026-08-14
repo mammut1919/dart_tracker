@@ -15,6 +15,7 @@ import '../widgets/average_last_dart_statistics.dart';
 import '../widgets/date_filter_selector.dart';
 import '../widgets/finishes_chart.dart';
 import '../widgets/finishes_statistics.dart';
+import '../widgets/personal_bests_statistics.dart';
 import '../widgets/statistics_aggregation_selector.dart';
 
 class AnalyticsPage extends StatefulWidget {
@@ -36,7 +37,7 @@ class AnalyticsPage extends StatefulWidget {
 }
 
 class _AnalyticsPageState extends State<AnalyticsPage> {
-  AnalyticsType _selectedAnalytics = AnalyticsType.finishes;
+  AnalyticsType _selectedAnalytics = AnalyticsType.personalBests;
 
   StatisticsAggregation _selectedAggregation = StatisticsAggregation.day;
 
@@ -100,6 +101,10 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
             ),
           )
         else
+          if (_selectedAnalytics == AnalyticsType.personalBests) ...[
+            PersonalBestsStatistics(),
+          ],
+
           if (_selectedAnalytics == AnalyticsType.finishes) ...[
             FinishesChart(
               finishes: widget.finishes,
