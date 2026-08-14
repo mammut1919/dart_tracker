@@ -117,7 +117,7 @@ class AnalyticsBuilder {
   }) {
     final points = <FinishPoint>[];
 
-    for (final finish in finishes) {
+    for (final finish in finishes.reversed) {
       final score = finish.score;
 
       if (score == null) {
