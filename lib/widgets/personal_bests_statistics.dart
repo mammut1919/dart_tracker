@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 
+import '../models/finish_multiplier.dart';
+import '../models/new_finish_entry.dart';
+import '../models/personal_bests.dart';
+
 class PersonalBestsStatistics extends StatelessWidget {
   const PersonalBestsStatistics({
     super.key,
+    required this.personalBests,
   });
+
+  final PersonalBests personalBests;
 
   @override
   Widget build(BuildContext context) {
@@ -11,23 +18,27 @@ class PersonalBestsStatistics extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const _SectionTitle('Finishes'),
-        const _StatisticsCard(
+        _StatisticsCard(
           rows: [
             _StatisticRow(
               label: 'Gewonnene Spiele',
-              value: '42',
+              value: '${personalBests.finishCount}',
             ),
             _StatisticRow(
               label: 'Höchstes Finish',
-              value: '170',
+              value: '${personalBests.highestFinish ?? '-'}',
             ),
             _StatisticRow(
               label: 'High Finishes',
-              value: '8',
+              value: '${personalBests.highFinishCount}',
             ),
             _StatisticRow(
               label: 'Höchster letzter Dart',
-              value: 'D20',
+              value: personalBests.highestLastDart == null
+                  ? '-'
+                  : _formatFinishField(
+                      personalBests.highestLastDart!,
+                    ),
             ),
           ],
         ),
@@ -35,15 +46,17 @@ class PersonalBestsStatistics extends StatelessWidget {
         const SizedBox(height: 12),
 
         const _SectionTitle('Short Legs'),
-        const _StatisticsCard(
+        _StatisticsCard(
           rows: [
             _StatisticRow(
               label: 'Kürzestes Short Leg',
-              value: '18 Darts',
+              value: personalBests.shortestShortLeg == null
+                  ? '-'
+                  : '${personalBests.shortestShortLeg} Darts',
             ),
             _StatisticRow(
               label: 'Short Legs',
-              value: '12',
+              value: '${personalBests.shortLegCount}',
             ),
           ],
         ),
@@ -51,24 +64,41 @@ class PersonalBestsStatistics extends StatelessWidget {
         const SizedBox(height: 12),
 
         const _SectionTitle('Scores'),
-        const _StatisticsCard(
+        _StatisticsCard(
           rows: [
             _StatisticRow(
               label: '180',
-              value: '7',
+              value: '${personalBests.count180}',
             ),
             _StatisticRow(
               label: '171',
-              value: '4',
+              value: '${personalBests.count171}',
             ),
             _StatisticRow(
               label: '162',
-              value: '9',
+              value: '${personalBests.count162}',
             ),
           ],
         ),
       ],
     );
+  }
+
+  String _formatFinishField(NewFinishEntry finish) {
+    if (finish.field == 25) {
+      return 'Bull';
+    }
+
+    switch (finish.multiplier) {
+      case FinishMultiplier.single:
+        return 'S${finish.field}';
+
+      case FinishMultiplier.double:
+        return 'D${finish.field}';
+
+      case FinishMultiplier.triple:
+        return 'T${finish.field}';
+    }
   }
 }
 

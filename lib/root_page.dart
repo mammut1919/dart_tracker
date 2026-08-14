@@ -486,6 +486,7 @@ class _RootPageState extends State<RootPage> {
             onDeleteFinish: _deleteFinish,
           ),
           AnalyticsPage(
+            entries: _filteredEntries,
             finishes: _filteredFinishes,
             settings: _settings,
             selectedDateFilter: _selectedDateFilter,

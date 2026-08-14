@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../analytics/analytics_builder.dart';
 import '../models/analytics_type.dart';
 import '../models/date_filter.dart';
+import '../models/new_entry.dart';
 import '../models/new_finish_entry.dart';
 import '../models/statistics_aggregation.dart';
 import '../settings/app_settings.dart';
@@ -21,13 +23,16 @@ import '../widgets/statistics_aggregation_selector.dart';
 class AnalyticsPage extends StatefulWidget {
   const AnalyticsPage({
     super.key,
+    required this.entries,
     required this.finishes,
     required this.settings,
     required this.selectedDateFilter,
     required this.onDateFilterChanged,
   });
 
+  final List<NewEntry> entries;
   final List<NewFinishEntry> finishes;
+
   final AppSettings settings;
   final DateFilter selectedDateFilter;
   final ValueChanged<DateFilter> onDateFilterChanged;
@@ -43,6 +48,16 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
 
   @override
   Widget build(BuildContext context) {
+
+    final builder = const AnalyticsBuilder();
+
+    final personalBests = builder.buildPersonalBests(
+      entries: widget.entries,
+      finishes: widget.finishes,
+      settings: widget.settings,
+      selectedDateFilter: widget.selectedDateFilter,
+    );
+
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       children: [
@@ -102,7 +117,9 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
           )
         else
           if (_selectedAnalytics == AnalyticsType.personalBests) ...[
-            PersonalBestsStatistics(),
+            PersonalBestsStatistics(
+              personalBests: personalBests,
+            )
           ],
 
           if (_selectedAnalytics == AnalyticsType.finishes) ...[
