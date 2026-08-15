@@ -20,10 +20,9 @@ class ScoreEntries extends Table {
 class FinishEntries extends Table {
   IntColumn get id => integer().autoIncrement()();
 
-  IntColumn get field => integer()();
+  IntColumn get field => integer().nullable()();
 
-  TextColumn get multiplier =>
-    text().withDefault(const Constant('double'))();
+  TextColumn get multiplier => text().nullable()();
 
   DateTimeColumn get timestamp => dateTime()();
 
@@ -35,7 +34,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -69,6 +68,10 @@ class AppDatabase extends _$AppDatabase {
         await customStatement(
           'UPDATE finish_entries SET field = 25 WHERE field = 50',
         );
+      }
+
+      if (from < 7) {
+        await m.alterTable(TableMigration(finishEntries));
       }
     },
   );

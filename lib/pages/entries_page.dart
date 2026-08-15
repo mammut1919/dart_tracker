@@ -22,6 +22,7 @@ class EntriesPage extends StatelessWidget {
     required this.onDateFilterChanged,
     required this.onAddEntry,
     required this.onShowAddDialog,
+    required this.onAddHighFinish,
     required this.onConfirmDelete,
   });
 
@@ -32,6 +33,7 @@ class EntriesPage extends StatelessWidget {
   final ValueChanged<DateFilter> onDateFilterChanged;
   final ValueChanged<NewEntry> onAddEntry;
   final Future<void> Function({EntryType? initialType,}) onShowAddDialog;
+  final Future<void> Function() onAddHighFinish;
   final Future<void> Function(NewEntry) onConfirmDelete;
 
   int _countEntries({
@@ -144,8 +146,7 @@ class EntriesPage extends StatelessWidget {
                 child: EntryButton(
                   label: 'High Finish',
                   color: settings.highFinishColor,
-                  onPressed: () =>
-                      onShowAddDialog(initialType: EntryType.highFinish,),
+                  onPressed: onAddHighFinish,
                 ),
               ),
             ),
