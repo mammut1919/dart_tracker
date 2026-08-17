@@ -10,17 +10,20 @@ import '../charts/chart_series.dart';
 import '../models/default_scores.dart';
 import '../models/entry_type.dart';
 import '../models/new_entry.dart';
+import '../models/new_finish_entry.dart';
 import '../theme/app_colors.dart';
 
 class EntriesChart extends StatelessWidget {
   const EntriesChart({
     super.key,
     required this.entries, 
+    required this.finishes,
     required this.settings,
     required this.includeBaseline,
   });
 
   final List<NewEntry> entries;
+  final List<NewFinishEntry> finishes;
   final AppSettings settings;
   final bool includeBaseline;
 
@@ -34,7 +37,10 @@ class EntriesChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final builder = const ChartBuilder();
 
-    final range = ChartRange.fromEntries(entries);
+    final range = ChartRange.fromDates([
+      ...entries.map((entry) => entry.timestamp),
+      ...finishes.map((finish) => finish.timestamp),
+    ]);
 
     final series = _buildSeries(builder, range);
 
@@ -235,9 +241,8 @@ class EntriesChart extends StatelessWidget {
       );
     }).toList();
 
-    final highFinishChart = builder.buildStepChart(
-      entries: entries,
-      type: EntryType.highFinish,
+    final highFinishChart = builder.buildHighFinishStepChart(
+      finishes: finishes,
       baseline: includeBaseline
         ? settings.baselineHighFinish
         : 0,
@@ -248,7 +253,7 @@ class EntriesChart extends StatelessWidget {
     series.add(
       ChartSeries(
         label: 'High Finish',
-        color: settings.colorForEntryType(EntryType.highFinish),
+        color: settings.highFinishColor,
         chart: highFinishChart,
       ),
     );

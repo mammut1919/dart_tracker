@@ -65,10 +65,16 @@ class AnalyticsBuilder {
     StatisticsAggregation aggregation = StatisticsAggregation.day,
   }) {
     return _buildAverageData(
-      finishes: finishes,
+      finishes: finishes
+          .where(
+            (finish) =>
+                finish.field != null &&
+                finish.multiplier != null,
+          )
+          .toList(),
       aggregation: aggregation,
       scoreProvider: (finish) =>
-          (finish.field * finish.multiplier.factor).toDouble(),
+          (finish.field! * finish.multiplier!.factor).toDouble(),
     );
   }
 
@@ -143,12 +149,16 @@ class AnalyticsBuilder {
     return points;
   }
 
-  String _formatFinishField(NewFinishEntry finish) {
+  String? _formatFinishField(NewFinishEntry finish) {
+    if (finish.field == null || finish.multiplier == null) {
+      return null;
+    }
+
     if (finish.field == 25) {
       return 'Bull';
     }
 
-    switch (finish.multiplier) {
+    switch (finish.multiplier!) {
       case FinishMultiplier.single:
         return 'S${finish.field}';
 
@@ -210,9 +220,11 @@ class AnalyticsBuilder {
           entry.value == 162,
     ).length;
 
-    final rawHighFinish = entries
-        .where((entry) => entry.type == EntryType.highFinish)
-        .length;
+    final rawHighFinish = finishes.where(
+      (finish) =>
+          finish.score != null &&
+          finish.score! >= 100,
+    ).length;
 
     final rawShortLeg = entries.where(
       (entry) =>
@@ -243,16 +255,19 @@ class AnalyticsBuilder {
         (includeBaseline ? settings.baselineShortLeg : 0);
 
     NewFinishEntry? highestLastDart;
+    int? highestLastDartValue;
 
     for (final finish in finishes) {
-      final value =
-          finish.field * finish.multiplier.factor;
+      if (finish.field == null || finish.multiplier == null) {
+        continue;
+      }
 
-      if (highestLastDart == null ||
-          value >
-              highestLastDart.field *
-                  highestLastDart.multiplier.factor) {
+      final value = finish.field! * finish.multiplier!.factor;
+
+      if (highestLastDartValue == null ||
+          value > highestLastDartValue) {
         highestLastDart = finish;
+        highestLastDartValue = value;
       }
     }
 
@@ -271,7 +286,15 @@ class AnalyticsBuilder {
     final finishFieldCounts = <String, int>{};
 
     for (final finish in finishes) {
+      if (finish.field == null || finish.multiplier == null) {
+        continue;
+      }
+
       final field = _formatFinishField(finish);
+
+      if (field == null) {
+        continue;
+      }
 
       finishFieldCounts[field] =
           (finishFieldCounts[field] ?? 0) + 1;

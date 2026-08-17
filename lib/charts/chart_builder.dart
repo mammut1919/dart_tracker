@@ -1,5 +1,6 @@
 import '../models/entry_type.dart';
 import '../models/new_entry.dart';
+import '../models/new_finish_entry.dart';
 import 'chart_data.dart';
 import 'chart_point.dart';
 
@@ -48,6 +49,35 @@ class ChartBuilder {
     // Linie bis zum rechten Diagrammrand verlängern
     final endX = chartEnd.difference(chartStart).inDays.toDouble();
 
+    points.add(ChartPoint(x: endX, y: current.toDouble()));
+
+    return ChartData(points: points, firstDate: chartStart, lastDate: chartEnd);
+  }
+
+  ChartData buildHighFinishStepChart({
+    required List<NewFinishEntry> finishes,
+    required int baseline,
+    required DateTime chartStart,
+    required DateTime chartEnd,
+  }) {
+    final filtered = finishes.where((finish) {
+      final score = finish.score;
+      return score != null && score >= 100;
+    }).toList()..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
+    final points = <ChartPoint>[];
+    var current = baseline;
+
+    points.add(ChartPoint(x: 0, y: current.toDouble()));
+
+    for (final finish in filtered) {
+      final x = finish.timestamp.difference(chartStart).inDays.toDouble();
+      points.add(ChartPoint(x: x, y: current.toDouble()));
+      current++;
+      points.add(ChartPoint(x: x, y: current.toDouble()));
+    }
+
+    final endX = chartEnd.difference(chartStart).inDays.toDouble();
     points.add(ChartPoint(x: endX, y: current.toDouble()));
 
     return ChartData(points: points, firstDate: chartStart, lastDate: chartEnd);

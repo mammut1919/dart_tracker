@@ -19,20 +19,11 @@ const score162Option = EntryOption(
   presetValue: 162,
 );
 
-const highFinishOption = EntryOption(
-  label: 'High Finish',
-  type: EntryType.highFinish,
-  inputLabel: 'Wert',
-  minValue: 100,
-  maxValue: 180,
-);
-
 List<EntryOption> availableEntryOptions(int shortLegLimit) {
   return [
     score180Option,
     score171Option,
     score162Option,
-    highFinishOption,
     EntryOption(
       label: 'Short Leg',
       type: EntryType.shortLeg,

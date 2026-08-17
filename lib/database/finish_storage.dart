@@ -19,7 +19,9 @@ class FinishStorage {
           (row) => NewFinishEntry(
             id: row.id,
             field: row.field,
-            multiplier: FinishMultiplier.values.byName(row.multiplier),
+            multiplier: row.multiplier == null
+                ? null
+                : FinishMultiplier.values.byName(row.multiplier!),
             timestamp: row.timestamp,
             score: row.score,
           ),
@@ -28,8 +30,8 @@ class FinishStorage {
   }
 
   Future<void> add(
-    int field,
-    FinishMultiplier multiplier,
+    int? field,
+    FinishMultiplier? multiplier,
     DateTime timestamp, {
     int? score,
   }) async {
@@ -37,8 +39,8 @@ class FinishStorage {
         .into(_database.finishEntries)
         .insert(
           FinishEntriesCompanion.insert(
-            field: field,
-            multiplier: Value(multiplier.name),
+            field: Value(field),
+            multiplier: Value(multiplier?.name),
             timestamp: timestamp,
             score: Value(score),
           ),

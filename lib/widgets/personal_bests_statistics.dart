@@ -38,7 +38,7 @@ class PersonalBestsStatistics extends StatelessWidget {
                   ? '-'
                   : _formatFinishField(
                       personalBests.highestLastDart!,
-                    ),
+                    )!,
             ),
           ],
         ),
@@ -84,12 +84,16 @@ class PersonalBestsStatistics extends StatelessWidget {
     );
   }
 
-  String _formatFinishField(NewFinishEntry finish) {
+  String? _formatFinishField(NewFinishEntry finish) {
+    if (finish.field == null || finish.multiplier == null) {
+      return null;
+    }
+
     if (finish.field == 25) {
       return 'Bull';
     }
 
-    switch (finish.multiplier) {
+    switch (finish.multiplier!) {
       case FinishMultiplier.single:
         return 'S${finish.field}';
 

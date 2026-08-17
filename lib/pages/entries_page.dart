@@ -4,7 +4,9 @@ import 'package:intl/intl.dart';
 import '../models/date_filter.dart';
 import '../models/default_scores.dart';
 import '../models/entry_type.dart';
+import '../models/finish_multiplier.dart';
 import '../models/new_entry.dart';
+import '../models/new_finish_entry.dart';
 import '../settings/app_settings.dart';
 import '../theme/app_colors.dart';
 import '../widgets/date_filter_selector.dart';
@@ -22,7 +24,10 @@ class EntriesPage extends StatelessWidget {
     required this.onDateFilterChanged,
     required this.onAddEntry,
     required this.onShowAddDialog,
+    required this.onAddHighFinish,
+    required this.onDeleteFinish,
     required this.onConfirmDelete,
+    required this.finishes,
   });
 
   final List<NewEntry> entries;
@@ -32,7 +37,10 @@ class EntriesPage extends StatelessWidget {
   final ValueChanged<DateFilter> onDateFilterChanged;
   final ValueChanged<NewEntry> onAddEntry;
   final Future<void> Function({EntryType? initialType,}) onShowAddDialog;
+  final Future<void> Function() onAddHighFinish;
   final Future<void> Function(NewEntry) onConfirmDelete;
+  final Future<void> Function(NewFinishEntry) onDeleteFinish;
+  final List<NewFinishEntry> finishes;
 
   int _countEntries({
     required EntryType type,
@@ -63,7 +71,10 @@ class EntriesPage extends StatelessWidget {
     final count180 = _countEntries(type: EntryType.score, value: 180);
     final count171 = _countEntries(type: EntryType.score, value: 171);
     final count162 = _countEntries(type: EntryType.score, value: 162);
-    final countHighFinish = _countEntries(type: EntryType.highFinish);
+    final highFinishes = finishes.where((finish) {
+      final score = finish.score;
+      return score != null && score >= 100;
+    }).toList();
     final countSL = _countEntries(
       type: EntryType.shortLeg,
       onlyValidShortLegs: true,
@@ -75,6 +86,15 @@ class EntriesPage extends StatelessWidget {
     final shortLegBaseline = selectedDateFilter.includesBaseline
       ? settings.baselineShortLeg
       : 0;
+
+    final history = [
+      ...entries.map(_HistoryItem.entry),
+      ...finishes
+          .where((finish) => finish.score != null && finish.score! >= 100)
+          .map(_HistoryItem.finish),
+    ]..sort(
+        (a, b) => b.timestamp.compareTo(a.timestamp),
+      );
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -144,8 +164,7 @@ class EntriesPage extends StatelessWidget {
                 child: EntryButton(
                   label: 'High Finish',
                   color: settings.highFinishColor,
-                  onPressed: () =>
-                      onShowAddDialog(initialType: EntryType.highFinish,),
+                  onPressed: onAddHighFinish,
                 ),
               ),
             ),
@@ -172,7 +191,7 @@ class EntriesPage extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 child: EntrySummaryCard(
-                  count: countHighFinish + highFinishBaseline,
+                  count: highFinishes.length + highFinishBaseline,
                   color: settings.highFinishColor,
                   label: 'HF',
                 ),
@@ -192,75 +211,148 @@ class EntriesPage extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         // score chart
-        if (entries.isNotEmpty) ...[
+        if (entries.isNotEmpty || highFinishes.isNotEmpty) ...[
           EntriesChart(
-            entries: entries, 
+            entries: entries,
+            finishes: highFinishes,
             settings: settings,
             includeBaseline: selectedDateFilter.includesBaseline,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 12),
         ],
-        const SizedBox(height: 24),
-        // history
         const Align(
           alignment: Alignment.centerLeft,
           child: Text(
             'Historie',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         const SizedBox(height: 8),
-        // list of historic scores
-        if (entries.isEmpty)
+        const SizedBox(height: 8),
+        if (history.isEmpty)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 32),
-            child: Center(child: Text('Noch keine Treffer erfasst.')),
+            child: Center(
+              child: Text('Noch keine Treffer erfasst.'),
+            ),
           )
         else
-          ...entries.map<Widget>((entry) {
+          ...history.map<Widget>((item) {
+            if (item.value != null) {
+              final entry = item.value!;
               final ignored =
-                entry.type == EntryType.shortLeg &&
-                entry.value > settings.shortLegLimit;
+                  entry.type == EntryType.shortLeg &&
+                  entry.value > settings.shortLegLimit;
+
+              return Dismissible(
+                key: ValueKey('entry-${entry.id}'),
+                direction: DismissDirection.endToStart,
+                confirmDismiss: (_) async {
+                  await onConfirmDelete(entry);
+                  return false;
+                },
+                background: Container(
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.only(right: 24),
+                  color: AppColors.delete,
+                  child: const Icon(
+                    Icons.delete,
+                    color: Colors.white,
+                  ),
+                ),
+                child: Card(
+                  child: ListTile(
+                    onLongPress: () => onConfirmDelete(entry),
+                    leading: Icon(entry.type.icon),
+                    title: Text(entry.type.format(entry.value)),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(dateFormat.format(entry.timestamp)),
+                        if (ignored)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 2),
+                            child: Text(
+                              'Nicht in der Statistik berücksichtigt\n'
+                              '(Statistik-Einstellungen: Grenze für Short Leg '
+                              '${settings.shortLegLimit} Darts)',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .outline,
+                                  ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }
+
+            final finish = item.finish!;
+
+            final finishLabel = finish.field != null &&
+                    finish.multiplier != null
+                ? '${finish.multiplier == FinishMultiplier.single ? 'S' : finish.multiplier == FinishMultiplier.double ? 'D' : 'T'}${finish.field}'
+                : 'High Finish';
+
             return Dismissible(
-              key: ValueKey(entry.id),
+              key: ValueKey('finish-${finish.id}'),
               direction: DismissDirection.endToStart,
               confirmDismiss: (_) async {
-                await onConfirmDelete(entry);
+                await onDeleteFinish(finish);
                 return false;
               },
               background: Container(
                 alignment: Alignment.centerRight,
                 padding: const EdgeInsets.only(right: 24),
                 color: AppColors.delete,
-                child: const Icon(Icons.delete, color: Colors.white),
+                child: const Icon(
+                  Icons.delete,
+                  color: Colors.white,
+                ),
               ),
               child: Card(
                 child: ListTile(
-                  onLongPress: () => onConfirmDelete(entry),
-                  leading: Icon(entry.type.icon),
-                  title: Text(entry.type.format(entry.value)),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(dateFormat.format(entry.timestamp)),
-                      if (ignored)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 2),
-                          child: Text(
-                            'Nicht in der Statistik berücksichtigt\n'
-                            '(Statistik-Einstellungen: Grenze für Short Leg ${settings.shortLegLimit} Darts)',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context).colorScheme.outline,
-                            ),
-                          ),
-                        ),
-                    ],
+                  onLongPress: () => onDeleteFinish(finish),
+                  leading: Icon(
+                    Icons.sports_score,
+                  ),
+                  title: Text(
+                    finish.score != null
+                        ? '$finishLabel (${finish.score})'
+                        : finishLabel,
+                  ),
+                  subtitle: Text(
+                    dateFormat.format(finish.timestamp),
                   ),
                 ),
               ),
             );
           }),
+
       ],
     );
   }
+}
+
+class _HistoryItem {
+  const _HistoryItem.entry(this.value)
+      : finish = null;
+
+  const _HistoryItem.finish(this.finish)
+      : value = null;
+
+  final NewEntry? value;
+  final NewFinishEntry? finish;
+
+  DateTime get timestamp =>
+      value?.timestamp ?? finish!.timestamp;
 }
