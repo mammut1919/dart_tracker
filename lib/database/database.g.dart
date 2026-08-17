@@ -317,9 +317,9 @@ class $FinishEntriesTable extends FinishEntries
   late final GeneratedColumn<int> field = GeneratedColumn<int>(
     'field',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.int,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _multiplierMeta = const VerificationMeta(
     'multiplier',
@@ -328,10 +328,9 @@ class $FinishEntriesTable extends FinishEntries
   late final GeneratedColumn<String> multiplier = GeneratedColumn<String>(
     'multiplier',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.string,
     requiredDuringInsert: false,
-    defaultValue: const Constant('double'),
   );
   static const VerificationMeta _timestampMeta = const VerificationMeta(
     'timestamp',
@@ -381,8 +380,6 @@ class $FinishEntriesTable extends FinishEntries
         _fieldMeta,
         field.isAcceptableOrUnknown(data['field']!, _fieldMeta),
       );
-    } else if (isInserting) {
-      context.missing(_fieldMeta);
     }
     if (data.containsKey('multiplier')) {
       context.handle(
@@ -420,11 +417,11 @@ class $FinishEntriesTable extends FinishEntries
       field: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}field'],
-      )!,
+      ),
       multiplier: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}multiplier'],
-      )!,
+      ),
       timestamp: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}timestamp'],
@@ -444,14 +441,14 @@ class $FinishEntriesTable extends FinishEntries
 
 class FinishEntry extends DataClass implements Insertable<FinishEntry> {
   final int id;
-  final int field;
-  final String multiplier;
+  final int? field;
+  final String? multiplier;
   final DateTime timestamp;
   final int? score;
   const FinishEntry({
     required this.id,
-    required this.field,
-    required this.multiplier,
+    this.field,
+    this.multiplier,
     required this.timestamp,
     this.score,
   });
@@ -459,8 +456,12 @@ class FinishEntry extends DataClass implements Insertable<FinishEntry> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
-    map['field'] = Variable<int>(field);
-    map['multiplier'] = Variable<String>(multiplier);
+    if (!nullToAbsent || field != null) {
+      map['field'] = Variable<int>(field);
+    }
+    if (!nullToAbsent || multiplier != null) {
+      map['multiplier'] = Variable<String>(multiplier);
+    }
     map['timestamp'] = Variable<DateTime>(timestamp);
     if (!nullToAbsent || score != null) {
       map['score'] = Variable<int>(score);
@@ -471,8 +472,12 @@ class FinishEntry extends DataClass implements Insertable<FinishEntry> {
   FinishEntriesCompanion toCompanion(bool nullToAbsent) {
     return FinishEntriesCompanion(
       id: Value(id),
-      field: Value(field),
-      multiplier: Value(multiplier),
+      field: field == null && nullToAbsent
+          ? const Value.absent()
+          : Value(field),
+      multiplier: multiplier == null && nullToAbsent
+          ? const Value.absent()
+          : Value(multiplier),
       timestamp: Value(timestamp),
       score: score == null && nullToAbsent
           ? const Value.absent()
@@ -487,8 +492,8 @@ class FinishEntry extends DataClass implements Insertable<FinishEntry> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return FinishEntry(
       id: serializer.fromJson<int>(json['id']),
-      field: serializer.fromJson<int>(json['field']),
-      multiplier: serializer.fromJson<String>(json['multiplier']),
+      field: serializer.fromJson<int?>(json['field']),
+      multiplier: serializer.fromJson<String?>(json['multiplier']),
       timestamp: serializer.fromJson<DateTime>(json['timestamp']),
       score: serializer.fromJson<int?>(json['score']),
     );
@@ -498,8 +503,8 @@ class FinishEntry extends DataClass implements Insertable<FinishEntry> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'field': serializer.toJson<int>(field),
-      'multiplier': serializer.toJson<String>(multiplier),
+      'field': serializer.toJson<int?>(field),
+      'multiplier': serializer.toJson<String?>(multiplier),
       'timestamp': serializer.toJson<DateTime>(timestamp),
       'score': serializer.toJson<int?>(score),
     };
@@ -507,14 +512,14 @@ class FinishEntry extends DataClass implements Insertable<FinishEntry> {
 
   FinishEntry copyWith({
     int? id,
-    int? field,
-    String? multiplier,
+    Value<int?> field = const Value.absent(),
+    Value<String?> multiplier = const Value.absent(),
     DateTime? timestamp,
     Value<int?> score = const Value.absent(),
   }) => FinishEntry(
     id: id ?? this.id,
-    field: field ?? this.field,
-    multiplier: multiplier ?? this.multiplier,
+    field: field.present ? field.value : this.field,
+    multiplier: multiplier.present ? multiplier.value : this.multiplier,
     timestamp: timestamp ?? this.timestamp,
     score: score.present ? score.value : this.score,
   );
@@ -557,8 +562,8 @@ class FinishEntry extends DataClass implements Insertable<FinishEntry> {
 
 class FinishEntriesCompanion extends UpdateCompanion<FinishEntry> {
   final Value<int> id;
-  final Value<int> field;
-  final Value<String> multiplier;
+  final Value<int?> field;
+  final Value<String?> multiplier;
   final Value<DateTime> timestamp;
   final Value<int?> score;
   const FinishEntriesCompanion({
@@ -570,12 +575,11 @@ class FinishEntriesCompanion extends UpdateCompanion<FinishEntry> {
   });
   FinishEntriesCompanion.insert({
     this.id = const Value.absent(),
-    required int field,
+    this.field = const Value.absent(),
     this.multiplier = const Value.absent(),
     required DateTime timestamp,
     this.score = const Value.absent(),
-  }) : field = Value(field),
-       timestamp = Value(timestamp);
+  }) : timestamp = Value(timestamp);
   static Insertable<FinishEntry> custom({
     Expression<int>? id,
     Expression<int>? field,
@@ -594,8 +598,8 @@ class FinishEntriesCompanion extends UpdateCompanion<FinishEntry> {
 
   FinishEntriesCompanion copyWith({
     Value<int>? id,
-    Value<int>? field,
-    Value<String>? multiplier,
+    Value<int?>? field,
+    Value<String?>? multiplier,
     Value<DateTime>? timestamp,
     Value<int?>? score,
   }) {
@@ -835,16 +839,16 @@ typedef $$ScoreEntriesTableProcessedTableManager =
 typedef $$FinishEntriesTableCreateCompanionBuilder =
     FinishEntriesCompanion Function({
       Value<int> id,
-      required int field,
-      Value<String> multiplier,
+      Value<int?> field,
+      Value<String?> multiplier,
       required DateTime timestamp,
       Value<int?> score,
     });
 typedef $$FinishEntriesTableUpdateCompanionBuilder =
     FinishEntriesCompanion Function({
       Value<int> id,
-      Value<int> field,
-      Value<String> multiplier,
+      Value<int?> field,
+      Value<String?> multiplier,
       Value<DateTime> timestamp,
       Value<int?> score,
     });
@@ -978,8 +982,8 @@ class $$FinishEntriesTableTableManager
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
-                Value<int> field = const Value.absent(),
-                Value<String> multiplier = const Value.absent(),
+                Value<int?> field = const Value.absent(),
+                Value<String?> multiplier = const Value.absent(),
                 Value<DateTime> timestamp = const Value.absent(),
                 Value<int?> score = const Value.absent(),
               }) => FinishEntriesCompanion(
@@ -992,8 +996,8 @@ class $$FinishEntriesTableTableManager
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
-                required int field,
-                Value<String> multiplier = const Value.absent(),
+                Value<int?> field = const Value.absent(),
+                Value<String?> multiplier = const Value.absent(),
                 required DateTime timestamp,
                 Value<int?> score = const Value.absent(),
               }) => FinishEntriesCompanion.insert(

@@ -60,8 +60,16 @@ class AnalyticsBuilder {
     return _buildAverageData(
       finishes: finishes,
       aggregation: aggregation,
-      scoreProvider: (finish) =>
-          (finish.field * finish.multiplier.factor).toDouble(),
+      scoreProvider: (finish) {
+        final field = finish.field;
+        final multiplier = finish.multiplier;
+
+        if (field == null || multiplier == null) {
+          return null;
+        }
+
+        return (field * multiplier.factor).toDouble();
+      },
     );
   }
 

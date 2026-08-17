@@ -4,7 +4,13 @@ class ChartRange {
   const ChartRange({required this.firstDate, required this.lastDate});
 
   factory ChartRange.fromEntries(List<NewEntry> entries) {
-    if (entries.isEmpty) {
+    return ChartRange.fromDates(entries.map((entry) => entry.timestamp));
+  }
+
+  factory ChartRange.fromDates(Iterable<DateTime> dates) {
+    final timestamps = dates.toList();
+
+    if (timestamps.isEmpty) {
       final now = DateTime.now();
 
       return ChartRange(
@@ -13,12 +19,10 @@ class ChartRange {
       );
     }
 
-    final firstDate = entries
-        .map((e) => e.timestamp)
+    final firstDate = timestamps
         .reduce((a, b) => a.isBefore(b) ? a : b);
 
-    final lastDate = entries
-        .map((e) => e.timestamp)
+    final lastDate = timestamps
         .reduce((a, b) => a.isAfter(b) ? a : b);
 
     final today = DateTime.now();

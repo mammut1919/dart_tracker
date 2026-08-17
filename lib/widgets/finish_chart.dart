@@ -27,7 +27,11 @@ class FinishChart extends StatelessWidget {
 
     // Treffer zählen
     for (final finish in finishes) {
-      counts.update(finish.field, (value) => value + 1, ifAbsent: () => 1);
+      final field = finish.field;
+
+      if (field != null) {
+        counts.update(field, (value) => value + 1, ifAbsent: () => 1);
+      }
     }
 
     return counts;

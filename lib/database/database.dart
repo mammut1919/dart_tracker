@@ -20,10 +20,9 @@ class ScoreEntries extends Table {
 class FinishEntries extends Table {
   IntColumn get id => integer().autoIncrement()();
 
-  IntColumn get field => integer()();
+  IntColumn get field => integer().nullable()();
 
-  TextColumn get multiplier =>
-    text().withDefault(const Constant('double'))();
+  TextColumn get multiplier => text().nullable()();
 
   DateTimeColumn get timestamp => dateTime()();
 
@@ -35,7 +34,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -68,6 +67,37 @@ class AppDatabase extends _$AppDatabase {
       if (from < 6) {
         await customStatement(
           'UPDATE finish_entries SET field = 25 WHERE field = 50',
+        );
+      }
+
+      if (from < 7) {
+        await m.alterTable(TableMigration(finishEntries));
+      }
+
+      if (from < 8) {
+        // Convert legacy High Finish entries to score-only finishes.
+        await customStatement('''
+          INSERT INTO finish_entries (field, multiplier, timestamp, score)
+          SELECT NULL, NULL, score_entries.timestamp, score_entries.score
+          FROM score_entries
+          WHERE score_entries.type = 1
+            AND NOT EXISTS (
+              SELECT 1
+              FROM finish_entries
+              WHERE finish_entries.timestamp = score_entries.timestamp
+                AND finish_entries.score = score_entries.score
+            )
+        ''');
+
+        // Remove legacy High Finish entries before remapping Short Leg.
+        await customStatement(
+          'DELETE FROM score_entries WHERE type = 1',
+        );
+
+        // EntryType.highFinish was index 1 and EntryType.shortLeg was index 2.
+        // After removing highFinish, shortLeg becomes index 1.
+        await customStatement(
+          'UPDATE score_entries SET type = 1 WHERE type = 2',
         );
       }
     },

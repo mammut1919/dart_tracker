@@ -18,6 +18,7 @@ import 'pages/finishes_page.dart';
 import 'settings/app_settings.dart';
 import 'settings/settings_repository.dart';
 import 'widgets/entry_dialog.dart';
+import 'widgets/high_finish_dialog.dart';
 import 'widgets/page_selector.dart';
 
 class RootPage extends StatefulWidget {
@@ -113,20 +114,6 @@ class _RootPageState extends State<RootPage> {
   }
 
   Future<void> _deleteEntry(NewEntry entry) async {
-    if (entry.type == EntryType.highFinish) {
-      final relatedFinish = _finishes.cast<NewFinishEntry?>().firstWhere(
-        (finish) =>
-            finish?.timestamp == entry.timestamp &&
-            finish?.score == entry.value,
-        orElse: () => null,
-      );
-
-      if (relatedFinish != null) {
-        await _finishStorage.delete(relatedFinish.id!);
-        await _loadFinishes();
-      }
-    }
-
     await _storage.delete(entry.id!);
     await _loadEntries();
   }
@@ -139,36 +126,25 @@ class _RootPageState extends State<RootPage> {
       score: finish.score,
     );
 
-    if (finish.score != null && finish.score! >= 100) {
-      await _storage.add(
-        EntryType.highFinish,
-        finish.score!,
-        finish.timestamp,
-      );
-      await _loadEntries();
-    }
-
     await _loadFinishes();
   }
 
   Future<void> _deleteFinish(NewFinishEntry finish) async {
-    if (finish.score != null && finish.score! >= 100) {
-      final relatedEntry = _entries.cast<NewEntry?>().firstWhere(
-        (entry) =>
-            entry?.type == EntryType.highFinish &&
-            entry?.timestamp == finish.timestamp &&
-            entry?.value == finish.score,
-        orElse: () => null,
-      );
-
-      if (relatedEntry != null) {
-        await _storage.delete(relatedEntry.id!);
-        await _loadEntries();
-      }
-    }
-
     await _finishStorage.delete(finish.id!);
     await _loadFinishes();
+  }
+
+  Future<void> _showHighFinishDialog() async {
+    final finish = await showDialog<NewFinishEntry>(
+      context: context,
+      builder: (_) => const HighFinishDialog(),
+    );
+
+    if (finish == null) {
+      return;
+    }
+
+    await _saveFinish(finish);
   }
 
   Future<void> _showAddDialog({EntryType? initialType}) async {
@@ -474,7 +450,10 @@ class _RootPageState extends State<RootPage> {
             onDateFilterChanged: _setDateFilter,
             onAddEntry: _addEntry,
             onShowAddDialog: _showAddDialog,
+            onAddHighFinish: _showHighFinishDialog,
+            onDeleteFinish: _deleteFinish,
             onConfirmDelete: _confirmDelete,
+            finishes: _filteredFinishes,
           ),
           FinishesPage(
             finishes: _filteredFinishes,
