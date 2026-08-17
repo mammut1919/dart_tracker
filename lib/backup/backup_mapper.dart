@@ -17,7 +17,7 @@ class BackupMapper {
   Map<String, dynamic> finishToJson(NewFinishEntry finish) {
     return {
       'field': finish.field,
-      'multiplier': finish.multiplier.name,
+      'multiplier': finish.multiplier,
       'timestamp': finish.timestamp.toIso8601String(),
       if (finish.score != null) 'score': finish.score,
     };

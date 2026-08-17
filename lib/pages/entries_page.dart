@@ -5,6 +5,7 @@ import '../models/date_filter.dart';
 import '../models/default_scores.dart';
 import '../models/entry_type.dart';
 import '../models/new_entry.dart';
+import '../models/new_finish_entry.dart';
 import '../settings/app_settings.dart';
 import '../theme/app_colors.dart';
 import '../widgets/date_filter_selector.dart';
@@ -24,6 +25,7 @@ class EntriesPage extends StatelessWidget {
     required this.onShowAddDialog,
     required this.onAddHighFinish,
     required this.onConfirmDelete,
+    required this.finishes,
   });
 
   final List<NewEntry> entries;
@@ -35,6 +37,7 @@ class EntriesPage extends StatelessWidget {
   final Future<void> Function({EntryType? initialType,}) onShowAddDialog;
   final Future<void> Function() onAddHighFinish;
   final Future<void> Function(NewEntry) onConfirmDelete;
+  final List<NewFinishEntry> finishes;
 
   int _countEntries({
     required EntryType type,
@@ -65,7 +68,10 @@ class EntriesPage extends StatelessWidget {
     final count180 = _countEntries(type: EntryType.score, value: 180);
     final count171 = _countEntries(type: EntryType.score, value: 171);
     final count162 = _countEntries(type: EntryType.score, value: 162);
-    final countHighFinish = _countEntries(type: EntryType.highFinish);
+    final highFinishes = finishes.where((finish) {
+      final score = finish.score;
+      return score != null && score >= 100;
+    }).toList();
     final countSL = _countEntries(
       type: EntryType.shortLeg,
       onlyValidShortLegs: true,
@@ -173,7 +179,7 @@ class EntriesPage extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 child: EntrySummaryCard(
-                  count: countHighFinish + highFinishBaseline,
+                  count: highFinishes.length + highFinishBaseline,
                   color: settings.highFinishColor,
                   label: 'HF',
                 ),
@@ -193,9 +199,10 @@ class EntriesPage extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         // score chart
-        if (entries.isNotEmpty) ...[
+        if (entries.isNotEmpty || highFinishes.isNotEmpty) ...[
           EntriesChart(
-            entries: entries, 
+            entries: entries,
+            finishes: highFinishes,
             settings: settings,
             includeBaseline: selectedDateFilter.includesBaseline,
           ),

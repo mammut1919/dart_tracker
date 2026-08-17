@@ -126,9 +126,6 @@ class AppSettings {
 
   Color colorForEntryType(EntryType type) {
     switch (type) {
-      case EntryType.highFinish:
-        return highFinishColor;
-
       case EntryType.shortLeg:
         return shortLegColor;
 

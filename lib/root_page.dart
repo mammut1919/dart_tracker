@@ -114,20 +114,6 @@ class _RootPageState extends State<RootPage> {
   }
 
   Future<void> _deleteEntry(NewEntry entry) async {
-    if (entry.type == EntryType.highFinish) {
-      final relatedFinish = _finishes.cast<NewFinishEntry?>().firstWhere(
-        (finish) =>
-            finish?.timestamp == entry.timestamp &&
-            finish?.score == entry.value,
-        orElse: () => null,
-      );
-
-      if (relatedFinish != null) {
-        await _finishStorage.delete(relatedFinish.id!);
-        await _loadFinishes();
-      }
-    }
-
     await _storage.delete(entry.id!);
     await _loadEntries();
   }
@@ -466,6 +452,7 @@ class _RootPageState extends State<RootPage> {
             onShowAddDialog: _showAddDialog,
             onAddHighFinish: _showHighFinishDialog,
             onConfirmDelete: _confirmDelete,
+            finishes: _filteredFinishes,
           ),
           FinishesPage(
             finishes: _filteredFinishes,
