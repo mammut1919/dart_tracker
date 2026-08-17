@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../analytics/analytics_builder.dart';
 import '../models/analytics_type.dart';
 import '../models/date_filter.dart';
+import '../models/new_entry.dart';
 import '../models/new_finish_entry.dart';
 import '../models/statistics_aggregation.dart';
 import '../settings/app_settings.dart';
@@ -15,18 +17,22 @@ import '../widgets/average_last_dart_statistics.dart';
 import '../widgets/date_filter_selector.dart';
 import '../widgets/finishes_chart.dart';
 import '../widgets/finishes_statistics.dart';
+import '../widgets/personal_bests_statistics.dart';
 import '../widgets/statistics_aggregation_selector.dart';
 
 class AnalyticsPage extends StatefulWidget {
   const AnalyticsPage({
     super.key,
+    required this.entries,
     required this.finishes,
     required this.settings,
     required this.selectedDateFilter,
     required this.onDateFilterChanged,
   });
 
+  final List<NewEntry> entries;
   final List<NewFinishEntry> finishes;
+
   final AppSettings settings;
   final DateFilter selectedDateFilter;
   final ValueChanged<DateFilter> onDateFilterChanged;
@@ -36,12 +42,21 @@ class AnalyticsPage extends StatefulWidget {
 }
 
 class _AnalyticsPageState extends State<AnalyticsPage> {
-  AnalyticsType _selectedAnalytics = AnalyticsType.finishes;
+  AnalyticsType _selectedAnalytics = AnalyticsType.personalBests;
 
   StatisticsAggregation _selectedAggregation = StatisticsAggregation.day;
 
   @override
   Widget build(BuildContext context) {
+    final builder = const AnalyticsBuilder();
+
+    final personalBests = builder.buildPersonalBests(
+      entries: widget.entries,
+      finishes: widget.finishes,
+      settings: widget.settings,
+      selectedDateFilter: widget.selectedDateFilter,
+    );
+
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       children: [
@@ -78,7 +93,9 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
 
             const Spacer(),
 
-            if (_selectedAnalytics != AnalyticsType.finishes)
+            if (_selectedAnalytics == AnalyticsType.averageFinish ||
+                _selectedAnalytics == AnalyticsType.averageFinishDart ||
+                _selectedAnalytics == AnalyticsType.activity)
               StatisticsAggregationSelector(
                 selectedAggregation: _selectedAggregation,
                 onSelectionChanged: (aggregation) {
@@ -95,68 +112,62 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
         if (widget.finishes.isEmpty)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 32),
-            child: Center(
-              child: Text('Noch keine Daten vorhanden.'),
-            ),
+            child: Center(child: Text('Noch keine Daten vorhanden.')),
           )
-        else
-          if (_selectedAnalytics == AnalyticsType.finishes) ...[
-            FinishesChart(
-              finishes: widget.finishes,
-              settings: widget.settings,
-            ),
+        else if (_selectedAnalytics == AnalyticsType.personalBests) ...[
+          PersonalBestsStatistics(personalBests: personalBests),
+        ],
 
-            const SizedBox(height: 16),
+        if (_selectedAnalytics == AnalyticsType.finishes) ...[
+          FinishesChart(finishes: widget.finishes, settings: widget.settings),
 
-            FinishesStatistics(
-              finishes: widget.finishes,
-            ),
-          ],
+          const SizedBox(height: 16),
 
-          if (_selectedAnalytics == AnalyticsType.averageFinish) ...[
-            AverageFinishChart(
-              finishes: widget.finishes,
-              settings: widget.settings,
-              aggregation: _selectedAggregation,
-            ),
+          FinishesStatistics(finishes: widget.finishes),
+        ],
 
-            const SizedBox(height: 16),
+        if (_selectedAnalytics == AnalyticsType.averageFinish) ...[
+          AverageFinishChart(
+            finishes: widget.finishes,
+            settings: widget.settings,
+            aggregation: _selectedAggregation,
+          ),
 
-            AverageFinishStatistics(
-              finishes: widget.finishes,
-              aggregation: _selectedAggregation,
-            ),
-          ],
+          const SizedBox(height: 16),
 
-          if (_selectedAnalytics == AnalyticsType.averageFinishDart) ...[
-            AverageLastDartChart(
-              finishes: widget.finishes,
-              settings: widget.settings,
-              aggregation: _selectedAggregation,
-            ),
+          AverageFinishStatistics(
+            finishes: widget.finishes,
+            aggregation: _selectedAggregation,
+          ),
+        ],
 
-            const SizedBox(height: 16),
+        if (_selectedAnalytics == AnalyticsType.averageFinishDart) ...[
+          AverageLastDartChart(
+            finishes: widget.finishes,
+            settings: widget.settings,
+            aggregation: _selectedAggregation,
+          ),
 
-            AverageLastDartStatistics(
-              finishes: widget.finishes,
-              aggregation: _selectedAggregation,
-            ),
-          ],
+          const SizedBox(height: 16),
 
-          if (_selectedAnalytics == AnalyticsType.activity) ...[
-            ActivityChart(
-              finishes: widget.finishes,
-              settings: widget.settings,
-              selectedDateFilter: widget.selectedDateFilter,
-              aggregation: _selectedAggregation,
-            ),
+          AverageLastDartStatistics(
+            finishes: widget.finishes,
+            aggregation: _selectedAggregation,
+          ),
+        ],
 
-            const SizedBox(height: 16),
+        if (_selectedAnalytics == AnalyticsType.activity) ...[
+          ActivityChart(
+            finishes: widget.finishes,
+            settings: widget.settings,
+            selectedDateFilter: widget.selectedDateFilter,
+            aggregation: _selectedAggregation,
+          ),
 
-            ActivityStatistics(
-              finishes: widget.finishes,
-            ),
-          ],
+          const SizedBox(height: 16),
+
+          ActivityStatistics(finishes: widget.finishes),
+        ],
       ],
     );
   }

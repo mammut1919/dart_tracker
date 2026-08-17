@@ -1,4 +1,5 @@
 enum AnalyticsType {
+  personalBests,
   finishes,
   averageFinish,
   averageFinishDart,
@@ -6,6 +7,9 @@ enum AnalyticsType {
 
   String get title {
     switch (this) {
+      case AnalyticsType.personalBests:
+        return 'Personal Bests';
+
       case AnalyticsType.finishes:
         return 'Finishes';
 
@@ -22,6 +26,9 @@ enum AnalyticsType {
 
   String get menuTitle {
     switch (this) {
+      case AnalyticsType.personalBests:
+        return 'Personal Bests';
+
       case AnalyticsType.finishes:
         return 'Finishes';
 
@@ -38,6 +45,9 @@ enum AnalyticsType {
 
   String get description {
     switch (this) {
+      case AnalyticsType.personalBests:
+        return 'Diese Übersicht zeigt deine persönlichen Bestwerte im gewählten Zeitraum.';
+
       case AnalyticsType.finishes:
         return 'Diese Seite zeigt alle erfassten Finishes im gewählten Zeitraum. Finish-Erfassung kann in den Einstellungen eingeschaltet werden.';
 

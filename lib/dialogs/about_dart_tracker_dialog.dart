@@ -25,7 +25,7 @@ class _AboutDartTrackerDialogState extends State<AboutDartTrackerDialog> {
     }
 
     setState(() {
-      _version = '${info.version} (Build ${info.buildNumber})';
+      _version = info.version;
     });
   }
 

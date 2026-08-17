@@ -1,8 +1,15 @@
 import '../models/average_finish_point.dart';
+import '../models/date_filter.dart';
+import '../models/entry_type.dart';
 import '../models/finish_multiplier.dart';
 import '../models/finish_point.dart';
+import '../models/new_entry.dart';
 import '../models/new_finish_entry.dart';
+import '../models/personal_bests.dart';
 import '../models/statistics_aggregation.dart';
+import '../settings/app_settings.dart';
+
+
 
 class AnalyticsBuilder {
   const AnalyticsBuilder();
@@ -58,18 +65,16 @@ class AnalyticsBuilder {
     StatisticsAggregation aggregation = StatisticsAggregation.day,
   }) {
     return _buildAverageData(
-      finishes: finishes,
+      finishes: finishes
+          .where(
+            (finish) =>
+                finish.field != null &&
+                finish.multiplier != null,
+          )
+          .toList(),
       aggregation: aggregation,
-      scoreProvider: (finish) {
-        final field = finish.field;
-        final multiplier = finish.multiplier;
-
-        if (field == null || multiplier == null) {
-          return null;
-        }
-
-        return (field * multiplier.factor).toDouble();
-      },
+      scoreProvider: (finish) =>
+          (finish.field! * finish.multiplier!.factor).toDouble(),
     );
   }
 
@@ -142,5 +147,194 @@ class AnalyticsBuilder {
     }
 
     return points;
+  }
+
+  String? _formatFinishField(NewFinishEntry finish) {
+    if (finish.field == null || finish.multiplier == null) {
+      return null;
+    }
+
+    if (finish.field == 25) {
+      return 'Bull';
+    }
+
+    switch (finish.multiplier!) {
+      case FinishMultiplier.single:
+        return 'S${finish.field}';
+
+      case FinishMultiplier.double:
+        return 'D${finish.field}';
+
+      case FinishMultiplier.triple:
+        return 'T${finish.field}';
+    }
+  }
+
+  Map<T, int> _findMostFrequent<T>(Map<T, int> counts) {
+    if (counts.isEmpty) {
+      return {};
+    }
+
+    final maxCount =
+        counts.values.reduce((a, b) => a > b ? a : b);
+
+    return Map.fromEntries(
+      counts.entries.where(
+        (entry) => entry.value == maxCount,
+      ),
+    );
+  }
+
+  PersonalBests buildPersonalBests({
+    required List<NewEntry> entries,
+    required List<NewFinishEntry> finishes,
+    required AppSettings settings,
+    required DateFilter selectedDateFilter,
+  }) {
+    final finishScores = finishes
+        .where((finish) => finish.score != null)
+        .map((finish) => finish.score!)
+        .toList();
+
+    final finishCount = finishes.length;
+
+    final highestFinish = finishScores.isEmpty
+        ? null
+        : finishScores.reduce((a, b) => a > b ? a : b);
+
+    final raw180 = entries.where(
+      (entry) =>
+          entry.type == EntryType.score &&
+          entry.value == 180,
+    ).length;
+
+    final raw171 = entries.where(
+      (entry) =>
+          entry.type == EntryType.score &&
+          entry.value == 171,
+    ).length;
+
+    final raw162 = entries.where(
+      (entry) =>
+          entry.type == EntryType.score &&
+          entry.value == 162,
+    ).length;
+
+    final rawHighFinish = finishes.where(
+      (finish) =>
+          finish.score != null &&
+          finish.score! >= 100,
+    ).length;
+
+    final rawShortLeg = entries.where(
+      (entry) =>
+          entry.type == EntryType.shortLeg &&
+          entry.value <= settings.shortLegLimit,
+    ).length;
+
+    final includeBaseline = selectedDateFilter.includesBaseline;
+
+    final count180 =
+        raw180 +
+        (includeBaseline ? settings.baselineFor(180) : 0);
+
+    final count171 =
+        raw171 +
+        (includeBaseline ? settings.baselineFor(171) : 0);
+
+    final count162 =
+        raw162 +
+        (includeBaseline ? settings.baselineFor(162) : 0);
+
+    final highFinishCount =
+        rawHighFinish +
+        (includeBaseline ? settings.baselineHighFinish : 0);
+
+    final shortLegCount =
+        rawShortLeg +
+        (includeBaseline ? settings.baselineShortLeg : 0);
+
+    NewFinishEntry? highestLastDart;
+    int? highestLastDartValue;
+
+    for (final finish in finishes) {
+      if (finish.field == null || finish.multiplier == null) {
+        continue;
+      }
+
+      final value = finish.field! * finish.multiplier!.factor;
+
+      if (highestLastDartValue == null ||
+          value > highestLastDartValue) {
+        highestLastDart = finish;
+        highestLastDartValue = value;
+      }
+    }
+
+    final shortLegEntries = entries.where(
+      (entry) =>
+          entry.type == EntryType.shortLeg &&
+          entry.value <= settings.shortLegLimit,
+    );
+
+    final shortestShortLeg = shortLegEntries.isEmpty
+        ? null
+        : shortLegEntries
+            .map((entry) => entry.value)
+            .reduce((a, b) => a < b ? a : b);
+
+    final finishFieldCounts = <String, int>{};
+
+    for (final finish in finishes) {
+      if (finish.field == null || finish.multiplier == null) {
+        continue;
+      }
+
+      final field = _formatFinishField(finish);
+
+      if (field == null) {
+        continue;
+      }
+
+      finishFieldCounts[field] =
+          (finishFieldCounts[field] ?? 0) + 1;
+    }
+
+    final finishScoreCounts = <int, int>{};
+
+    for (final score in finishScores) {
+      finishScoreCounts[score] =
+          (finishScoreCounts[score] ?? 0) + 1;
+    }
+
+    final mostFrequentFinishFields =
+        _findMostFrequent(finishFieldCounts);
+
+    final mostFrequentFinishes =
+        _findMostFrequent(finishScoreCounts);
+
+    return PersonalBests(
+      finishCount: finishCount,
+      highestFinish: highestFinish,
+      highFinishCount: highFinishCount,
+      highestLastDart: highestLastDart,
+      shortestShortLeg: shortestShortLeg,
+      shortLegCount: shortLegCount,
+      count180: count180,
+      count171: count171,
+      count162: count162,
+      mostFrequentFinishFields:
+          mostFrequentFinishFields.keys.toList(),
+      mostFrequentFinishFieldCount:
+          mostFrequentFinishFields.isEmpty
+              ? null
+              : mostFrequentFinishFields.values.first,
+      mostFrequentFinishes:
+          mostFrequentFinishes.keys.toList(),
+      mostFrequentFinishCount:
+          mostFrequentFinishes.isEmpty
+              ? null
+              : mostFrequentFinishes.values.first,
+    );
   }
 }
