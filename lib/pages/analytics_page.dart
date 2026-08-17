@@ -48,7 +48,6 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
 
   @override
   Widget build(BuildContext context) {
-
     final builder = const AnalyticsBuilder();
 
     final personalBests = builder.buildPersonalBests(
@@ -94,7 +93,9 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
 
             const Spacer(),
 
-            if (_selectedAnalytics != AnalyticsType.finishes)
+            if (_selectedAnalytics == AnalyticsType.averageFinish ||
+                _selectedAnalytics == AnalyticsType.averageFinishDart ||
+                _selectedAnalytics == AnalyticsType.activity)
               StatisticsAggregationSelector(
                 selectedAggregation: _selectedAggregation,
                 onSelectionChanged: (aggregation) {
@@ -111,74 +112,62 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
         if (widget.finishes.isEmpty)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 32),
-            child: Center(
-              child: Text('Noch keine Daten vorhanden.'),
-            ),
+            child: Center(child: Text('Noch keine Daten vorhanden.')),
           )
-        else
-          if (_selectedAnalytics == AnalyticsType.personalBests) ...[
-            PersonalBestsStatistics(
-              personalBests: personalBests,
-            )
-          ],
+        else if (_selectedAnalytics == AnalyticsType.personalBests) ...[
+          PersonalBestsStatistics(personalBests: personalBests),
+        ],
 
-          if (_selectedAnalytics == AnalyticsType.finishes) ...[
-            FinishesChart(
-              finishes: widget.finishes,
-              settings: widget.settings,
-            ),
+        if (_selectedAnalytics == AnalyticsType.finishes) ...[
+          FinishesChart(finishes: widget.finishes, settings: widget.settings),
 
-            const SizedBox(height: 16),
+          const SizedBox(height: 16),
 
-            FinishesStatistics(
-              finishes: widget.finishes,
-            ),
-          ],
+          FinishesStatistics(finishes: widget.finishes),
+        ],
 
-          if (_selectedAnalytics == AnalyticsType.averageFinish) ...[
-            AverageFinishChart(
-              finishes: widget.finishes,
-              settings: widget.settings,
-              aggregation: _selectedAggregation,
-            ),
+        if (_selectedAnalytics == AnalyticsType.averageFinish) ...[
+          AverageFinishChart(
+            finishes: widget.finishes,
+            settings: widget.settings,
+            aggregation: _selectedAggregation,
+          ),
 
-            const SizedBox(height: 16),
+          const SizedBox(height: 16),
 
-            AverageFinishStatistics(
-              finishes: widget.finishes,
-              aggregation: _selectedAggregation,
-            ),
-          ],
+          AverageFinishStatistics(
+            finishes: widget.finishes,
+            aggregation: _selectedAggregation,
+          ),
+        ],
 
-          if (_selectedAnalytics == AnalyticsType.averageFinishDart) ...[
-            AverageLastDartChart(
-              finishes: widget.finishes,
-              settings: widget.settings,
-              aggregation: _selectedAggregation,
-            ),
+        if (_selectedAnalytics == AnalyticsType.averageFinishDart) ...[
+          AverageLastDartChart(
+            finishes: widget.finishes,
+            settings: widget.settings,
+            aggregation: _selectedAggregation,
+          ),
 
-            const SizedBox(height: 16),
+          const SizedBox(height: 16),
 
-            AverageLastDartStatistics(
-              finishes: widget.finishes,
-              aggregation: _selectedAggregation,
-            ),
-          ],
+          AverageLastDartStatistics(
+            finishes: widget.finishes,
+            aggregation: _selectedAggregation,
+          ),
+        ],
 
-          if (_selectedAnalytics == AnalyticsType.activity) ...[
-            ActivityChart(
-              finishes: widget.finishes,
-              settings: widget.settings,
-              selectedDateFilter: widget.selectedDateFilter,
-              aggregation: _selectedAggregation,
-            ),
+        if (_selectedAnalytics == AnalyticsType.activity) ...[
+          ActivityChart(
+            finishes: widget.finishes,
+            settings: widget.settings,
+            selectedDateFilter: widget.selectedDateFilter,
+            aggregation: _selectedAggregation,
+          ),
 
-            const SizedBox(height: 16),
+          const SizedBox(height: 16),
 
-            ActivityStatistics(
-              finishes: widget.finishes,
-            ),
-          ],
+          ActivityStatistics(finishes: widget.finishes),
+        ],
       ],
     );
   }
