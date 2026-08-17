@@ -451,6 +451,7 @@ class _RootPageState extends State<RootPage> {
             onAddEntry: _addEntry,
             onShowAddDialog: _showAddDialog,
             onAddHighFinish: _showHighFinishDialog,
+            onDeleteFinish: _deleteFinish,
             onConfirmDelete: _confirmDelete,
             finishes: _filteredFinishes,
           ),
