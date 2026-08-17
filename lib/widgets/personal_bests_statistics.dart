@@ -21,7 +21,7 @@ class PersonalBestsStatistics extends StatelessWidget {
         _StatisticsCard(
           rows: [
             _StatisticRow(
-              label: 'Gewonnene Spiele',
+              label: 'Anzahl Finishes',
               value: '${personalBests.finishCount}',
             ),
             _StatisticRow(
@@ -80,8 +80,44 @@ class PersonalBestsStatistics extends StatelessWidget {
             ),
           ],
         ),
+
+        const SizedBox(height: 12),
+
+        const _SectionTitle('Häufigste Finishes'),
+        _StatisticsCard(
+          rows: [
+            _StatisticRow(
+              label: 'Häufigstes Finish-Feld',
+              value: _formatMostFrequentFields(),
+            ),
+            _StatisticRow(
+              label: 'Häufigstes Finish',
+              value: _formatMostFrequentFinishes(),
+            ),
+          ],
+        ),
       ],
     );
+  }
+
+  String _formatMostFrequentFields() {
+    if (personalBests.mostFrequentFinishFields.isEmpty ||
+        personalBests.mostFrequentFinishFieldCount == null) {
+      return '-';
+    }
+
+    return '${personalBests.mostFrequentFinishFields.join(', ')} '
+        '(${personalBests.mostFrequentFinishFieldCount}×)';
+  }
+
+  String _formatMostFrequentFinishes() {
+    if (personalBests.mostFrequentFinishes.isEmpty ||
+        personalBests.mostFrequentFinishCount == null) {
+      return '-';
+    }
+
+    return '${personalBests.mostFrequentFinishes.join(', ')} '
+        '(${personalBests.mostFrequentFinishCount}×)';
   }
 
   String? _formatFinishField(NewFinishEntry finish) {
