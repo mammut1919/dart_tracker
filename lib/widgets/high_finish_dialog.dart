@@ -45,7 +45,8 @@ class _HighFinishDialogState extends State<HighFinishDialog> {
       _validation = score == null || score < 100
           ? const FinishScoreValidation(
               isValid: false,
-              errorMessage: 'Bitte einen High Finish Score von 100 bis 180 eingeben.',
+              errorMessage:
+                  'Bitte einen High Finish Score von 100 bis 180 eingeben.',
             )
           : _validator.validate(
               score: score,
@@ -81,6 +82,11 @@ class _HighFinishDialogState extends State<HighFinishDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final fields = finishFields.where(
+      (field) =>
+          _multiplier == FinishMultiplier.double || field != 25,
+    );
+
     return AlertDialog(
       title: const Text('High Finish hinzufügen'),
       content: SingleChildScrollView(
@@ -95,14 +101,23 @@ class _HighFinishDialogState extends State<HighFinishDialog> {
                 decimal: false,
               ),
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Finish Score (100-180)',
-                errorText: _validation?.isValid == false
-                    ? _validation?.errorMessage
-                    : null,
               ),
               onChanged: (_) => _validate(),
             ),
+            if (_validation?.isValid == false) ...[
+              const SizedBox(height: 4),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  _validation!.errorMessage.toString(),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                ),
+              ),
+            ],
             const SizedBox(height: 16),
             FilledButton.tonal(
               onPressed: _pickDate,
@@ -126,7 +141,10 @@ class _HighFinishDialogState extends State<HighFinishDialog> {
               DropdownButtonFormField<FinishMultiplier>(
                 initialValue: _multiplier,
                 decoration: const InputDecoration(labelText: 'Multiplier'),
-                items: FinishMultiplier.values
+                items: [
+                  FinishMultiplier.double,
+                  FinishMultiplier.triple,
+                ]
                     .map(
                       (multiplier) => DropdownMenuItem(
                         value: multiplier,
@@ -141,6 +159,11 @@ class _HighFinishDialogState extends State<HighFinishDialog> {
 
                   setState(() {
                     _multiplier = multiplier;
+
+                    if (_multiplier == FinishMultiplier.triple &&
+                        _field == 25) {
+                      _field = 20;
+                    }
                   });
                   _validate();
                 },
@@ -149,7 +172,7 @@ class _HighFinishDialogState extends State<HighFinishDialog> {
               DropdownButtonFormField<int>(
                 initialValue: _field,
                 decoration: const InputDecoration(labelText: 'Letzter Dart'),
-                items: finishFields
+                items: fields
                     .map(
                       (field) => DropdownMenuItem(
                         value: field,
