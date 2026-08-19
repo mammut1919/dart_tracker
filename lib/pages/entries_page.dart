@@ -13,7 +13,7 @@ import '../widgets/entries_chart.dart';
 import '../widgets/entry_button.dart';
 import '../widgets/entry_summary_card.dart';
 
-class EntriesPage extends StatelessWidget {
+class EntriesPage extends StatefulWidget {
   const EntriesPage({
     super.key,
     required this.entries,
@@ -43,12 +43,19 @@ class EntriesPage extends StatelessWidget {
   final Future<void> Function(NewFinishEntry) onDeleteFinish;
   final List<NewFinishEntry> finishes;
 
+  @override
+  State<EntriesPage> createState() => _EntriesPageState();
+}
+
+class _EntriesPageState extends State<EntriesPage> {
+  bool _showAllHistory = false;
+
   int _countEntries({
     required EntryType type,
     int? value,
     bool onlyValidShortLegs = false,
   }) {
-    return entries.where((entry) {
+    return widget.entries.where((entry) {
       if (entry.type != type) {
         return false;
       }
@@ -59,7 +66,7 @@ class EntriesPage extends StatelessWidget {
 
       if (onlyValidShortLegs &&
           type == EntryType.shortLeg &&
-          entry.value > settings.shortLegLimit) {
+          entry.value > widget.settings.shortLegLimit) {
         return false;
       }
 
@@ -72,7 +79,7 @@ class EntriesPage extends StatelessWidget {
     final count180 = _countEntries(type: EntryType.score, value: 180);
     final count171 = _countEntries(type: EntryType.score, value: 171);
     final count162 = _countEntries(type: EntryType.score, value: 162);
-    final highFinishes = finishes.where((finish) {
+    final highFinishes = widget.finishes.where((finish) {
       final score = finish.score;
       return score != null && score >= 100;
     }).toList();
@@ -80,30 +87,34 @@ class EntriesPage extends StatelessWidget {
       type: EntryType.shortLeg,
       onlyValidShortLegs: true,
     );
-    final highFinishBaseline = selectedDateFilter.includesBaseline
-      ? settings.baselineHighFinish
+    final highFinishBaseline = widget.selectedDateFilter.includesBaseline
+      ? widget.settings.baselineHighFinish
       : 0;
 
-    final shortLegBaseline = selectedDateFilter.includesBaseline
-      ? settings.baselineShortLeg
+    final shortLegBaseline = widget.selectedDateFilter.includesBaseline
+      ? widget.settings.baselineShortLeg
       : 0;
 
     final history = [
-      ...entries.map(_HistoryItem.entry),
-      ...finishes
+      ...widget.entries.map(_HistoryItem.entry),
+      ...widget.finishes
           .where((finish) => finish.score != null && finish.score! >= 100)
           .map(_HistoryItem.finish),
     ]..sort(
         (a, b) => b.timestamp.compareTo(a.timestamp),
       );
 
+    final visibleHistory =
+        _showAllHistory ? history : history.take(3).toList();
+
+
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       children: [
         // date selector
         DateFilterSelector(
-          selectedFilter: selectedDateFilter,
-          onSelectionChanged: onDateFilterChanged,
+          selectedFilter: widget.selectedDateFilter,
+          onSelectionChanged: widget.onDateFilterChanged,
         ),
         const SizedBox(height: 8),
         // score buttons
@@ -114,8 +125,8 @@ class EntriesPage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 child: EntryButton(
                   label: '${definition.score}',
-                  color: settings.colorFor(definition.score),
-                  onPressed: () => onAddEntry(
+                  color: widget.settings.colorFor(definition.score),
+                  onPressed: () => widget.onAddEntry(
                     NewEntry(
                       type: EntryType.score,
                       value: definition.score,
@@ -137,8 +148,8 @@ class EntriesPage extends StatelessWidget {
               162 => count162,
               _ => 0,
             };
-            final baseline = selectedDateFilter.includesBaseline
-              ? settings.baselineFor(definition.score)
+            final baseline = widget.selectedDateFilter.includesBaseline
+              ? widget.settings.baselineFor(definition.score)
               : 0;
             final displayCount =
                 rawCount + baseline;
@@ -148,7 +159,7 @@ class EntriesPage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 child: EntrySummaryCard(
                   count: displayCount,
-                  color: settings.colorFor(definition.score),
+                  color: widget.settings.colorFor(definition.score),
                   label: '${definition.score}',
                 ),
               ),
@@ -164,8 +175,8 @@ class EntriesPage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 child: EntryButton(
                   label: 'High Finish',
-                  color: settings.highFinishColor,
-                  onPressed: onAddHighFinish,
+                  color: widget.settings.highFinishColor,
+                  onPressed: widget.onAddHighFinish,
                 ),
               ),
             ),
@@ -175,8 +186,8 @@ class EntriesPage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 child: EntryButton(
                   label: 'Short Leg',
-                  color: settings.shortLegColor,
-                  onPressed: () => onShowAddDialog(
+                  color: widget.settings.shortLegColor,
+                  onPressed: () => widget.onShowAddDialog(
                     initialType: EntryType.shortLeg,
                   ),
                 ),
@@ -193,7 +204,7 @@ class EntriesPage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 child: EntrySummaryCard(
                   count: highFinishes.length + highFinishBaseline,
-                  color: settings.highFinishColor,
+                  color: widget.settings.highFinishColor,
                   label: 'HF',
                 ),
               ),
@@ -203,7 +214,7 @@ class EntriesPage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 child: EntrySummaryCard(
                   count: countSL + shortLegBaseline,
-                  color: settings.shortLegColor,
+                  color: widget.settings.shortLegColor,
                   label: 'SL',
                 ),
               ),
@@ -212,12 +223,12 @@ class EntriesPage extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         // score chart
-        if (entries.isNotEmpty || highFinishes.isNotEmpty) ...[
+        if (widget.entries.isNotEmpty || highFinishes.isNotEmpty) ...[
           EntriesChart(
-            entries: entries,
+            entries: widget.entries,
             finishes: highFinishes,
-            settings: settings,
-            includeBaseline: selectedDateFilter.includesBaseline,
+            settings: widget.settings,
+            includeBaseline: widget.selectedDateFilter.includesBaseline,
           ),
           const SizedBox(height: 12),
         ],
@@ -233,7 +244,7 @@ class EntriesPage extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         const SizedBox(height: 8),
-        if (history.isEmpty)
+        if (visibleHistory.isEmpty)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 32),
             child: Center(
@@ -241,13 +252,12 @@ class EntriesPage extends StatelessWidget {
             ),
           )
         else
-          ...history.map<Widget>((item) {
+          ...visibleHistory.map<Widget>((item) {
             if (item.value != null) {
               final entry = item.value!;
               final ignored =
                   entry.type == EntryType.shortLeg &&
-                  entry.value > settings.shortLegLimit;
-
+                  entry.value > widget.settings.shortLegLimit;
               return Card(
                 child: ListTile(
                   leading: Icon(entry.type.icon),
@@ -255,14 +265,14 @@ class EntriesPage extends StatelessWidget {
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(dateFormat.format(entry.timestamp)),
+                      Text(widget.dateFormat.format(entry.timestamp)),
                       if (ignored)
                         Padding(
                           padding: const EdgeInsets.only(top: 2),
                           child: Text(
                             'Nicht in der Statistik berücksichtigt\n'
                             '(Statistik-Einstellungen: Grenze für Short Leg '
-                            '${settings.shortLegLimit} Darts)',
+                            '${widget.settings.shortLegLimit} Darts)',
                             style: Theme.of(context)
                                 .textTheme
                                 .bodySmall
@@ -277,7 +287,7 @@ class EntriesPage extends StatelessWidget {
                   ),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete),
-                    onPressed: () => onConfirmDelete(entry),
+                    onPressed: () => widget.onConfirmDelete(entry),
                     tooltip: 'Löschen',
                   ),
                 ),
@@ -302,16 +312,28 @@ class EntriesPage extends StatelessWidget {
                       : finishLabel,
                 ),
                 subtitle: Text(
-                  dateFormat.format(finish.timestamp),
+                  widget.dateFormat.format(finish.timestamp),
                 ),
                 trailing: IconButton(
                   icon: const Icon(Icons.delete),
-                  onPressed: () => onConfirmDeleteFinish(finish),
+                  onPressed: () => widget.onConfirmDeleteFinish(finish),
                   tooltip: 'Löschen',
                 ),
               ),
             );
           }),
+          if (history.length > 3) ...[
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _showAllHistory = !_showAllHistory;
+                });
+              },
+              child: Text(
+                _showAllHistory ? 'Weniger anzeigen' : 'Mehr anzeigen',
+              ),
+            ),
+          ],
       ],
     );
   }
