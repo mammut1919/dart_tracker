@@ -8,7 +8,6 @@ import '../models/finish_multiplier.dart';
 import '../models/new_entry.dart';
 import '../models/new_finish_entry.dart';
 import '../settings/app_settings.dart';
-import '../theme/app_colors.dart';
 import '../widgets/date_filter_selector.dart';
 import '../widgets/entries_chart.dart';
 import '../widgets/entry_button.dart';
@@ -27,6 +26,7 @@ class EntriesPage extends StatelessWidget {
     required this.onAddHighFinish,
     required this.onDeleteFinish,
     required this.onConfirmDelete,
+    required this.onConfirmDeleteFinish,
     required this.finishes,
   });
 
@@ -39,6 +39,7 @@ class EntriesPage extends StatelessWidget {
   final Future<void> Function({EntryType? initialType,}) onShowAddDialog;
   final Future<void> Function() onAddHighFinish;
   final Future<void> Function(NewEntry) onConfirmDelete;
+  final Future<void> Function(NewFinishEntry) onConfirmDeleteFinish;
   final Future<void> Function(NewFinishEntry) onDeleteFinish;
   final List<NewFinishEntry> finishes;
 
@@ -247,50 +248,37 @@ class EntriesPage extends StatelessWidget {
                   entry.type == EntryType.shortLeg &&
                   entry.value > settings.shortLegLimit;
 
-              return Dismissible(
-                key: ValueKey('entry-${entry.id}'),
-                direction: DismissDirection.endToStart,
-                confirmDismiss: (_) async {
-                  await onConfirmDelete(entry);
-                  return false;
-                },
-                background: Container(
-                  alignment: Alignment.centerRight,
-                  padding: const EdgeInsets.only(right: 24),
-                  color: AppColors.delete,
-                  child: const Icon(
-                    Icons.delete,
-                    color: Colors.white,
-                  ),
-                ),
-                child: Card(
-                  child: ListTile(
-                    onLongPress: () => onConfirmDelete(entry),
-                    leading: Icon(entry.type.icon),
-                    title: Text(entry.type.format(entry.value)),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(dateFormat.format(entry.timestamp)),
-                        if (ignored)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 2),
-                            child: Text(
-                              'Nicht in der Statistik berücksichtigt\n'
-                              '(Statistik-Einstellungen: Grenze für Short Leg '
-                              '${settings.shortLegLimit} Darts)',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .outline,
-                                  ),
-                            ),
+              return Card(
+                child: ListTile(
+                  leading: Icon(entry.type.icon),
+                  title: Text(entry.type.format(entry.value)),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(dateFormat.format(entry.timestamp)),
+                      if (ignored)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Text(
+                            'Nicht in der Statistik berücksichtigt\n'
+                            '(Statistik-Einstellungen: Grenze für Short Leg '
+                            '${settings.shortLegLimit} Darts)',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .outline,
+                                ),
                           ),
-                      ],
-                    ),
+                        ),
+                    ],
+                  ),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () => onConfirmDelete(entry),
+                    tooltip: 'Löschen',
                   ),
                 ),
               );
@@ -303,41 +291,27 @@ class EntriesPage extends StatelessWidget {
                 ? '${finish.multiplier == FinishMultiplier.single ? 'S' : finish.multiplier == FinishMultiplier.double ? 'D' : 'T'}${finish.field}'
                 : 'High Finish';
 
-            return Dismissible(
-              key: ValueKey('finish-${finish.id}'),
-              direction: DismissDirection.endToStart,
-              confirmDismiss: (_) async {
-                await onDeleteFinish(finish);
-                return false;
-              },
-              background: Container(
-                alignment: Alignment.centerRight,
-                padding: const EdgeInsets.only(right: 24),
-                color: AppColors.delete,
-                child: const Icon(
-                  Icons.delete,
-                  color: Colors.white,
+            return Card(
+              child: ListTile(
+                leading: const Icon(
+                  Icons.sports_score,
                 ),
-              ),
-              child: Card(
-                child: ListTile(
-                  onLongPress: () => onDeleteFinish(finish),
-                  leading: Icon(
-                    Icons.sports_score,
-                  ),
-                  title: Text(
-                    finish.score != null
-                        ? '$finishLabel (${finish.score})'
-                        : finishLabel,
-                  ),
-                  subtitle: Text(
-                    dateFormat.format(finish.timestamp),
-                  ),
+                title: Text(
+                  finish.score != null
+                      ? '$finishLabel (${finish.score})'
+                      : finishLabel,
+                ),
+                subtitle: Text(
+                  dateFormat.format(finish.timestamp),
+                ),
+                trailing: IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: () => onConfirmDeleteFinish(finish),
+                  tooltip: 'Löschen',
                 ),
               ),
             );
           }),
-
       ],
     );
   }

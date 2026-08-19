@@ -6,7 +6,6 @@ import '../models/date_filter.dart';
 import '../models/finish_multiplier.dart';
 import '../models/finish_tracking_mode.dart';
 import '../models/new_finish_entry.dart';
-import '../theme/app_colors.dart';
 import '../widgets/date_filter_selector.dart';
 import '../widgets/finish_chart.dart';
 import '../widgets/finish_grid.dart';
@@ -23,6 +22,7 @@ class FinishesPage extends StatefulWidget {
     required this.onDateFilterChanged,
     required this.onSaveFinish,
     required this.onDeleteFinish,
+    required this.onConfirmDeleteFinish,
     required this.settings,
   });
 
@@ -32,6 +32,7 @@ class FinishesPage extends StatefulWidget {
   final ValueChanged<DateFilter> onDateFilterChanged;
   final Future<void> Function(NewFinishEntry) onSaveFinish;
   final Future<void> Function(NewFinishEntry) onDeleteFinish;
+  final Future<void> Function(NewFinishEntry) onConfirmDeleteFinish;
   final AppSettings settings;
 
   @override
@@ -41,41 +42,6 @@ class FinishesPage extends StatefulWidget {
 class _FinishesPageState extends State<FinishesPage> {
   FinishMultiplier _selectedMultiplier = FinishMultiplier.double;
     bool _showAllHistory = false;
-
-  Future<void> _confirmDeleteFinish(
-    BuildContext context,
-    NewFinishEntry finish,
-  ) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Finish löschen?'),
-          content: Text(
-            'Soll ${
-              finish.field == 25 && finish.multiplier == FinishMultiplier.double
-                ? "Bull"
-                : "${finish.multiplier == FinishMultiplier.double ? 'D' : 'T'}${finish.field}"
-            } wirklich gelöscht werden?',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Abbrechen'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('Löschen'),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (confirmed == true) {
-      await widget.onDeleteFinish(finish);
-    }
-  }
 
   int _countForFilter(DateFilter filter) {
     final startDate = filter.startDate;
@@ -197,38 +163,28 @@ class _FinishesPageState extends State<FinishesPage> {
                 )
               else
                 ...historyFinishes.map<Widget>((finish) {
-                  return Dismissible(
-                    key: ValueKey(finish.id),
-                    direction: DismissDirection.endToStart,
-                    confirmDismiss: (_) async {
-                      await _confirmDeleteFinish(context, finish);
-                      return false;
-                    },
-                    background: Container(
-                      alignment: Alignment.centerRight,
-                      padding: const EdgeInsets.only(right: 24),
-                      color: AppColors.delete,
-                      child: const Icon(Icons.delete, color: Colors.white),
-                    ),
-                    child: Card(
-                      child: ListTile(
-                        onLongPress: () =>
-                            _confirmDeleteFinish(context, finish),
-                        leading: const Icon(Icons.gps_fixed),
-                        title: Text(
-                          '${finish.field == 25 &&
-                                  finish.multiplier == FinishMultiplier.double
-                              ? 'Bull'
-                              : '${finish.multiplier == FinishMultiplier.double ? 'D' : 'T'}${finish.field}'}'
-                          '${finish.score != null ? ' (Finish: ${finish.score})' : ''}',
-                        ),
-                        subtitle: Text(
-                          DateFormat('dd.MM.yyyy').format(finish.timestamp),
-                        ),
+                  return Card(
+                    child: ListTile(
+                      leading: const Icon(Icons.gps_fixed),
+                      title: Text(
+                        '${finish.field == 25 &&
+                                finish.multiplier == FinishMultiplier.double
+                            ? 'Bull'
+                            : '${finish.multiplier == FinishMultiplier.double ? 'D' : 'T'}${finish.field}'}'
+                        '${finish.score != null ? ' (Finish: ${finish.score})' : ''}',
+                      ),
+                      subtitle: Text(
+                        DateFormat('dd.MM.yyyy').format(finish.timestamp),
+                      ),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () => widget.onConfirmDeleteFinish(finish),
+                        tooltip: 'Löschen',
                       ),
                     ),
                   );
                 }),
+
                 if (visibleFinishes.length > 3)
                   TextButton(
                     onPressed: () {

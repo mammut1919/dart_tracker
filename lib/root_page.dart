@@ -7,6 +7,7 @@ import 'database/database.dart';
 import 'database/score_storage.dart';
 import 'database/finish_storage.dart';
 import 'dialogs/settings_dialog.dart';
+import 'models/analytics_type.dart';
 import 'models/app_page.dart';
 import 'models/entry_type.dart';
 import 'models/date_filter.dart';
@@ -47,6 +48,43 @@ class _RootPageState extends State<RootPage> {
   DateFilter _selectedDateFilter = DateFilter.allTime;
 
   AppPage _currentPage = AppPage.entries; 
+  AnalyticsType _currentAnalytics = AnalyticsType.personalBests;
+
+  static const _navigationPages = [
+    _NavigationTarget(AppPage.entries),
+    _NavigationTarget(AppPage.finishes),
+    _NavigationTarget(
+      AppPage.analytics,
+      analyticsType: AnalyticsType.personalBests,
+    ),
+    _NavigationTarget(
+      AppPage.analytics,
+      analyticsType: AnalyticsType.finishes,
+    ),
+    _NavigationTarget(
+      AppPage.analytics,
+      analyticsType: AnalyticsType.averageFinish,
+    ),
+    _NavigationTarget(
+      AppPage.analytics,
+      analyticsType: AnalyticsType.averageFinishDart,
+    ),
+    _NavigationTarget(
+      AppPage.analytics,
+      analyticsType: AnalyticsType.activity,
+    ),
+  ];
+  int get _navigationIndex {
+    if (_currentPage == AppPage.entries) {
+      return 0;
+    }
+
+    if (_currentPage == AppPage.finishes) {
+      return 1;
+    }
+
+    return 2 + AnalyticsType.values.indexOf(_currentAnalytics);
+  }
 
   List<NewEntry> _entries = [];
   List<NewFinishEntry> _finishes = [];
@@ -69,6 +107,36 @@ class _RootPageState extends State<RootPage> {
   void _setDateFilter(DateFilter filter) {
     setState(() {
       _selectedDateFilter = filter;
+    });
+  }
+
+  void _setAnalyticsType(AnalyticsType analytics) {
+    if (analytics == AnalyticsType.activity &&
+        _selectedDateFilter == DateFilter.today) {
+      _selectedDateFilter = DateFilter.last7Days;
+    }
+
+    setState(() {
+      _currentAnalytics = analytics;
+    });
+  }
+
+  void _navigateSwipe(int direction) {
+    final currentIndex = _navigationIndex;
+    final newIndex = currentIndex + direction;
+
+    if (newIndex < 0 || newIndex >= _navigationPages.length) {
+      return;
+    }
+
+    final page = _navigationPages[newIndex];
+
+    if (page.analyticsType != null) {
+      _setAnalyticsType(page.analyticsType!);
+    }
+
+    setState(() {
+      _currentPage = page.page;
     });
   }
 
@@ -165,15 +233,12 @@ class _RootPageState extends State<RootPage> {
     await _loadEntries();
   }
 
-  Future<void> _confirmDelete(NewEntry entry) async {
-    final delete = await showDialog<bool>(
+  Future<bool> _confirmDelete() async {
+    final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Eintrag löschen'),
-        content: Text(
-          'Möchtest du den Treffer ${entry.value} vom '
-          '${_dateFormat.format(entry.timestamp)} wirklich löschen?',
-        ),
+        title: const Text('Löschen'),
+        content: const Text('Eintrag wirklich löschen?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -187,8 +252,18 @@ class _RootPageState extends State<RootPage> {
       ),
     );
 
-    if (delete == true) {
+    return confirmed == true;
+  }
+
+  Future<void> _confirmDeleteEntry(NewEntry entry) async {
+    if (await _confirmDelete()) {
       await _deleteEntry(entry);
+    }
+  }
+
+  Future<void> _confirmDeleteFinish(NewFinishEntry finish) async {
+    if (await _confirmDelete()) {
+      await _deleteFinish(finish);
     }
   }
 
@@ -439,40 +514,65 @@ class _RootPageState extends State<RootPage> {
           ) 
         ],
       ),
-      body: IndexedStack(
-        index: _currentPage.index,
-        children: [
-          EntriesPage(
-            entries: _filteredEntries,
-            settings: _settings,
-            dateFormat: _dateFormat,
-            selectedDateFilter: _selectedDateFilter,
-            onDateFilterChanged: _setDateFilter,
-            onAddEntry: _addEntry,
-            onShowAddDialog: _showAddDialog,
-            onAddHighFinish: _showHighFinishDialog,
-            onDeleteFinish: _deleteFinish,
-            onConfirmDelete: _confirmDelete,
-            finishes: _filteredFinishes,
-          ),
-          FinishesPage(
-            finishes: _filteredFinishes,
-            allFinishes: _finishes,
-            settings: _settings,
-            selectedDateFilter: _selectedDateFilter,
-            onDateFilterChanged: _setDateFilter,
-            onSaveFinish: _saveFinish,
-            onDeleteFinish: _deleteFinish,
-          ),
-          AnalyticsPage(
-            entries: _filteredEntries,
-            finishes: _filteredFinishes,
-            settings: _settings,
-            selectedDateFilter: _selectedDateFilter,
-            onDateFilterChanged: _setDateFilter,
-          ),
-        ],
-      ),
+        body: GestureDetector(
+          onHorizontalDragEnd: (details) {
+            final velocity = details.primaryVelocity ?? 0;
+
+            if (velocity < 0) {
+              _navigateSwipe(1);
+            } else if (velocity > 0) {
+              _navigateSwipe(-1);
+            }
+          },
+          child: IndexedStack(
+            index: _currentPage.index,
+            children: [
+            EntriesPage(
+              entries: _filteredEntries,
+              settings: _settings,
+              dateFormat: _dateFormat,
+              selectedDateFilter: _selectedDateFilter,
+              onDateFilterChanged: _setDateFilter,
+              onAddEntry: _addEntry,
+              onShowAddDialog: _showAddDialog,
+              onAddHighFinish: _showHighFinishDialog,
+              onDeleteFinish: _deleteFinish,
+              onConfirmDelete: _confirmDeleteEntry,
+              onConfirmDeleteFinish: _confirmDeleteFinish,
+              finishes: _filteredFinishes,
+            ),
+            FinishesPage(
+              finishes: _filteredFinishes,
+              allFinishes: _finishes,
+              settings: _settings,
+              selectedDateFilter: _selectedDateFilter,
+              onDateFilterChanged: _setDateFilter,
+              onSaveFinish: _saveFinish,
+              onDeleteFinish: _deleteFinish,
+              onConfirmDeleteFinish: _confirmDeleteFinish,
+            ),
+            AnalyticsPage(
+              entries: _filteredEntries,
+              finishes: _filteredFinishes,
+              settings: _settings,
+              selectedDateFilter: _selectedDateFilter,
+              onDateFilterChanged: _setDateFilter,
+              selectedAnalytics: _currentAnalytics,
+              onAnalyticsChanged: _setAnalyticsType,
+            ),
+          ],
+        ),
+      )
     );
   }
+}
+
+class _NavigationTarget {
+  const _NavigationTarget(
+    this.page, {
+    this.analyticsType,
+  });
+
+  final AppPage page;
+  final AnalyticsType? analyticsType;
 }
