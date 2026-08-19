@@ -6,7 +6,6 @@ import '../models/date_filter.dart';
 import '../models/finish_multiplier.dart';
 import '../models/finish_tracking_mode.dart';
 import '../models/new_finish_entry.dart';
-import '../theme/app_colors.dart';
 import '../widgets/date_filter_selector.dart';
 import '../widgets/finish_chart.dart';
 import '../widgets/finish_grid.dart';
@@ -164,38 +163,28 @@ class _FinishesPageState extends State<FinishesPage> {
                 )
               else
                 ...historyFinishes.map<Widget>((finish) {
-                  return Dismissible(
-                    key: ValueKey(finish.id),
-                    direction: DismissDirection.endToStart,
-                    confirmDismiss: (_) async {
-                      await widget.onConfirmDeleteFinish(finish);
-                      return false;
-                    },
-                    background: Container(
-                      alignment: Alignment.centerRight,
-                      padding: const EdgeInsets.only(right: 24),
-                      color: AppColors.delete,
-                      child: const Icon(Icons.delete, color: Colors.white),
-                    ),
-                    child: Card(
-                      child: ListTile(
-                        onLongPress: () =>
-                            widget.onConfirmDeleteFinish(finish),
-                        leading: const Icon(Icons.gps_fixed),
-                        title: Text(
-                          '${finish.field == 25 &&
-                                  finish.multiplier == FinishMultiplier.double
-                              ? 'Bull'
-                              : '${finish.multiplier == FinishMultiplier.double ? 'D' : 'T'}${finish.field}'}'
-                          '${finish.score != null ? ' (Finish: ${finish.score})' : ''}',
-                        ),
-                        subtitle: Text(
-                          DateFormat('dd.MM.yyyy').format(finish.timestamp),
-                        ),
+                  return Card(
+                    child: ListTile(
+                      leading: const Icon(Icons.gps_fixed),
+                      title: Text(
+                        '${finish.field == 25 &&
+                                finish.multiplier == FinishMultiplier.double
+                            ? 'Bull'
+                            : '${finish.multiplier == FinishMultiplier.double ? 'D' : 'T'}${finish.field}'}'
+                        '${finish.score != null ? ' (Finish: ${finish.score})' : ''}',
+                      ),
+                      subtitle: Text(
+                        DateFormat('dd.MM.yyyy').format(finish.timestamp),
+                      ),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () => widget.onConfirmDeleteFinish(finish),
+                        tooltip: 'Löschen',
                       ),
                     ),
                   );
                 }),
+
                 if (visibleFinishes.length > 3)
                   TextButton(
                     onPressed: () {
