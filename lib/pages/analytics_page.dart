@@ -28,6 +28,8 @@ class AnalyticsPage extends StatefulWidget {
     required this.settings,
     required this.selectedDateFilter,
     required this.onDateFilterChanged,
+    required this.selectedAnalytics,
+    required this.onAnalyticsChanged,
   });
 
   final List<NewEntry> entries;
@@ -36,14 +38,14 @@ class AnalyticsPage extends StatefulWidget {
   final AppSettings settings;
   final DateFilter selectedDateFilter;
   final ValueChanged<DateFilter> onDateFilterChanged;
+  final AnalyticsType selectedAnalytics;
+  final ValueChanged<AnalyticsType> onAnalyticsChanged;
 
   @override
   State<AnalyticsPage> createState() => _AnalyticsPageState();
 }
 
 class _AnalyticsPageState extends State<AnalyticsPage> {
-  AnalyticsType _selectedAnalytics = AnalyticsType.personalBests;
-
   StatisticsAggregation _selectedAggregation = StatisticsAggregation.day;
 
   @override
@@ -61,23 +63,14 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       children: [
         AnalyticsSelector(
-          selectedAnalytics: _selectedAnalytics,
-          onSelectionChanged: (analytics) {
-            if (analytics == AnalyticsType.activity &&
-                widget.selectedDateFilter == DateFilter.today) {
-              widget.onDateFilterChanged(DateFilter.last7Days);
-            }
-
-            setState(() {
-              _selectedAnalytics = analytics;
-            });
-          },
+          selectedAnalytics: widget.selectedAnalytics,
+          onSelectionChanged: widget.onAnalyticsChanged,
         ),
 
         const SizedBox(height: 8),
 
         Text(
-          _selectedAnalytics.description,
+          widget.selectedAnalytics.description,
           style: Theme.of(context).textTheme.bodySmall,
         ),
 
@@ -88,14 +81,14 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
             DateFilterSelector(
               selectedFilter: widget.selectedDateFilter,
               onSelectionChanged: widget.onDateFilterChanged,
-              showToday: _selectedAnalytics != AnalyticsType.activity,
+              showToday: widget.selectedAnalytics != AnalyticsType.activity,
             ),
 
             const Spacer(),
 
-            if (_selectedAnalytics == AnalyticsType.averageFinish ||
-                _selectedAnalytics == AnalyticsType.averageFinishDart ||
-                _selectedAnalytics == AnalyticsType.activity)
+            if (widget.selectedAnalytics == AnalyticsType.averageFinish ||
+                widget.selectedAnalytics == AnalyticsType.averageFinishDart ||
+                widget.selectedAnalytics == AnalyticsType.activity)
               StatisticsAggregationSelector(
                 selectedAggregation: _selectedAggregation,
                 onSelectionChanged: (aggregation) {
@@ -114,11 +107,11 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
             padding: EdgeInsets.symmetric(vertical: 32),
             child: Center(child: Text('Noch keine Daten vorhanden.')),
           )
-        else if (_selectedAnalytics == AnalyticsType.personalBests) ...[
+        else if (widget.selectedAnalytics == AnalyticsType.personalBests) ...[
           PersonalBestsStatistics(personalBests: personalBests),
         ],
 
-        if (_selectedAnalytics == AnalyticsType.finishes) ...[
+        if (widget.selectedAnalytics == AnalyticsType.finishes) ...[
           FinishesChart(finishes: widget.finishes, settings: widget.settings),
 
           const SizedBox(height: 16),
@@ -126,7 +119,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
           FinishesStatistics(finishes: widget.finishes),
         ],
 
-        if (_selectedAnalytics == AnalyticsType.averageFinish) ...[
+        if (widget.selectedAnalytics == AnalyticsType.averageFinish) ...[
           AverageFinishChart(
             finishes: widget.finishes,
             settings: widget.settings,
@@ -141,7 +134,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
           ),
         ],
 
-        if (_selectedAnalytics == AnalyticsType.averageFinishDart) ...[
+        if (widget.selectedAnalytics == AnalyticsType.averageFinishDart) ...[
           AverageLastDartChart(
             finishes: widget.finishes,
             settings: widget.settings,
@@ -156,7 +149,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
           ),
         ],
 
-        if (_selectedAnalytics == AnalyticsType.activity) ...[
+        if (widget.selectedAnalytics == AnalyticsType.activity) ...[
           ActivityChart(
             finishes: widget.finishes,
             settings: widget.settings,
