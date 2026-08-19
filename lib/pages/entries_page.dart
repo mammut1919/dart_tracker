@@ -27,6 +27,7 @@ class EntriesPage extends StatelessWidget {
     required this.onAddHighFinish,
     required this.onDeleteFinish,
     required this.onConfirmDelete,
+    required this.onConfirmDeleteFinish,
     required this.finishes,
   });
 
@@ -39,6 +40,7 @@ class EntriesPage extends StatelessWidget {
   final Future<void> Function({EntryType? initialType,}) onShowAddDialog;
   final Future<void> Function() onAddHighFinish;
   final Future<void> Function(NewEntry) onConfirmDelete;
+  final Future<void> Function(NewFinishEntry) onConfirmDeleteFinish;
   final Future<void> Function(NewFinishEntry) onDeleteFinish;
   final List<NewFinishEntry> finishes;
 
@@ -307,7 +309,7 @@ class EntriesPage extends StatelessWidget {
               key: ValueKey('finish-${finish.id}'),
               direction: DismissDirection.endToStart,
               confirmDismiss: (_) async {
-                await onDeleteFinish(finish);
+                await onConfirmDeleteFinish(finish);
                 return false;
               },
               background: Container(
@@ -321,7 +323,7 @@ class EntriesPage extends StatelessWidget {
               ),
               child: Card(
                 child: ListTile(
-                  onLongPress: () => onDeleteFinish(finish),
+                  onLongPress: () => onConfirmDeleteFinish(finish),
                   leading: Icon(
                     Icons.sports_score,
                   ),

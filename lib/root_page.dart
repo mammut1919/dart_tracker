@@ -165,15 +165,12 @@ class _RootPageState extends State<RootPage> {
     await _loadEntries();
   }
 
-  Future<void> _confirmDelete(NewEntry entry) async {
-    final delete = await showDialog<bool>(
+  Future<bool> _confirmDelete() async {
+    final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Eintrag löschen'),
-        content: Text(
-          'Möchtest du den Treffer ${entry.value} vom '
-          '${_dateFormat.format(entry.timestamp)} wirklich löschen?',
-        ),
+        title: const Text('Löschen'),
+        content: const Text('Eintrag wirklich löschen?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -187,8 +184,18 @@ class _RootPageState extends State<RootPage> {
       ),
     );
 
-    if (delete == true) {
+    return confirmed == true;
+  }
+
+  Future<void> _confirmDeleteEntry(NewEntry entry) async {
+    if (await _confirmDelete()) {
       await _deleteEntry(entry);
+    }
+  }
+
+  Future<void> _confirmDeleteFinish(NewFinishEntry finish) async {
+    if (await _confirmDelete()) {
+      await _deleteFinish(finish);
     }
   }
 
@@ -452,7 +459,8 @@ class _RootPageState extends State<RootPage> {
             onShowAddDialog: _showAddDialog,
             onAddHighFinish: _showHighFinishDialog,
             onDeleteFinish: _deleteFinish,
-            onConfirmDelete: _confirmDelete,
+            onConfirmDelete: _confirmDeleteEntry,
+            onConfirmDeleteFinish: _confirmDeleteFinish,
             finishes: _filteredFinishes,
           ),
           FinishesPage(
@@ -463,6 +471,7 @@ class _RootPageState extends State<RootPage> {
             onDateFilterChanged: _setDateFilter,
             onSaveFinish: _saveFinish,
             onDeleteFinish: _deleteFinish,
+            onConfirmDeleteFinish: _confirmDeleteFinish,
           ),
           AnalyticsPage(
             entries: _filteredEntries,

@@ -23,6 +23,7 @@ class FinishesPage extends StatefulWidget {
     required this.onDateFilterChanged,
     required this.onSaveFinish,
     required this.onDeleteFinish,
+    required this.onConfirmDeleteFinish,
     required this.settings,
   });
 
@@ -32,6 +33,7 @@ class FinishesPage extends StatefulWidget {
   final ValueChanged<DateFilter> onDateFilterChanged;
   final Future<void> Function(NewFinishEntry) onSaveFinish;
   final Future<void> Function(NewFinishEntry) onDeleteFinish;
+  final Future<void> Function(NewFinishEntry) onConfirmDeleteFinish;
   final AppSettings settings;
 
   @override
@@ -41,41 +43,6 @@ class FinishesPage extends StatefulWidget {
 class _FinishesPageState extends State<FinishesPage> {
   FinishMultiplier _selectedMultiplier = FinishMultiplier.double;
     bool _showAllHistory = false;
-
-  Future<void> _confirmDeleteFinish(
-    BuildContext context,
-    NewFinishEntry finish,
-  ) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Finish löschen?'),
-          content: Text(
-            'Soll ${
-              finish.field == 25 && finish.multiplier == FinishMultiplier.double
-                ? "Bull"
-                : "${finish.multiplier == FinishMultiplier.double ? 'D' : 'T'}${finish.field}"
-            } wirklich gelöscht werden?',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Abbrechen'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('Löschen'),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (confirmed == true) {
-      await widget.onDeleteFinish(finish);
-    }
-  }
 
   int _countForFilter(DateFilter filter) {
     final startDate = filter.startDate;
@@ -201,7 +168,7 @@ class _FinishesPageState extends State<FinishesPage> {
                     key: ValueKey(finish.id),
                     direction: DismissDirection.endToStart,
                     confirmDismiss: (_) async {
-                      await _confirmDeleteFinish(context, finish);
+                      await widget.onConfirmDeleteFinish(finish);
                       return false;
                     },
                     background: Container(
@@ -213,7 +180,7 @@ class _FinishesPageState extends State<FinishesPage> {
                     child: Card(
                       child: ListTile(
                         onLongPress: () =>
-                            _confirmDeleteFinish(context, finish),
+                            widget.onConfirmDeleteFinish(finish),
                         leading: const Icon(Icons.gps_fixed),
                         title: Text(
                           '${finish.field == 25 &&
