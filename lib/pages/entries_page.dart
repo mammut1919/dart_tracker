@@ -49,6 +49,7 @@ class EntriesPage extends StatefulWidget {
 
 class _EntriesPageState extends State<EntriesPage> {
   bool _showAllHistory = false;
+  _HistoryFilter _historyFilter = _HistoryFilter.all;
 
   int _countEntries({
     required EntryType type,
@@ -104,9 +105,22 @@ class _EntriesPageState extends State<EntriesPage> {
         (a, b) => b.timestamp.compareTo(a.timestamp),
       );
 
-    final visibleHistory =
-        _showAllHistory ? history : history.take(3).toList();
+    final filteredHistory = history.where((item) {
+      switch (_historyFilter) {
+        case _HistoryFilter.all:
+          return true;
+        case _HistoryFilter.scores:
+          return item.value?.type == EntryType.score;
+        case _HistoryFilter.shortLegs:
+          return item.value?.type == EntryType.shortLeg;
+        case _HistoryFilter.highFinishes:
+          return item.finish != null;
+      }
+    }).toList();
 
+    final visibleHistory = _showAllHistory
+        ? filteredHistory
+        : filteredHistory.take(3).toList();
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -232,17 +246,46 @@ class _EntriesPageState extends State<EntriesPage> {
           ),
           const SizedBox(height: 12),
         ],
-        const Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            'Historie',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+        // history
+        Row(
+          children: [
+            const Text(
+              'Historie',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
+            const Spacer(),
+            PopupMenuButton<_HistoryFilter>(
+              initialValue: _historyFilter,
+              onSelected: (filter) {
+                setState(() {
+                  _historyFilter = filter;
+                  _showAllHistory = false;
+                });
+              },
+              itemBuilder: (context) => _HistoryFilter.values
+                  .map(
+                    (filter) => PopupMenuItem<_HistoryFilter>(
+                      value: filter,
+                      child: Text(filter.label),
+                    ),
+                  )
+                  .toList(),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _historyFilter.label,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const Icon(Icons.arrow_drop_down),
+                ],
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 8),
         const SizedBox(height: 8),
         if (visibleHistory.isEmpty)
           const Padding(
@@ -251,13 +294,14 @@ class _EntriesPageState extends State<EntriesPage> {
               child: Text('Noch keine Treffer erfasst.'),
             ),
           )
-        else
+        else ...[
           ...visibleHistory.map<Widget>((item) {
             if (item.value != null) {
               final entry = item.value!;
               final ignored =
                   entry.type == EntryType.shortLeg &&
                   entry.value > widget.settings.shortLegLimit;
+
               return Card(
                 child: ListTile(
                   leading: Icon(entry.type.icon),
@@ -303,9 +347,7 @@ class _EntriesPageState extends State<EntriesPage> {
 
             return Card(
               child: ListTile(
-                leading: const Icon(
-                  Icons.sports_score,
-                ),
+                leading: const Icon(Icons.sports_score),
                 title: Text(
                   finish.score != null
                       ? '$finishLabel (${finish.score})'
@@ -322,7 +364,8 @@ class _EntriesPageState extends State<EntriesPage> {
               ),
             );
           }),
-          if (history.length > 3) ...[
+
+          if (filteredHistory.length > 3) ...[
             TextButton(
               onPressed: () {
                 setState(() {
@@ -334,6 +377,7 @@ class _EntriesPageState extends State<EntriesPage> {
               ),
             ),
           ],
+        ],
       ],
     );
   }
@@ -351,4 +395,24 @@ class _HistoryItem {
 
   DateTime get timestamp =>
       value?.timestamp ?? finish!.timestamp;
+}
+
+enum _HistoryFilter {
+  all,
+  scores,
+  shortLegs,
+  highFinishes;
+
+  String get label {
+    switch (this) {
+      case _HistoryFilter.all:
+        return 'Alle';
+      case _HistoryFilter.scores:
+        return 'Scores';
+      case _HistoryFilter.shortLegs:
+        return 'Short Legs';
+      case _HistoryFilter.highFinishes:
+        return 'High Finishes';
+    }
+  }
 }
