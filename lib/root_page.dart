@@ -11,6 +11,7 @@ import 'models/analytics_type.dart';
 import 'models/app_page.dart';
 import 'models/entry_type.dart';
 import 'models/date_filter.dart';
+import 'models/finish_multiplier.dart';
 import 'models/new_entry.dart';
 import 'models/new_finish_entry.dart';
 import 'pages/analytics_page.dart';
@@ -74,6 +75,7 @@ class _RootPageState extends State<RootPage> {
       analyticsType: AnalyticsType.activity,
     ),
   ];
+
   int get _navigationIndex {
     if (_currentPage == AppPage.entries) {
       return 0;
@@ -140,6 +142,40 @@ class _RootPageState extends State<RootPage> {
     });
   }
 
+  void _showMessage(String message) {
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
+  }
+
+  String _formatEntry(NewEntry entry) {
+    return entry.type.format(entry.value);
+  }
+
+  String _formatFinish(NewFinishEntry finish) {
+    if (finish.score != null && finish.score! >= 100) {
+      return 'High Finish (${finish.score})';
+    }
+
+    if (finish.field == 25 &&
+        finish.multiplier == FinishMultiplier.double) {
+      return 'Bull Finish';
+    }
+
+    if (finish.field != null && finish.multiplier != null) {
+      final multiplier = finish.multiplier == FinishMultiplier.double ? 'D' : 'T';
+      return '$multiplier${finish.field} Finish';
+    }
+
+    return 'Finish';
+  }
+
   Future<void> _loadEntries() async {
     final entries = await _storage.getAll();
 
@@ -177,29 +213,26 @@ class _RootPageState extends State<RootPage> {
 
   Future<void> _addEntry(NewEntry entry) async {
     await _storage.add(entry.type, entry.value, entry.timestamp);
-
     await _loadEntries();
+    _showMessage('${_formatEntry(entry)} gespeichert.');
   }
 
   Future<void> _deleteEntry(NewEntry entry) async {
     await _storage.delete(entry.id!);
     await _loadEntries();
+    _showMessage('${_formatEntry(entry)} gelöscht.');
   }
 
   Future<void> _saveFinish(NewFinishEntry finish) async {
-    await _finishStorage.add(
-      finish.field,
-      finish.multiplier,
-      finish.timestamp,
-      score: finish.score,
-    );
-
+    await _finishStorage.add(finish.field, finish.multiplier, finish.timestamp, score: finish.score);
     await _loadFinishes();
+    _showMessage('${_formatFinish(finish)} gespeichert.');
   }
 
   Future<void> _deleteFinish(NewFinishEntry finish) async {
     await _finishStorage.delete(finish.id!);
     await _loadFinishes();
+    _showMessage('${_formatFinish(finish)} gelöscht.');
   }
 
   Future<void> _showHighFinishDialog() async {
